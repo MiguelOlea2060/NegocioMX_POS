@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@drawable/login_gradient_background"
+    tools:context=".usuario_nuevo_activity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <ImageView
+                android:id="@+id/imgUsuarioNuevo"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@drawable/usuarios_icono_64x64"
+                android:layout_marginEnd="16dp" />
+
+            <TextView
+                android:id="@+id/lblEncabezadoUsuarioNuevo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Registro de Usuario"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/deep_blue" />
+
+        </LinearLayout>
+
+        <!-- Registration Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            android:backgroundTint="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Welcome Text -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Crear Nueva Cuenta"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/deep_blue"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Complete todos los campos para registrarse"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:gravity="center"
+                    android:layout_marginBottom="24dp" />
+
+                <!-- Full Name Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:boxStrokeColor="@color/deep_blue"
+                    app:hintTextColor="@color/deep_blue"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/txtNombreCompletoUsuarioNuevo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Nombre Completo"
+                        android:inputType="textPersonName|textCapWords"
+                        android:maxLength="250"
+                        android:textSize="16sp"
+                        android:drawableStart="@drawable/baseline_person_24"
+                        android:drawablePadding="12dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Email Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:boxStrokeColor="@color/deep_blue"
+                    app:hintTextColor="@color/deep_blue"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/txtEmailUsuarioNuevo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Email"
+                        android:inputType="textEmailAddress"
+                        android:maxLength="150"
+                        android:textSize="16sp"
+                        android:drawableStart="@drawable/baseline_email_24"
+                        android:drawablePadding="12dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Password Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:boxStrokeColor="@color/deep_blue"
+                    app:hintTextColor="@color/deep_blue"
+                    app:passwordToggleEnabled="true"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/txtContrasenaUsuarioNuevo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Contraseña (mínimo 6 caracteres)"
+                        android:inputType="textPassword"
+                        android:maxLength="30"
+                        android:textSize="16sp"
+                        android:drawableStart="@drawable/ic_lock"
+                        android:drawablePadding="12dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Confirm Password Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="24dp"
+                    app:boxStrokeColor="@color/deep_blue"
+                    app:hintTextColor="@color/deep_blue"
+                    app:passwordToggleEnabled="true"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/txtRepetirContrasenaUsuarioNuevo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="Confirmar Contraseña"
+                        android:inputType="textPassword"
+                        android:maxLength="30"
+                        android:textSize="16sp"
+                        android:drawableStart="@drawable/ic_lock"
+                        android:drawablePadding="12dp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Password Requirements -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• La contraseña debe tener al menos 6 caracteres\n• Incluya letras y números para mayor seguridad"
+                    android:textSize="12sp"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_marginBottom="24dp"
+                    android:padding="8dp"
+                    android:background="@drawable/info_background" />
+
+                <!-- Buttons -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRegresarNuevo"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="CANCELAR"
+                        android:textSize="14sp"
+                        app:cornerRadius="28dp"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        app:strokeColor="@color/deep_blue"
+                        android:textColor="@color/deep_blue" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnEnviarSolicitudUsuarioNuevo"
+                        android:layout_width="0dp"
+                        android:layout_height="56dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="8dp"
+                        android:text="REGISTRARSE"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:cornerRadius="28dp"
+                        android:backgroundTint="@color/deep_blue"
+                        android:textColor="@android:color/white"
+                        app:icon="@drawable/ic_person_add"
+                        app:iconGravity="textStart" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Footer Space -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="32dp" />
+
+    </LinearLayout>
+
+</ScrollView>

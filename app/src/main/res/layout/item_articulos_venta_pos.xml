@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:padding="5dp"
+    android:background="@color/botonverde"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardArticuloVentaPOS"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/lblCantidadArticuloVentaPOSA"
+                    android:layout_width="45dp"
+                    android:layout_marginLeft="3dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:textStyle="bold"
+                    android:text="15"/>
+
+                <TextView
+                    android:id="@+id/lblNombreArticuloVentaPOSA"
+                    android:layout_width="wrap_content"
+                    android:textFontWeight="2"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="Nombre"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/lblPrecioVentaArticuloVentaPOSA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:text="P.V.: $"/>
+
+                <TextView
+                    android:id="@+id/lblImporteArticuloVentaPOSA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:text="Imp.: $"/>
+
+                <ImageView
+                    android:layout_marginRight="5dp"
+                    android:id="@+id/imgEliminaArticuloVentaPOS"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    app:srcCompat="@android:drawable/presence_busy" />
+
+                <ImageView
+                    android:layout_marginRight="4dp"
+                    android:id="@+id/imgAgregaCantidadArticuloVentaPOS"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    app:srcCompat="@drawable/agregar_icono_64x64" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</LinearLayout>

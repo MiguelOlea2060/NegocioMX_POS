@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".cliente_activity">
+    <LinearLayout
+        android:id="@+id/llEncabezadoCliente"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp">
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_marginLeft="1dp"
+            app:srcCompat="@drawable/logo_cliente_100x100" />
+
+        <TextView
+            android:id="@+id/lblEncabezadoCliente"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:textSize="20dp"
+            android:layout_marginLeft="10dp"
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical"
+            android:text="Cliente" />
+
+        <ImageView
+            android:layout_marginRight="5dp"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/btnAdeudoClienteAlta"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/adeudo_icono_64x64" />
+
+        <ImageView
+            android:layout_marginRight="5dp"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/btnNuevoClienteAlta"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/agregar_icono_64x64" />
+        <ImageView
+            android:layout_marginRight="5dp"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/btnGuardarCliente"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/save_14949" />
+
+        <ImageView
+            android:layout_marginRight="3dp"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/btnRegresarCliente"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/regresar_icono_64x64" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/llEncabezadoCliente">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/lblNombreCliente"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:text="Nombre:" />
+
+            <EditText
+                android:drawableLeft="@drawable/baseline_person_24"
+                android:hint="Nombre del Cliente"
+                android:textColor="@color/deep_blue"
+                android:textColorHint="@color/deep_blue"
+                android:background="@drawable/ed_shape"
+                android:drawablePadding="10dp"
+                android:layout_marginLeft="16dp"
+                android:paddingLeft="10dp"
+                android:layout_height="38dp"
+
+                android:id="@+id/txtNombreCliente"
+                android:layout_width="wrap_content"
+                android:layout_marginRight="3dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:maxLength="250"
+                android:inputType="text"
+                android:text=""
+                android:tooltipText="Nombre de Cliente" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/lblRfcCliente"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:text="Rfc:" />
+
+            <EditText
+                android:hint="R.F.C."
+                android:textColor="@color/deep_blue"
+                android:textColorHint="@color/deep_blue"
+                android:background="@drawable/ed_shape"
+                android:drawablePadding="10dp"
+                android:layout_marginLeft="16dp"
+                android:paddingLeft="10dp"
+                android:layout_height="38dp"
+                android:id="@+id/txtRfcCliente"
+                android:layout_marginRight="15dp"
+                android:layout_weight="0"
+                android:ems="10"
+                android:maxLength="13"
+                android:inputType="text"
+                android:text=""
+                android:tooltipText="Rfc de Cliente"
+                android:layout_width="wrap_content"/>
+
+            <CheckBox
+                android:id="@+id/chkRfcGenericoCliente"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:layout_marginRight="5dp"
+                android:text="Generico" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/lblTelefonoClienteAlta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:text="Telefono:" />
+
+            <EditText
+                android:drawableLeft="@drawable/baseline_contact_phone_24"
+                android:hint="Telefono"
+                android:textColor="@color/deep_blue"
+                android:textColorHint="@color/deep_blue"
+                android:background="@drawable/ed_shape"
+                android:drawablePadding="10dp"
+                android:layout_marginLeft="16dp"
+                android:paddingLeft="10dp"
+                android:layout_height="38dp"
+
+                android:id="@+id/txtTelefonoCliente"
+                android:layout_width="200dp"
+                android:layout_marginRight="16dp"
+                android:maxLength="14"
+                android:inputType="phone"
+                android:text=""/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/lblEmailCliente"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:text="Email:" />
+
+            <EditText
+                android:drawableLeft="@drawable/baseline_email_24"
+                android:hint="Email"
+                android:textColor="@color/deep_blue"
+                android:textColorHint="@color/deep_blue"
+                android:background="@drawable/ed_shape"
+                android:drawablePadding="10dp"
+                android:layout_marginLeft="16dp"
+                android:paddingLeft="10dp"
+                android:layout_height="38dp"
+
+                android:id="@+id/txtEmailCliente"
+                android:layout_width="wrap_content"
+                android:layout_marginRight="3dp"
+                android:ems="10"
+                android:layout_weight="1"
+                android:maxLength="150"
+                android:inputType="textWebEmailAddress"
+                android:text=""
+                android:tooltipText="Email de Cliente" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/lblCPCliente"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:text="Codigo postal:" />
+
+            <EditText
+                android:hint="Codigo postal "
+                android:textColor="@color/deep_blue"
+                android:textColorHint="@color/deep_blue"
+                android:background="@drawable/ed_shape"
+                android:drawablePadding="10dp"
+                android:layout_marginLeft="16dp"
+                android:paddingLeft="10dp"
+                android:layout_height="38dp"
+
+                android:id="@+id/txtCPCliente"
+                android:layout_width="130dp"
+                android:layout_marginRight="3dp"
+                android:maxLength="5"
+                android:inputType="number"
+                android:text=""
+                android:tooltipText="Codigo postal de Cliente" />
+
+            <ImageView
+                android:layout_marginLeft="10dp"
+                android:id="@+id/imgDireccionCliente"
+                android:layout_gravity="center_vertical"
+                android:layout_width="40dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                app:srcCompat="@drawable/logo_direccion_80x80" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <CheckBox
+                android:id="@+id/chkActivoCliente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:layout_marginRight="5dp"
+                android:text="Activo" />
+
+            <CheckBox
+                android:id="@+id/chkPredeterminadoClienteAlta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:layout_marginRight="5dp"
+                android:text="Predeterminado" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/lblListaClientes"
+                android:layout_width="match_parent"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:gravity="center_horizontal"
+                android:background="@color/black"
+                android:textColor="@color/white"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:text="Lista de Clientes" />
+
+            <LinearLayout
+                android:layout_marginTop="5dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:background="@color/black"
+                    android:layout_width="match_parent"
+                    android:layout_height="3dp"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvCliente"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

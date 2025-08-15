@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "499977945472",
+    "project_id": "negociomx-fr",
+    "storage_bucket": "negociomx-fr.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:499977945472:android:ae736a5c4a242d21d40165",
+        "android_client_info": {
+          "package_name": "com.example.negociomx_pos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtF4WX0h5CBuCioUZgBKwmHanbweOrD9I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

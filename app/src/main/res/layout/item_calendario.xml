@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <CalendarView
+        android:padding="10dp"
+        android:id="@+id/dtFechaCal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+    </CalendarView>
+
+    <LinearLayout
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <ImageView
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/aceptar_icono_64x64"
+        android:id="@+id/imgAceptarCalendario"
+        android:layout_marginRight="15dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"/>
+
+    <ImageView
+        android:layout_marginLeft="15dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/cancelar_icono_64x64"
+        android:id="@+id/imgCancelarCalendario"
+        android:layout_width="50dp"
+        android:layout_height="50dp"/>
+    </LinearLayout>
+</LinearLayout>

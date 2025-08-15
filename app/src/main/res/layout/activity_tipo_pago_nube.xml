@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".tipo_pago_nube_activity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imgEncTipoPasoNube"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_marginLeft="2dp"
+            app:srcCompat="@drawable/tipopago_icono_64x64" />
+
+        <TextView
+            android:id="@+id/lblEncabezadoTipoPagoNube"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:layout_weight="2"
+            android:layout_marginLeft="7dp"
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical"
+            android:text="Tipo de pago (Nube)" />
+
+        <ImageView
+            android:src="@drawable/save_14949"
+            android:id="@+id/btnGuardarTipoPagoNube"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginRight="7dp"/>
+        <ImageView
+            android:src="@drawable/regresar_icono_64x64"
+            android:id="@+id/btnRegresarTipoPagoNube"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginRight="3dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@color/black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/lblNombreTipoPagoNube"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:text="Nombre:" />
+
+            <EditText
+                android:hint="Nombre"
+                android:textColor="@color/deep_blue"
+                android:textColorHint="@color/deep_blue"
+                android:background="@drawable/ed_shape"
+                android:drawableLeft="@drawable/baseline_contacts_24"
+                android:drawablePadding="10dp"
+                android:layout_marginLeft="16dp"
+                android:paddingLeft="10dp"
+                android:layout_height="38dp"
+
+                android:id="@+id/txtNombreTipoPagoNube"
+                android:layout_width="wrap_content"
+                android:layout_marginRight="3dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:maxLength="30"
+                android:inputType="text"
+                android:text=""
+                android:tooltipText="Nombre de tipo de pago" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/lblClaveTipoPagoNube"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
+                android:text="Clave:" />
+
+            <EditText
+                android:inputType="number"
+                android:hint="Clave"
+                android:textColor="@color/deep_blue"
+                android:textColorHint="@color/deep_blue"
+                android:background="@drawable/ed_shape"
+                android:drawablePadding="10dp"
+                android:layout_marginLeft="4dp"
+                android:paddingLeft="3dp"
+                android:layout_height="38dp"
+                android:maxLength="4"
+                android:id="@+id/txtClaveTipoPagoNube"
+                android:layout_width="100dp"
+                android:text="" />
+
+            <CheckBox
+                android:id="@+id/chkActivoTipoPagoNube"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:textColor="@color/deep_blue"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:text="Activo" />
+
+            <CheckBox
+                android:id="@+id/chkPredeterminadoTipoPagoNube"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:textColor="@color/deep_blue"
+                android:layout_marginRight="5dp"
+                android:text="Predeterminado" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <CheckBox
+                android:id="@+id/chkAutorizadoSATTipoPagoNube"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:textColor="@color/deep_blue"
+                android:layout_marginRight="5dp"
+                android:text="Autorizado SAT" />
+
+            <CheckBox
+                android:id="@+id/chkPagadoTipoPagoNube"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:textColor="@color/deep_blue"
+                android:layout_marginRight="5dp"
+                android:text="Pagado" />
+
+            <CheckBox
+                android:id="@+id/chkCreditoTipoPagoNube"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:textColor="@color/deep_blue"
+                android:layout_marginRight="5dp"
+                android:text="Credito" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="2dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/lblEncListaTiposPagoNube"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="18dp"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginBottom="3dp"
+                    android:background="@color/blue_white_normal"
+                    android:text="Lista de Tipos" />
+
+                <View
+                    android:background="@color/black"
+                    android:layout_width="match_parent"
+                    android:layout_marginBottom="5dp"
+                    android:layout_height="3dp"/>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTipoPagoNube"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

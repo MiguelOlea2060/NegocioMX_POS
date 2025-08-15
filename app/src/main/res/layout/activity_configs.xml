@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_marginLeft="3dp"
+    android:layout_marginRight="3dp"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".configs_activity">
+
+    <LinearLayout
+        android:layout_marginBottom="5dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imgEmpresaNube"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_marginLeft="2dp"
+            app:srcCompat="@drawable/configs_icono_64x64" />
+
+        <TextView
+            android:id="@+id/lblEncabezadoConfigs"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:textSize="20dp"
+            android:layout_marginLeft="10dp"
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical"
+            android:text="Configuraciones" />
+
+        <ImageView
+            android:layout_marginRight="10dp"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/btnGuardarConfigs"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/save_14949" />
+        <ImageView
+            android:layout_marginRight="5dp"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/btnRegresarConfigs"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/regresar_icono_64x64" />
+
+    </LinearLayout>
+    <View
+        android:background="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="3dp"/>
+
+    <LinearLayout
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginLeft="5dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="35dp">
+        <TextView
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:id="@+id/lblEmpresaConfigsAlta"
+            android:text="Empresa:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Spinner
+            android:layout_weight="1"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="5dp"
+            android:id="@+id/cmbEmpresaConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginLeft="5dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="35dp">
+        <TextView
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:id="@+id/lblTipoPagoPredeterminadoConfig"
+            android:text="Tipo pago (pre):"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Spinner
+            android:layout_weight="1"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="5dp"
+            android:id="@+id/cmbTipoPagoPreConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginLeft="15dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:background="@color/blue_normal_deep"
+            android:text="Datos de la Nota de venta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginLeft="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="7dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:id="@+id/lblPrefijoFolioNVConfig"
+            android:text="Prefijo"
+            android:layout_marginRight="3dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:hint="Prefijo"
+            android:textSize="18dp"
+            android:maxLength="15"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="5dp"
+            android:id="@+id/txPrefijoFolioNVConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:id="@+id/lblConsecutivoFolioNVConfig"
+            android:text="Consecutivo:"
+            android:layout_marginRight="3dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:textSize="18dp"
+            android:maxLength="6"
+            android:layout_weight="1"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="5dp"
+            android:id="@+id/txtPrefijoFolioNVConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginLeft="15dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:background="@color/blue_normal_deep"
+            android:text="Datos del Pago"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="7dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:id="@+id/lblPrefijoFolioPagoConfig"
+            android:text="Prefijo"
+            android:layout_marginRight="3dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:textSize="18dp"
+            android:maxLength="15"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="5dp"
+            android:id="@+id/txPrefijoFolioPagoConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:textStyle="bold"
+            android:textSize="18dp"
+            android:id="@+id/lblConsecutivoFolioPagoConfig"
+            android:text="Consecutivo:"
+            android:layout_marginRight="3dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <EditText
+            android:textSize="18dp"
+            android:maxLength="6"
+            android:layout_weight="1"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="5dp"
+            android:id="@+id/txtConsecutivoFolioPagoConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <CheckBox
+            android:textStyle="bold"
+            android:textSize="16dp"
+            android:text="Predeterminada"
+            android:id="@+id/chkPredeterminadoConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</LinearLayout>

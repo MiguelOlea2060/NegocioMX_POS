@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_marginLeft="5dp"
+    android:padding="5dp"
+    android:background="@color/blue_normal_deep"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardVentaA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/lblClienteVentaA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="20dp"
+                    android:textStyle="bold"
+                    android:layout_marginLeft="3dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="10dp"
+                    android:layout_weight="1"
+                    android:text="Martin Ruiz Peña"/>
+
+                <TextView
+                    android:id="@+id/lblFolioVentaA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22dp"
+                    android:textStyle="bold"
+                    android:textAlignment="textEnd"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="Folio: NV-450"/>
+
+                <ImageView
+                    android:src="@drawable/miniprinter_icono_64x64"
+                    android:id="@+id/imgImprimirTicketVentaA"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginLeft="4dp"
+                    android:textStyle="bold"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:background="@color/blue_white"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/lblSubtotalVentaA"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="2dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="22dp"
+                    android:textAlignment="textStart"
+                    android:textStyle="bold"
+                    android:text="Subtotal \n$ 1,000 "/>
+
+                <TextView
+                    android:id="@+id/lblMontoImpuestoVentaA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="22dp"
+                    android:layout_weight="1"
+                    android:layout_marginRight="7dp"
+                    android:textAlignment="textStart"
+                    android:text="IVA\n$ 160"/>
+
+                <TextView
+                    android:id="@+id/lblTotalVentaA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="textStart"
+                    android:textSize="26dp"
+                    android:layout_marginRight="7dp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:text="Total\n$ 1,155.5"/>
+
+            </LinearLayout>
+
+            <View
+                android:layout_marginTop="3dp"
+                android:background="@color/blue_normal_deep"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"/>
+
+            <LinearLayout
+                android:layout_marginTop="3dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/lblTotalArticulosVentaA"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="3dp"
+                    android:textSize="20dp"
+                    android:layout_marginRight="10dp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:text="5 Articulos"/>
+
+                <ImageView
+                    android:layout_gravity="left"
+                    android:id="@+id/imgStatusVentaA"
+                    android:layout_marginLeft="5dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/icono_on_50x24"/>
+
+                <ImageView
+                    android:src="@drawable/ver_detalles_a_64x64"
+                    android:id="@+id/imgVerDetallesVentaA"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginRight="7dp"
+                    android:layout_marginLeft="20dp"
+                    android:textStyle="bold"/>
+
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

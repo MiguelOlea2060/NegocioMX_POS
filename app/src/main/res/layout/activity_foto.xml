@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".foto_activity">
+
+    <ImageView
+        android:id="@+id/imgAceptarFotoActivity"
+        android:src="@drawable/aceptar_icono_64x64"
+        android:layout_width="45dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="45dp"/>
+
+    <ImageView
+        android:id="@+id/imgFotoActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</RelativeLayout>

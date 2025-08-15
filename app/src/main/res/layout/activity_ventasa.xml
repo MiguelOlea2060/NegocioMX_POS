@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ventasa_activity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/blue_white_normal"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="7dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/btnRegresarVentasA"
+                android:src="@drawable/regresar_icono_64x64"
+                android:layout_width="50dp"
+                android:layout_height="50dp"/>
+            <TextView
+                android:id="@+id/lblFiltrosVentasA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:text="-> Filtros de Busqueda"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:background="@color/deep_blue"
+                android:textSize="18dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/lblFechaInicioVentasA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginRight="10dp"
+                android:gravity="center_vertical"
+                android:text="Fecha de:"
+                android:textColor="@color/black"
+                android:textSize="18dp" />
+
+            <ImageView
+                android:src="@drawable/calendario_icono_64x64"
+                android:id="@+id/imgFechaInicioVentasA"
+                android:layout_marginRight="10dp"
+                android:layout_width="45dp"
+                android:layout_weight="1"
+                android:layout_height="45dp"/>
+
+            <TextView
+                android:id="@+id/lblFechaFinVentasA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="15dp"
+                android:gravity="center_vertical"
+                android:text="hasta"
+                android:textAlignment="textEnd"
+                android:layout_weight="1"
+                android:textColor="@color/black"
+                android:textSize="18dp" />
+
+            <ImageView
+                android:src="@drawable/calendario_icono_64x64"
+                android:id="@+id/imgFechaFinVentasA"
+                android:layout_marginRight="15dp"
+                android:layout_weight="0"
+                android:layout_width="45dp"
+                android:layout_height="45dp"/>
+
+            <ImageView
+                android:id="@+id/imgBuscarVentasA"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/icono_buscar_blue_64x64" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/lblClienteVentasA"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:gravity="center_vertical"
+                android:text="Cliente:"
+                android:textColor="@color/black"
+                android:textSize="18dp" />
+
+            <Spinner
+                android:id="@+id/cmbClienteVentasA"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1" />
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/lblEncabezadoVentasA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:gravity="center_horizontal"
+            android:text="Lista de Ventas"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvVentasA"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp" />
+    </LinearLayout>
+</LinearLayout>

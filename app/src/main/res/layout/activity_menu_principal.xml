@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".menu_principal_activity">
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:layout_gravity="center"
+            android:id="@+id/imgFotoEncabezado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            app:srcCompat="@drawable/transvision_logo_chico250px" />
+
+        <ImageView
+            android:layout_gravity="top"
+            android:id="@+id/imgLoginLogoutMenuPrincipal"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="40dp"
+            app:srcCompat="@drawable/logout_icono_64x64" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnAltaArticulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:text="Articulo" />
+
+        <Button
+            android:id="@+id/btnConsultaArticulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="Consulta Articulo" />
+
+        <Button
+            android:layout_marginRight="15dp"
+            android:id="@+id/btnCliente"
+            android:layout_marginLeft="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cliente" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginLeft="10dp"
+        android:id="@+id/linearLayout3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp">
+
+        <Button
+            android:id="@+id/btnUM"
+            android:layout_gravity="left"
+            android:layout_marginRight="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Uni. de Medida" />
+
+        <Button
+            android:layout_gravity="right"
+            android:id="@+id/btnCategoria"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Categoria" />
+
+        <Button
+            android:layout_gravity="right"
+            android:layout_marginLeft="8dp"
+            android:id="@+id/btnImpuesto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Impuesto" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btnTipoPago"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tipo pago" />
+
+        <Button
+            android:layout_marginLeft="10dp"
+            android:id="@+id/btnUsuarios"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Usuarios" />
+
+        <Button
+            android:layout_marginLeft="10dp"
+            android:id="@+id/btnSincronizacion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sincronización" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btnEmpresas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Empresas" />
+
+        <Button
+            android:layout_marginLeft="10dp"
+            android:id="@+id/btnConfiguraciones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Configs" />
+
+        <Button
+            android:layout_marginLeft="10dp"
+            android:id="@+id/btnRadminVPN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Radmin VPN" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/btnPos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="POS" />
+
+        <Button
+            android:layout_marginLeft="10dp"
+            android:id="@+id/btnVentas"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ventas" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="10dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_marginLeft="10dp"
+            android:id="@+id/btnLectorQR"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lector QR" />
+        <Button
+            android:layout_marginLeft="10dp"
+            android:id="@+id/btnPaso1SOC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Paso 1 - SOC" />
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".articulo_alta_activity">
+
+    <LinearLayout
+        android:id="@+id/llEncabezado"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_weight="1"
+        android:background="#61FC0B"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="0dp">
+
+
+        <ImageView
+            android:id="@+id/imgFotoEncArticulo"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:srcCompat="@drawable/logo1_articulo_150x150" />
+
+        <TextView
+            android:id="@+id/lblEncabezadoAltaArticulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="3dp"
+            android:textSize="20dp"
+            android:layout_marginLeft="10dp"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:text="Alta de Articulo" />
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:id="@+id/imgNuevoArticuloAlta"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginRight="7dp"
+            app:srcCompat="@drawable/agregar_icono_64x64" />
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:id="@+id/imgGuardarArticulo"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginRight="7dp"
+            app:srcCompat="@drawable/save_14949" />
+
+        <ImageView
+            android:layout_gravity="center_vertical"
+            android:id="@+id/imgRegresarArticuloAlta"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginRight="4dp"
+            app:srcCompat="@drawable/regresar_icono_64x64" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@+id/llEncabezado"
+        tools:layout_editor_absoluteX="10dp">
+
+        <LinearLayout
+            android:layout_marginTop="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/lblNombreArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16dp"
+                android:layout_marginRight="3dp"
+                android:text="Nombre:" />
+
+            <EditText
+                android:id="@+id/txtNombreArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:layout_weight="1"
+                android:ems="10"
+                android:maxLength="1000"
+                android:inputType="text"
+                android:text=""
+                android:tooltipText="Nombre del Articulo" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:textSize="16dp"
+                android:id="@+id/lblCodigoBarraArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:text="Codigo barra:" />
+
+            <EditText
+                android:id="@+id/txtCodigoBarraArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:layout_weight="1"
+                android:inputType="text"
+                android:maxLength="15"
+                android:text=""
+                android:tooltipText="Nombre del Articulo" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/lblPrecioVentaArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16dp"
+                android:layout_marginRight="10dp"
+                android:text="Precio venta:" />
+
+            <EditText
+                android:id="@+id/txtPrecioVentaArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:layout_weight="1"
+                android:inputType="numberDecimal"
+                android:maxLength="10"
+                android:text=""
+                android:tooltipText="Nombre del Articulo" />
+
+            <TextView
+                android:id="@+id/lblExistenciaArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:textSize="16dp"
+                android:text="Existencia:" />
+
+            <EditText
+                android:id="@+id/txtExistenciaArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="3dp"
+                android:layout_weight="1"
+                android:inputType="numberDecimal"
+                android:text=""
+                android:tooltipText="Existencia inicial" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="U. Medida:"
+                android:layout_marginRight="5dp"
+                android:textSize="16dp"
+                android:gravity="center_vertical"
+                android:id="@+id/lblUnidadMedidaAltaArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <Spinner
+                android:layout_marginRight="10dp"
+                android:gravity="center_vertical"
+                android:id="@+id/cmbUnidadMedidaArticulo"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="Categoria:"
+                android:layout_marginRight="5dp"
+                android:textSize="16dp"
+                android:gravity="center_vertical"
+                android:id="@+id/lblCategoriaAltaArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <Spinner
+                android:layout_marginRight="5dp"
+                android:id="@+id/cmbCategoriaArticulo"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+
+            <ImageView
+                android:id="@+id/imgAgregaNuevaCategoriaAlta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                app:srcCompat="@android:drawable/ic_input_add" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="5dp"
+        android:orientation="horizontal"
+        tools:layout_editor_absoluteX="10dp">
+
+        <TextView
+            android:id="@+id/lblStatusArticulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16dp"
+            android:text="Status: " />
+        <Spinner
+            android:layout_weight="2"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:id="@+id/cmbStatusArticulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/lblFotoArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="3dp"
+                android:text="Foto" />
+
+            <ImageView
+                android:id="@+id/imgFotoArticulo"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_gravity="center"
+                android:src="@drawable/sinfoto_360x360"
+                android:text="" />
+
+            <Button
+                android:id="@+id/btnTomarFotoArticulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="5dp"
+                android:text="Tomar Foto" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:background="@color/black"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"/>
+
+            <LinearLayout
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/btnCerrarArticulo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@color/botonverde"
+                    android:text="Cerrar" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
