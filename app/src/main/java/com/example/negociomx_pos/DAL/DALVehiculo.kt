@@ -46,11 +46,11 @@ class DALVehiculo {
             // ✅ QUERY CORREGIDO PARA EL ESQUEMA REAL DE LA BASE DE DATOS
             val query = """
                 
-                select vin, v.idmarca, v.idmodelo, m.nombre Marca, mo.nombre Modelo,
-                 v.Annio, v.Motor v.version from dbo.vehiculo v
-                		inner join dbo.MarcaAuto m on v.IdMarca=m.IdMarcaAuto
-                		inner join dbo.Modelo mo on v.IdModelo=mo.IdModelo
-                where v.vin != ?
+                select vin, vehiculo.idmarca, vehiculo.idmodelo, marcaauto.nombre Marca, modelo.nombre Modelo,
+                 Annio annio, Motor, version, idvehiculo from vehiculo
+                		inner join dbo.MarcaAuto on vehiculo.IdMarca=MarcaAuto.IdMarcaAuto
+                		inner join dbo.Modelo on vehiculo.IdModelo=modelo.IdModelo
+                where vehiculo.vin != ?
               
             """.trimIndent()
 

@@ -1,4 +1,4 @@
-package com.example.negociomx_pos
+/*package com.example.negociomx_pos
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -512,4 +512,4 @@ class articulo_nube_activity : AppCompatActivity() {
             ex.printStackTrace()
         }
     }
-}
+}*/

@@ -1,5 +1,6 @@
 package com.example.negociomx_pos
 
+import android.content.Intent
 import android.database.DatabaseUtils
 import android.os.Bundle
 import android.os.Handler
@@ -166,7 +167,7 @@ class usuario_nuevo_activity : AppCompatActivity() {
                 // Timeout de 15 segundos para verificación
                 configurarTimeoutLargo("verificación")
 
-                dalUsu.getUsuarioByEmail(email) { res ->
+                dalUsu.getUsuarioByEmail(email) { res: UsuarioNube? ->
                     Log.d("UsuarioNuevo", "📞 Verificación completada")
 
                     runOnUiThread {
@@ -208,7 +209,7 @@ class usuario_nuevo_activity : AppCompatActivity() {
         // Timeout de 20 segundos para insert
         configurarTimeoutLargo("registro")
 
-        dalUsu.insert(usuario) { insertResult ->
+        dalUsu.insert(usuario) { insertResult: String ->
             Log.d("UsuarioNuevo", "📞 === RESULTADO INSERT ===")
             Log.d("UsuarioNuevo", "📊 Resultado: '$insertResult'")
 
@@ -223,8 +224,8 @@ class usuario_nuevo_activity : AppCompatActivity() {
                         "¡Usuario registrado exitosamente!\n\nSu cuenta será verificada por un administrador.",
                         "¡Éxito!"
                     ) {
-                        Log.d("UsuarioNuevo", "🚪 Cerrando pantalla")
-                        cierraPantalla()
+                        Log.d("UsuarioNuevo", "🚪 Navegando a pantalla de login")
+                        navegarALogin()
                     }
                 } else {
                     Log.e("UsuarioNuevo", "❌ Error en registro")
@@ -277,6 +278,20 @@ class usuario_nuevo_activity : AppCompatActivity() {
     private fun cierraPantalla() {
         cancelarTimeout()
         finish()
+    }
+
+    private fun navegarALogin() {
+        try {
+            val intent = Intent(this, acceso_activity::class.java)
+            // Limpiar el stack de actividades para que no pueda regresar
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish() // Cerrar la actividad actual
+        } catch (e: Exception) {
+            Log.e("UsuarioNuevo", "Error navegando a login: ${e.message}")
+            // Si falla la navegación, cerrar la pantalla actual
+            cierraPantalla()
+        }
     }
 
     override fun onDestroy() {

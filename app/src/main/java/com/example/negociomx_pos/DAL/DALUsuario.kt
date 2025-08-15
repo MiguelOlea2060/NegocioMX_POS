@@ -2,211 +2,305 @@ package com.example.negociomx_pos.DAL
 
 import android.util.Log
 import com.example.negociomx_pos.BE.UsuarioNube
-import com.example.negociomx_pos.Utils.ParametrosSistema
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import java.util.concurrent.ThreadLocalRandom
-import kotlin.random.Random
+import com.google.firebase.database.*
+import java.util.UUID
 
 class DALUsuario {
-    var NombreTabla="Usuario"
 
-    private lateinit var firebaseAuth:FirebaseAuth
-    private lateinit var firebaseRef: DatabaseReference
+    private val database: DatabaseReference = FirebaseDatabase.getInstance("https://negociomx-fr-default-rtdb.firebaseio.com/").reference
 
-    public fun insert(entidad: UsuarioNube, onFinishIntentoListener :(String) -> Unit)
-    {
-        Log.d("DALUsuario", "🚀 INICIANDO INSERT - REFERENCIA CORREGIDA")
-
-        // ✅ REFERENCIA CORREGIDA: NEGOCIOMX-FB/Usuario
-        firebaseRef = FirebaseDatabase.getInstance().getReference("NEGOCIOMX-FB").child(NombreTabla)
-
-        var rnd=Random(1000001)
-        firebaseAuth=FirebaseAuth.getInstance()
-        val idEntidad:Int=ThreadLocalRandom.current().nextInt(3000001)
-        entidad.Id=idEntidad.toString()
+    fun getUsuarioByEmail(email: String, onFinish: (UsuarioNube?) -> Unit) {
+        Log.d("DALUsuario", "🔍 Buscando usuario por email: '$email'")
+        Log.d("DALUsuario", "🌐 URL Firebase: https://negociomx-fr-default-rtdb.firebaseio.com/")
+        Log.d("DALUsuario", "📂 Ruta: NEGOCIOMX-FB/Usuario")
 
         try {
-            Log.d("DALUsuario", "📝 Guardando usuario: ${entidad.Email} con ID: ${idEntidad}")
-            Log.d("DALUsuario", "🔗 Referencia Firebase: ${firebaseRef.toString()}")
-            Log.d("DALUsuario", "📍 Se guardará en: NEGOCIOMX-FB/Usuario/${idEntidad}")
+            val usuariosRef = database.child("NEGOCIOMX-FB").child("Usuario")
 
-            // CONFIGURAR FIREBASE PARA FUNCIONAR OFFLINE
-            try {
-                FirebaseDatabase.getInstance().setPersistenceEnabled(true)
-            } catch (e: Exception) {
-                Log.w("DALUsuario", "Persistencia ya habilitada: ${e.message}")
+            // Timeout de 30 segundos
+            val timeoutRunnable = Runnable {
+                Log.e("DALUsuario", "⏰ TIMEOUT: Búsqueda tardó más de 30 segundos")
+                onFinish(null)
             }
 
-            firebaseRef.child(idEntidad.toString()).setValue(entidad)
-                .addOnCompleteListener { task ->
-                    Log.d("DALUsuario", "📊 Task completado. Exitoso: ${task.isSuccessful}")
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(timeoutRunnable, 30000)
 
-                    if (task.isSuccessful) {
-                        Log.d("DALUsuario", "✅ Usuario guardado en NEGOCIOMX-FB/Usuario")
+            usuariosRef.orderByChild("email").equalTo(email)
+                .addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        // Cancelar timeout
+                        android.os.Handler(android.os.Looper.getMainLooper()).removeCallbacks(timeoutRunnable)
 
-                        // CREAR EN AUTH - MANTENER TU LÓGICA
-                        firebaseAuth.createUserWithEmailAndPassword(entidad.Email!!, entidad.Password!!)
-                            .addOnCompleteListener { authTask ->
-                                if (authTask.isSuccessful) {
-                                    Log.d("DALUsuario", "🎉 Usuario creado en Auth exitosamente")
-                                    onFinishIntentoListener("SUCCESS_COMPLETE")
-                                } else {
-                                    Log.w("DALUsuario", "⚠️ Auth falló pero DB OK: ${authTask.exception?.message}")
-                                    // ÉXITO PARCIAL - DB guardado
-                                    onFinishIntentoListener("SUCCESS_DB_ONLY")
+                        Log.d("DALUsuario", "📊 Snapshot existe: ${snapshot.exists()}")
+                        Log.d("DALUsuario", "📊 Número de hijos: ${snapshot.childrenCount}")
+
+                        if (snapshot.exists()) {
+                            for (userSnapshot in snapshot.children) {
+                                Log.d("DALUsuario", "🔑 Key encontrada: ${userSnapshot.key}")
+
+                                try {
+                                    val firebaseData = userSnapshot.value as? Map<String, Any>
+
+                                    if (firebaseData != null) {
+                                        val usuario = UsuarioNube().apply {
+                                            // ✅ MANEJO DUAL: camelCase Y PascalCase
+                                            Id = (firebaseData["id"] ?: firebaseData["Id"]) as? String
+                                            IdLocal = (firebaseData["idLocal"] ?: firebaseData["IdLocal"]) as? String
+                                            NombreCompleto = (firebaseData["nombreCompleto"] ?: firebaseData["NombreCompleto"]) as? String
+                                            Email = (firebaseData["email"] ?: firebaseData["Email"]) as? String
+                                            Password = (firebaseData["password"] ?: firebaseData["Password"]) as? String
+                                            IdRol = (firebaseData["idRol"] ?: firebaseData["IdRol"]) as? String
+                                            IdEmpresa = (firebaseData["idEmpresa"] ?: firebaseData["IdEmpresa"]) as? String
+                                            Activo = (firebaseData["activo"] ?: firebaseData["Activo"]) as? Boolean
+                                            CuentaVerificada = (firebaseData["cuentaVerificada"] ?: firebaseData["CuentaVerificada"]) as? Boolean
+                                            RazonSocialEmpresa = (firebaseData["razonSocialEmpresa"] ?: firebaseData["RazonSocialEmpresa"]) as? String
+                                            NombreCuentaVerificada = (firebaseData["nombreCuentaVerificada"] ?: firebaseData["NombreCuentaVerificada"]) as? String
+                                            RfcEmpresa = (firebaseData["rfcEmpresa"] ?: firebaseData["RfcEmpresa"]) as? String
+                                        }
+
+                                        Log.d("DALUsuario", "✅ Usuario mapeado exitosamente")
+                                        Log.d("DALUsuario", "👤 Email: ${usuario.Email}")
+                                        Log.d("DALUsuario", "🟢 Activo: ${usuario.Activo}")
+                                        Log.d("DALUsuario", "✅ Verificado: ${usuario.CuentaVerificada}")
+                                        Log.d("DALUsuario", "🆔 ID: ${usuario.Id}")
+                                        Log.d("DALUsuario", "👤 Nombre: ${usuario.NombreCompleto}")
+
+                                        onFinish(usuario)
+                                        return
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("DALUsuario", "❌ Error mapeando usuario: ${e.message}")
                                 }
                             }
-                            .addOnCanceledListener{
-                                Log.w("DALUsuario", "🚫 Auth cancelado pero DB OK")
-                                onFinishIntentoListener("SUCCESS_DB_ONLY")
-                            }
-                    } else {
-                        Log.e("DALUsuario", "❌ Error guardando en DB: ${task.exception?.message}")
-                        onFinishIntentoListener("")
+                        }
+
+                        // ✅ BÚSQUEDA ADICIONAL CON PascalCase
+                        Log.d("DALUsuario", "🔍 Búsqueda adicional con Email (PascalCase)")
+                        usuariosRef.orderByChild("Email").equalTo(email)
+                            .addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(snapshotPascal: DataSnapshot) {
+                                    Log.d("DALUsuario", "📊 Snapshot PascalCase existe: ${snapshotPascal.exists()}")
+
+                                    if (snapshotPascal.exists()) {
+                                        for (userSnapshot in snapshotPascal.children) {
+                                            Log.d("DALUsuario", "🔑 Key PascalCase encontrada: ${userSnapshot.key}")
+
+                                            try {
+                                                val firebaseData = userSnapshot.value as? Map<String, Any>
+
+                                                if (firebaseData != null) {
+                                                    val usuario = UsuarioNube().apply {
+                                                        // ✅ MANEJO DUAL: camelCase Y PascalCase
+                                                        Id = (firebaseData["id"] ?: firebaseData["Id"]) as? String
+                                                        IdLocal = (firebaseData["idLocal"] ?: firebaseData["IdLocal"]) as? String
+                                                        NombreCompleto = (firebaseData["nombreCompleto"] ?: firebaseData["NombreCompleto"]) as? String
+                                                        Email = (firebaseData["email"] ?: firebaseData["Email"]) as? String
+                                                        Password = (firebaseData["password"] ?: firebaseData["Password"]) as? String
+                                                        IdRol = (firebaseData["idRol"] ?: firebaseData["IdRol"]) as? String
+                                                        IdEmpresa = (firebaseData["idEmpresa"] ?: firebaseData["IdEmpresa"]) as? String
+                                                        Activo = (firebaseData["activo"] ?: firebaseData["Activo"]) as? Boolean
+                                                        CuentaVerificada = (firebaseData["cuentaVerificada"] ?: firebaseData["CuentaVerificada"]) as? Boolean
+                                                        RazonSocialEmpresa = (firebaseData["razonSocialEmpresa"] ?: firebaseData["RazonSocialEmpresa"]) as? String
+                                                        NombreCuentaVerificada = (firebaseData["nombreCuentaVerificada"] ?: firebaseData["NombreCuentaVerificada"]) as? String
+                                                        RfcEmpresa = (firebaseData["rfcEmpresa"] ?: firebaseData["RfcEmpresa"]) as? String
+                                                    }
+
+                                                    Log.d("DALUsuario", "✅ Usuario PascalCase mapeado exitosamente")
+                                                    Log.d("DALUsuario", "👤 Email: ${usuario.Email}")
+                                                    Log.d("DALUsuario", "🟢 Activo: ${usuario.Activo}")
+                                                    Log.d("DALUsuario", "✅ Verificado: ${usuario.CuentaVerificada}")
+
+                                                    onFinish(usuario)
+                                                    return
+                                                }
+                                            } catch (e: Exception) {
+                                                Log.e("DALUsuario", "❌ Error mapeando usuario PascalCase: ${e.message}")
+                                            }
+                                        }
+                                    }
+
+                                    Log.w("DALUsuario", "❌ Usuario no encontrado para email: $email")
+                                    onFinish(null)
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    Log.e("DALUsuario", "💥 Error Firebase PascalCase: ${error.message}")
+                                    onFinish(null)
+                                }
+                            })
                     }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("DALUsuario", "💥 Fallo completo: ${exception.message}")
-                    onFinishIntentoListener("")
-                }
-        }
-        catch (ex:Exception)
-        {
-            Log.e("DALUsuario", "🔥 Excepción crítica: ${ex.message}")
-            onFinishIntentoListener("")
+
+                    override fun onCancelled(error: DatabaseError) {
+                        // Cancelar timeout
+                        android.os.Handler(android.os.Looper.getMainLooper()).removeCallbacks(timeoutRunnable)
+
+                        Log.e("DALUsuario", "💥 Error Firebase: ${error.message}")
+                        Log.e("DALUsuario", "💥 Código error: ${error.code}")
+                        Log.e("DALUsuario", "💥 Detalles: ${error.details}")
+                        onFinish(null)
+                    }
+                })
+
+        } catch (e: Exception) {
+            Log.e("DALUsuario", "🔥 Excepción en getUsuarioByEmail: ${e.message}")
+            onFinish(null)
         }
     }
 
-    public fun update(entidad: UsuarioNube, onFinishIntentoListener :(String) -> Unit)
-    {
-        // ✅ REFERENCIA CORREGIDA: NEGOCIOMX-FB/Usuario
-        firebaseRef = FirebaseDatabase.getInstance().getReference("NEGOCIOMX-FB").child(NombreTabla)
-        firebaseAuth=FirebaseAuth.getInstance()
+    fun insert(usuario: UsuarioNube, onFinish: (String) -> Unit) {
+        Log.d("DALUsuario", "💾 === INSERTANDO USUARIO ===")
+        Log.d("DALUsuario", "👤 Email: ${usuario.Email}")
+        Log.d("DALUsuario", "👤 Nombre: ${usuario.NombreCompleto}")
 
         try {
-            firebaseRef.child(entidad.Id!!).setValue(entidad)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        firebaseAuth.createUserWithEmailAndPassword(entidad.Email!!, entidad.Password!!)
-                            .addOnCompleteListener { authTask ->
-                                if (authTask.isSuccessful) {
-                                    onFinishIntentoListener(authTask.result.toString())
-                                } else {
-                                    onFinishIntentoListener("")
-                                }
-                            }
-                            .addOnCanceledListener{
-                                onFinishIntentoListener("")
-                            }
+            val usuariosRef = database.child("NEGOCIOMX-FB").child("Usuario")
+
+            // ✅ GENERAR ID NUMÉRICO ALEATORIO
+            var userId = generateNumericId()
+
+            // ✅ VERIFICAR SI EL ID EXISTE
+            usuariosRef.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        // 🔄 SI EL ID EXISTE, GENERAR UNO NUEVO RECURSIVAMENTE
+                        Log.w("DALUsuario", "⚠️ ID $userId ya existe, generando uno nuevo")
+                        insert(usuario, onFinish) // Llamada recursiva
                     } else {
-                        onFinishIntentoListener("")
+                        // ✅ SI EL ID NO EXISTE, PROCEDER CON LA INSERCIÓN
+                        Log.d("DALUsuario", "🔑 ID generado: $userId")
+
+                        // ✅ USAR camelCase para nuevos usuarios (consistencia)
+                        val firebaseData = mapOf(
+                            "id" to userId,
+                            "idLocal" to usuario.IdLocal,
+                            "nombreCompleto" to usuario.NombreCompleto,
+                            "email" to usuario.Email,
+                            "password" to usuario.Password,
+                            "idRol" to usuario.IdRol,
+                            "idEmpresa" to usuario.IdEmpresa,
+                            "activo" to usuario.Activo,
+                            "cuentaVerificada" to usuario.CuentaVerificada,
+                            "razonSocialEmpresa" to usuario.RazonSocialEmpresa,
+                            "nombreCuentaVerificada" to usuario.NombreCuentaVerificada,
+                            "rfcEmpresa" to usuario.RfcEmpresa
+                        )
+
+                        // Timeout de 30 segundos
+                        val timeoutRunnable = Runnable {
+                            Log.e("DALUsuario", "⏰ TIMEOUT: Insert tardó más de 30 segundos")
+                            onFinish("")
+                        }
+
+                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(timeoutRunnable, 30000)
+
+                        usuariosRef.child(userId).setValue(firebaseData)
+                            .addOnSuccessListener {
+                                // Cancelar timeout
+                                android.os.Handler(android.os.Looper.getMainLooper()).removeCallbacks(timeoutRunnable)
+
+                                Log.d("DALUsuario", "✅ Usuario insertado exitosamente")
+                                Log.d("DALUsuario", "🔑 ID retornado: $userId")
+                                onFinish(userId)
+                            }
+                            .addOnFailureListener { exception ->
+                                // Cancelar timeout
+                                android.os.Handler(android.os.Looper.getMainLooper()).removeCallbacks(timeoutRunnable)
+
+                                Log.e("DALUsuario", "❌ Error insertando usuario: ${exception.message}")
+                                onFinish("")
+                            }
                     }
                 }
-                .addOnFailureListener { exception ->
-                    onFinishIntentoListener("")
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("DALUsuario", "💥 Error Firebase al verificar ID: ${error.message}")
+                    onFinish("")
                 }
-        }
-        catch (ex:Exception)
-        {
-            var cad=ex.toString()
-            onFinishIntentoListener("")
+            })
+
+        } catch (e: Exception) {
+            Log.e("DALUsuario", "🔥 Excepción en insert: ${e.message}")
+            onFinish("")
         }
     }
 
-    public fun getUsuarioByEmail(email:String, onfinishReadListener: (UsuarioNube?) -> Unit)
-    {
-        Log.d("DALUsuario", "🔍 BÚSQUEDA DE USUARIO - REFERENCIA CORREGIDA")
-        Log.d("DALUsuario", "📧 Buscando email: '$email'")
+    fun getAllUsuarios(onFinish: (List<UsuarioNube>) -> Unit) {
+        Log.d("DALUsuario", "📋 === OBTENIENDO TODOS LOS USUARIOS ===")
 
-        // ✅ REFERENCIA CORREGIDA: NEGOCIOMX-FB/Usuario
-        firebaseRef = FirebaseDatabase.getInstance().getReference("NEGOCIOMX-FB").child(NombreTabla)
+        try {
+            val usuariosRef = database.child("NEGOCIOMX-FB").child("Usuario")
 
-        Log.d("DALUsuario", "🔗 Referencia: ${firebaseRef.toString()}")
-        Log.d("DALUsuario", "📍 Buscando en: NEGOCIOMX-FB/Usuario")
+            // Timeout de 30 segundos
+            val timeoutRunnable = Runnable {
+                Log.e("DALUsuario", "⏰ TIMEOUT: getAllUsuarios tardó más de 30 segundos")
+                onFinish(emptyList())
+            }
 
-        firebaseRef.addListenerForSingleValueEvent( object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                Log.d("DALUsuario", "📊 onDataChange ejecutado")
-                Log.d("DALUsuario", "📈 Snapshot existe: ${snapshot.exists()}")
-                Log.d("DALUsuario", "👥 Número de usuarios: ${snapshot.childrenCount}")
+            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(timeoutRunnable, 30000)
 
-                var item: UsuarioNube? = null
-                var encontrado: Boolean = false
+            usuariosRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    // Cancelar timeout
+                    android.os.Handler(android.os.Looper.getMainLooper()).removeCallbacks(timeoutRunnable)
 
-                if(snapshot.exists()) {
-                    for (e in snapshot.children) {
-                        try {
-                            item = e.getValue(UsuarioNube::class.java)
-                            Log.d("DALUsuario", "👤 Revisando usuario: ${item?.Email}")
+                    Log.d("DALUsuario", "📊 Snapshot existe: ${snapshot.exists()}")
+                    Log.d("DALUsuario", "📊 Número de usuarios: ${snapshot.childrenCount}")
 
-                            if(item?.Email != null && item.Email.equals(email, ignoreCase = true)) {
-                                Log.d("DALUsuario", "🎯 ¡USUARIO ENCONTRADO!")
-                                encontrado = true
-                                break
+                    val usuarios = mutableListOf<UsuarioNube>()
+
+                    if (snapshot.exists()) {
+                        for (userSnapshot in snapshot.children) {
+                            try {
+                                val firebaseData = userSnapshot.value as? Map<String, Any>
+
+                                if (firebaseData != null) {
+                                    val usuario = UsuarioNube().apply {
+                                        // ✅ MANEJO DUAL: camelCase Y PascalCase
+                                        Id = (firebaseData["id"] ?: firebaseData["Id"]) as? String
+                                        IdLocal = (firebaseData["idLocal"] ?: firebaseData["IdLocal"]) as? String
+                                        NombreCompleto = (firebaseData["nombreCompleto"] ?: firebaseData["NombreCompleto"]) as? String
+                                        Email = (firebaseData["email"] ?: firebaseData["Email"]) as? String
+                                        Password = (firebaseData["password"] ?: firebaseData["Password"]) as? String
+                                        IdRol = (firebaseData["idRol"] ?: firebaseData["IdRol"]) as? String
+                                        IdEmpresa = (firebaseData["idEmpresa"] ?: firebaseData["IdEmpresa"]) as? String
+                                        Activo = (firebaseData["activo"] ?: firebaseData["Activo"]) as? Boolean
+                                        CuentaVerificada = (firebaseData["cuentaVerificada"] ?: firebaseData["CuentaVerificada"]) as? Boolean
+                                        RazonSocialEmpresa = (firebaseData["razonSocialEmpresa"] ?: firebaseData["RazonSocialEmpresa"]) as? String
+                                        NombreCuentaVerificada = (firebaseData["nombreCuentaVerificada"] ?: firebaseData["NombreCuentaVerificada"]) as? String
+                                        RfcEmpresa = (firebaseData["rfcEmpresa"] ?: firebaseData["RfcEmpresa"]) as? String
+                                    }
+
+                                    usuarios.add(usuario)
+                                }
+                            } catch (e: Exception) {
+                                Log.e("DALUsuario", "❌ Error mapeando usuario: ${e.message}")
                             }
-                        } catch (ex: Exception) {
-                            Log.e("DALUsuario", "⚠️ Error procesando usuario: ${ex.message}")
                         }
                     }
-                } else {
-                    Log.d("DALUsuario", "📭 No hay datos en NEGOCIOMX-FB/Usuario")
+
+                    Log.d("DALUsuario", "✅ ${usuarios.size} usuarios mapeados exitosamente")
+                    onFinish(usuarios)
                 }
 
-                Log.d("DALUsuario", "🏁 Resultado final - Encontrado: $encontrado")
+                override fun onCancelled(error: DatabaseError) {
+                    // Cancelar timeout
+                    android.os.Handler(android.os.Looper.getMainLooper()).removeCallbacks(timeoutRunnable)
 
-                if(encontrado) {
-                    onfinishReadListener(item)
-                } else {
-                    onfinishReadListener(null)
+                    Log.e("DALUsuario", "💥 Error Firebase: ${error.message}")
+                    Log.e("DALUsuario", "💥 Código error: ${error.code}")
+                    Log.e("DALUsuario", "💥 Detalles: ${error.details}")
+                    onFinish(emptyList())
                 }
-            }
+            })
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("DALUsuario", "❌ Error en consulta: ${error.message}")
-                Log.e("DALUsuario", "🔢 Código: ${error.code}")
-                Log.e("DALUsuario", "📝 Detalles: ${error.details}")
-
-                // EN CASO DE ERROR, ASUMIR QUE EMAIL ESTÁ DISPONIBLE
-                onfinishReadListener(null)
-            }
-        })
+        } catch (e: Exception) {
+            Log.e("DALUsuario", "🔥 Excepción en getAllUsuarios: ${e.message}")
+            onFinish(emptyList())
+        }
     }
 
-    public fun getAllUsuarios(idEmpresaNube:String?, activo:Boolean?, onfinishReadListener: (List<UsuarioNube>,String) -> Unit)
-    {
-        var mensajeError:String=""
-        // ✅ REFERENCIA CORREGIDA: NEGOCIOMX-FB/Usuario
-        firebaseRef = FirebaseDatabase.getInstance().getReference("NEGOCIOMX-FB").child(NombreTabla)
-
-        firebaseRef.addListenerForSingleValueEvent( object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                var item: UsuarioNube
-                var listaUsuarios:MutableList<UsuarioNube> = mutableListOf()
-
-                if(snapshot.exists()) {
-                    for (e in snapshot.children) {
-                        try {
-                            item = e.getValue(UsuarioNube::class.java)!!
-                            if(item != null && (activo == null || item.Activo == activo)
-                                && (idEmpresaNube == null || item.IdEmpresa.equals(idEmpresaNube))) {
-                                listaUsuarios.add(item)
-                            }
-                        } catch (ex: Exception) {
-                            Log.e("DALUsuario", "Error procesando usuario en getAllUsuarios: ${ex.message}")
-                        }
-                    }
-                }
-                onfinishReadListener(listaUsuarios, mensajeError)
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                onfinishReadListener(arrayListOf(), error.toString())
-            }
-        })
+    // ✅ FUNCIÓN PARA GENERAR ID NUMÉRICO ALEATORIO
+    private fun generateNumericId(): String {
+        return (100000..999999).random().toString()
     }
 }

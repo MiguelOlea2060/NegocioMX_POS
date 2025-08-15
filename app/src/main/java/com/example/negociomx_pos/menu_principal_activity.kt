@@ -1013,17 +1013,17 @@ class menu_principal_activity : AppCompatActivity() {
             res->
             if(res==2)
                 ejecutaPantallaArticuloLocal()
-            else
-                ejecutaPantallaArticuloNube()
+         //   else
+               // ejecutaPantallaArticuloNube()
         }
     }
 
-    private fun ejecutaPantallaArticuloNube()
+  /*  private fun ejecutaPantallaArticuloNube()
     {
         val intent= Intent(this,articulo_nube_activity::class.java)
         intent.putExtra("tipoArticulo",2)
         startActivity(intent)
-    }
+    }*/
 
     private fun ejecutaPantallaArticuloLocal()
     {
