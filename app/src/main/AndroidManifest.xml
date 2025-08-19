@@ -23,6 +23,7 @@
         tools:ignore="ScopedStorage" />
 
     <application
+
         android:name=".Utils.negociomx_posApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -33,7 +34,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NegocioMX_POS"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
 
         <provider
             android:name="androidx.core.content.FileProvider"

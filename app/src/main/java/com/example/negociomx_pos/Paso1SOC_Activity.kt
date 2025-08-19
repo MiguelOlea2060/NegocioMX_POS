@@ -1,30 +1,28 @@
 package com.example.negociomx_pos
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_pos.BE.Vehiculo
 import com.example.negociomx_pos.DAL.DALVehiculo
+import com.example.negociomx_pos.Utils.FileUploadUtil
 import com.example.negociomx_pos.databinding.ActivityPaso1SocBinding
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,8 +31,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
     private lateinit var binding: ActivityPaso1SocBinding
     private val dalVehiculo = DALVehiculo()
     private var vehiculoActual: Vehiculo? = null
-    private var evidencia1Base64: String = ""
-    private var evidencia2Base64: String = ""
+    private var evidencia1NombreArchivo: String = ""
+    private var evidencia2NombreArchivo: String = ""
+    private var currentPhotoType: Int = 0 // Para saber qué evidencia estamos capturando
     private var fotoUri: Uri? = null
 
     // ✅ LAUNCHER PARA ESCÁNER DE CÓDIGOS
@@ -193,6 +192,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
 
         try {
+            currentPhotoType = numeroEvidencia // Guardar qué evidencia estamos capturando
             val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
             val imageFileName = "SOC_${numeroEvidencia}_${timeStamp}.jpg"
             val storageDir = File(getExternalFilesDir(null), "SOC_Photos")
@@ -205,7 +205,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
             fotoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
 
             // Guardar qué evidencia estamos capturando
-            photoFile.writeText(numeroEvidencia.toString())
+            //photoFile.writeText(numeroEvidencia.toString())
 
             camaraLauncher.launch(fotoUri)
 
@@ -215,7 +215,192 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
     }
 
+
+    private fun obtenerArchivoDesdeUri(uri: Uri): File? {
+        return try {
+            // Si es una URI de FileProvider, obtener la ruta real
+            val path = uri.path
+            if (path != null) {
+                val file = File(path)
+                if (file.exists()) {
+                    return file
+                }
+            }
+
+            // Si no funciona, intentar con ContentResolver
+            val inputStream = contentResolver.openInputStream(uri)
+            if (inputStream != null) {
+                val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+                val tempFile = File(getExternalFilesDir(null), "temp_photo_$timeStamp.jpg")
+
+                tempFile.outputStream().use { output ->
+                    inputStream.copyTo(output)
+                }
+                inputStream.close()
+
+                return tempFile
+            }
+
+            null
+        } catch (e: Exception) {
+            Log.e("Paso1SOC", "Error obteniendo archivo desde URI: ${e.message}")
+            null
+        }
+    }
+
+    private fun comprimirImagen(archivoOriginal: File): File {
+        return try {
+            val bitmap = BitmapFactory.decodeFile(archivoOriginal.absolutePath)
+
+            // Calcular nuevo tamaño manteniendo proporción (máximo 2048px)
+            val maxSize = 2048
+            val ratio = minOf(maxSize.toFloat() / bitmap.width, maxSize.toFloat() / bitmap.height)
+            val newWidth = (bitmap.width * ratio).toInt()
+            val newHeight = (bitmap.height * ratio).toInt()
+
+            val bitmapRedimensionado = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+
+            // Crear archivo comprimido
+            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val archivoComprimido = File(getExternalFilesDir(null), "compressed_$timeStamp.jpg")
+
+            val outputStream = FileOutputStream(archivoComprimido)
+            bitmapRedimensionado.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
+            outputStream.close()
+
+            bitmap.recycle()
+            bitmapRedimensionado.recycle()
+
+            Log.d("Paso1SOC", "✅ Imagen comprimida: ${archivoComprimido.length()} bytes")
+            archivoComprimido
+
+        } catch (e: Exception) {
+            Log.e("Paso1SOC", "Error comprimiendo imagen: ${e.message}")
+            archivoOriginal
+        }
+    }
+
     private fun procesarFoto(uri: Uri) {
+        lifecycleScope.launch {
+            try {
+                Log.d("Paso1SOC", "📸 Procesando foto para evidencia $currentPhotoType")
+
+                val vehiculo = vehiculoActual
+                if (vehiculo == null) {
+                    Toast.makeText(this@Paso1SOC_Activity, "Error: No hay vehículo seleccionado", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                // Crear nombre único para el archivo
+                val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+                val nombreArchivo = "SOC_${vehiculo.VIN}_EV${currentPhotoType}_${timeStamp}.jpg"
+
+                // ✅ CORRECCIÓN: Obtener el archivo real desde la URI
+                val archivoLocal = obtenerArchivoDesdeUri(uri)
+
+                if (archivoLocal == null || !archivoLocal.exists()) {
+                    Toast.makeText(this@Paso1SOC_Activity, "Error: Archivo de foto no encontrado", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                // <CHANGE> Comprimir imagen si es mayor a 4.5MB
+                val archivoFinal = if (archivoLocal.length() > 4.5 * 1024 * 1024) {
+                    Log.d("Paso1SOC", "📦 Comprimiendo imagen de ${archivoLocal.length()} bytes")
+                    comprimirImagen(archivoLocal)
+                } else {
+                    archivoLocal
+                }
+
+                // Subir foto al servidor
+                Toast.makeText(this@Paso1SOC_Activity, "Subiendo evidencia $currentPhotoType...", Toast.LENGTH_SHORT).show()
+
+                val nombreArchivoSubido = FileUploadUtil.subirFotoAlServidor(
+                    archivoFoto = archivoFinal,
+                    nombreArchivo = nombreArchivo,
+                    vin = vehiculo.VIN
+                )
+
+                if (nombreArchivoSubido != null) {
+                    // Guardar nombre del archivo según la evidencia
+                    if (currentPhotoType == 1) {
+                        evidencia1NombreArchivo = nombreArchivoSubido
+                        binding.tvEstadoEvidencia1.text = "✅"
+                        Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 1 subida al servidor", Toast.LENGTH_SHORT).show()
+                    } else {
+                        evidencia2NombreArchivo = nombreArchivoSubido
+                        binding.tvEstadoEvidencia2.text = "✅"
+                        Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 2 subida al servidor", Toast.LENGTH_SHORT).show()
+                    }
+
+                    Log.d("Paso1SOC", "✅ Evidencia $currentPhotoType guardada como: $nombreArchivoSubido")
+                } else {
+                    Toast.makeText(this@Paso1SOC_Activity, "❌ Error subiendo evidencia $currentPhotoType", Toast.LENGTH_LONG).show()
+                }
+
+            } catch (e: Exception) {
+                Log.e("Paso1SOC", "💥 Error procesando foto: ${e.message}")
+                Toast.makeText(this@Paso1SOC_Activity, "Error procesando foto: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+
+   /* private fun procesarFoto(uri: Uri) {
+        lifecycleScope.launch {
+            try {
+                Log.d("Paso1SOC", "📸 Procesando foto para evidencia $currentPhotoType")
+
+                val vehiculo = vehiculoActual
+                if (vehiculo == null) {
+                    Toast.makeText(this@Paso1SOC_Activity, "Error: No hay vehículo seleccionado", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                // Crear nombre único para el archivo
+                val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+                val nombreArchivo = "SOC_${vehiculo.VIN}_EV${currentPhotoType}_${timeStamp}.jpg"
+
+                // Obtener el archivo local
+                val archivoLocal = File(uri.path ?: "")
+
+                if (!archivoLocal.exists()) {
+                    Toast.makeText(this@Paso1SOC_Activity, "Error: Archivo de foto no encontrado", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+
+                // Subir foto al servidor
+                Toast.makeText(this@Paso1SOC_Activity, "Subiendo evidencia $currentPhotoType...", Toast.LENGTH_SHORT).show()
+
+                val nombreArchivoSubido = FileUploadUtil.subirFotoAlServidor(
+                    archivoFoto = archivoLocal,
+                    nombreArchivo = nombreArchivo,
+                    vin = vehiculo.VIN
+                )
+
+                if (nombreArchivoSubido != null) {
+                    // Guardar nombre del archivo según la evidencia
+                    if (currentPhotoType == 1) {
+                        evidencia1NombreArchivo = nombreArchivoSubido
+                        binding.tvEstadoEvidencia1.text = "✅"
+                        Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 1 subida al servidor", Toast.LENGTH_SHORT).show()
+                    } else {
+                        evidencia2NombreArchivo = nombreArchivoSubido
+                        binding.tvEstadoEvidencia2.text = "✅"
+                        Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 2 subida al servidor", Toast.LENGTH_SHORT).show()
+                    }
+
+                    Log.d("Paso1SOC", "✅ Evidencia $currentPhotoType guardada como: $nombreArchivoSubido")
+                } else {
+                    Toast.makeText(this@Paso1SOC_Activity, "❌ Error subiendo evidencia $currentPhotoType", Toast.LENGTH_LONG).show()
+                }
+
+            } catch (e: Exception) {
+                Log.e("Paso1SOC", "💥 Error procesando foto: ${e.message}")
+                Toast.makeText(this@Paso1SOC_Activity, "Error procesando foto: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }*/
+  /*  private fun procesarFoto(uri: Uri) {
         try {
             val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
             val base64 = convertirBitmapABase64(bitmap)
@@ -239,13 +424,13 @@ class Paso1SOC_Activity : AppCompatActivity() {
             Toast.makeText(this, "Error procesando foto", Toast.LENGTH_SHORT).show()
         }
     }
-
-    private fun convertirBitmapABase64(bitmap: Bitmap): String {
+*/
+  /*  private fun convertirBitmapABase64(bitmap: Bitmap): String {
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
-    }
+    }*/
 
     private fun guardarSOC() {
         val vehiculo = vehiculoActual
@@ -280,8 +465,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     bateria = bateria,
                     modoTransporte = binding.cbModoTransporte.isChecked,
                     requiereRecarga = binding.cbRequiereRecarga.isChecked,
-                    evidencia1 = evidencia1Base64,
-                    evidencia2 = evidencia2Base64
+                    evidencia1 = evidencia1NombreArchivo,
+                    evidencia2 = evidencia2NombreArchivo
+
                 )
 
                 if (exito) {
@@ -310,8 +496,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
 
         vehiculoActual = null
-        evidencia1Base64 = ""
-        evidencia2Base64 = ""
+        evidencia1NombreArchivo = ""
+        evidencia2NombreArchivo = ""
         ocultarSeccionesSOC()
     }
 }
