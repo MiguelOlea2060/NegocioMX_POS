@@ -9,10 +9,10 @@ object ConexionSQLServer {
     // ⚙️ CONFIGURA ESTOS DATOS CON TU SERVIDOR SQL
     //private const val SERVER = "127.0.0.1"
     //private const val SERVER = "MIGUELOLEA"
-    private const val SERVER = "192.168.1.71"
+    private const val SERVER = "192.168.1.162"
     private const val DATABASE = "NegocioMX_PatioLaPalma"
     private const val USERNAME = "sa"
-    private const val PASSWORD = "NITr11ziu7"
+    private const val PASSWORD = "NITr11ziu7.#"
     private const val PORT = "1433"
 
     fun obtenerConexion(): Connection? {
