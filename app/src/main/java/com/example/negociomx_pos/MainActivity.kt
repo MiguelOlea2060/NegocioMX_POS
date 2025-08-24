@@ -2,6 +2,7 @@ package com.example.negociomx_pos
 
 import android.content.ContentValues
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.RectF
 import android.os.Build
@@ -15,6 +16,7 @@ import android.view.MotionEvent
 import android.view.OrientationEventListener
 import android.view.ScaleGestureDetector
 import android.view.Surface
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.AspectRatio
@@ -52,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
+
     private val multiplePermissionId = 14
     private val multiplePermissionNameList = if (Build.VERSION.SDK_INT >= 33) {
         arrayListOf(
@@ -85,6 +88,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(mainBinding.root)
 
+
+
         if (checkMultiplePermission()) {
             startCamera()
         }
@@ -99,6 +104,7 @@ class MainActivity : AppCompatActivity() {
             }
             bindCameraUserCases()
         }
+
 
         mainBinding.aspectRatioTxt.setOnClickListener {
             if (aspectRatio == AspectRatio.RATIO_16_9) {
@@ -125,7 +131,15 @@ class MainActivity : AppCompatActivity() {
         mainBinding.flashToggleIB.setOnClickListener {
             setFlashIcon(camera)
         }
+
+
+
+
     }
+
+
+
+    //
 
     private fun checkMultiplePermission(): Boolean {
         val listPermissionNeeded = arrayListOf<String>()

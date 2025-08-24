@@ -123,6 +123,7 @@ class menu_principal_activity : AppCompatActivity() {
         val btnRadmin = findViewById<Button>(R.id.btnRadminVPN)
         val btnLectorQR = findViewById<Button>(R.id.btnLectorQR)
         val btnPaso1SOC =findViewById<Button>(R.id.btnPaso1SOC)
+        val btnVehiculo = findViewById<Button>(R.id.btnVehiculo)
 
         getEmpresaNubeCfgNubeCfgNVNube()
 
@@ -234,6 +235,10 @@ class menu_principal_activity : AppCompatActivity() {
             override fun handleOnBackPressed() {
             }
         })
+        btnVehiculo.setOnClickListener {
+            val intent = Intent(this, alta_vehiculo::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun verificarCatalogosDeNubePorActualizarLocalmente() {

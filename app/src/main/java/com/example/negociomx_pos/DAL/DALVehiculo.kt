@@ -1,6 +1,10 @@
 package com.example.negociomx_pos.DAL
 
 import android.util.Log
+import com.example.negociomx_pos.BE.DireccionVehiculo
+import com.example.negociomx_pos.BE.Marca
+import com.example.negociomx_pos.BE.Modelo
+import com.example.negociomx_pos.BE.Transmision
 import com.example.negociomx_pos.BE.Vehiculo
 import com.example.negociomx_pos.Utils.ConexionSQLServer
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +31,253 @@ class DALVehiculo {
         }
     }
 
-    // ✅ CONSULTAR VEHÍCULO POR VIN - CORREGIDO PARA ESQUEMA REAL
+
+    // ✅ INSERTAR NUEVO VEHÍCULO
+    suspend fun insertarVehiculo(
+        vin: String,
+        motor: String,
+        idMarca: Int,
+        idModelo: Int,
+        anio: Int,
+        idTransmision: Int,
+        idDireccion: Int,
+        version: String
+    ): Boolean = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+
+        try {
+            Log.d("DALVehiculo", "💾 Insertando nuevo vehículo con VIN: $vin")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext false
+            }
+
+            val query = """
+                INSERT INTO Vehiculo (Vin, Motor, IdMarca, IdModelo, Annio, IdTransmision, IdDireccionVehiculo, Version, FechaModificacion)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, GETDATE())
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setString(1, vin)
+            statement.setString(2, motor)
+            statement.setInt(3, idMarca)
+            statement.setInt(4, idModelo)
+            statement.setInt(5, anio)
+            statement.setInt(6, idTransmision)
+            statement.setInt(7, idDireccion)
+            statement.setString(8, version)
+
+            val filasAfectadas = statement.executeUpdate()
+
+            if (filasAfectadas > 0) {
+                Log.d("DALVehiculo", "✅ Vehículo insertado exitosamente")
+                return@withContext true
+            } else {
+                Log.w("DALVehiculo", "⚠️ No se insertó el vehículo")
+                return@withContext false
+            }
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error insertando vehículo: ${e.message}")
+            e.printStackTrace()
+            return@withContext false
+        } finally {
+            try {
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+    }
+
+
+    // ✅ OBTENER TODAS LAS MARCAS
+    suspend fun obtenerMarcas(): List<Marca> = withContext(Dispatchers.IO) {
+        val marcas = mutableListOf<Marca>()
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext marcas
+            }
+
+            val query = "SELECT IdMarcaAuto, Nombre FROM MarcaAuto ORDER BY Nombre"
+            statement = conexion.prepareStatement(query)
+            resultSet = statement.executeQuery()
+
+            while (resultSet.next()) {
+                val marca = Marca(
+                    IdMarcaAuto = resultSet.getInt("IdMarcaAuto"),
+                    Nombre = resultSet.getString("Nombre") ?: ""
+                )
+                marcas.add(marca)
+            }
+
+            Log.d("DALVehiculo", "✅ Se obtuvieron ${marcas.size} marcas")
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error obteniendo marcas: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+
+        return@withContext marcas
+    }
+
+
+    // ✅ OBTENER MODELOS POR MARCA
+    suspend fun obtenerModelosPorMarca(idMarca: Int): List<Modelo> = withContext(Dispatchers.IO) {
+        val modelos = mutableListOf<Modelo>()
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext modelos
+            }
+
+            val query = "SELECT IdModelo, Nombre, IdMarca FROM Modelo WHERE IdMarca = ? ORDER BY Nombre"
+            statement = conexion.prepareStatement(query)
+            statement.setInt(1, idMarca)
+            resultSet = statement.executeQuery()
+
+            while (resultSet.next()) {
+                val modelo = Modelo(
+                    IdModelo = resultSet.getInt("IdModelo"),
+                    Nombre = resultSet.getString("Nombre") ?: "",
+                    IdMarcaAuto = resultSet.getInt("IdMarca")
+                )
+                modelos.add(modelo)
+            }
+
+            Log.d("DALVehiculo", "✅ Se obtuvieron ${modelos.size} modelos para marca $idMarca")
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error obteniendo modelos: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+
+        return@withContext modelos
+    }
+
+
+    // ✅ OBTENER TODAS LAS TRANSMISIONES
+    suspend fun obtenerTransmisiones(): List<Transmision> = withContext(Dispatchers.IO) {
+        val transmisiones = mutableListOf<Transmision>()
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext transmisiones
+            }
+
+            val query = "SELECT IdTransmision, Nombre FROM Transmision ORDER BY Nombre"
+            statement = conexion.prepareStatement(query)
+            resultSet = statement.executeQuery()
+
+            while (resultSet.next()) {
+                val transmision = Transmision(
+                    IdTransmision = resultSet.getInt("IdTransmision"),
+                    Nombre = resultSet.getString("Nombre") ?: ""
+                )
+                transmisiones.add(transmision)
+            }
+
+            Log.d("DALVehiculo", "✅ Se obtuvieron ${transmisiones.size} transmisiones")
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error obteniendo transmisiones: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+
+        return@withContext transmisiones
+    }
+
+
+    // ✅ OBTENER TODAS LAS DIRECCIONES
+    suspend fun obtenerDirecciones(): List<DireccionVehiculo> = withContext(Dispatchers.IO) {
+        val direcciones = mutableListOf<DireccionVehiculo>()
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext direcciones
+            }
+
+            val query = "SELECT IdDireccionVehiculo, Nombre FROM DireccionVehiculo ORDER BY Nombre"
+            statement = conexion.prepareStatement(query)
+            resultSet = statement.executeQuery()
+
+            while (resultSet.next()) {
+                val direccion = DireccionVehiculo(
+                    IdDireccionVehiculo = resultSet.getInt("IdDireccionVehiculo"),
+                    Nombre = resultSet.getString("Nombre") ?: ""
+                )
+                direcciones.add(direccion)
+            }
+
+            Log.d("DALVehiculo", "✅ Se obtuvieron ${direcciones.size} direcciones")
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error obteniendo direcciones: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+
+        return@withContext direcciones
+    }
+
+
+// ✅ CONSULTAR VEHÍCULO POR VIN - CORREGIDO PARA ESQUEMA REAL
     suspend fun consultarVehiculoPorVIN(vin: String): Vehiculo? = withContext(Dispatchers.IO) {
         var vehiculo: Vehiculo? = null
         var conexion: Connection? = null
@@ -163,4 +413,8 @@ class DALVehiculo {
             }
         }
     }
+
+
+
 }
+
