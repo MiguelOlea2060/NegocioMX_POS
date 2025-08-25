@@ -10,7 +10,7 @@ import java.net.URL
 object FileUploadUtil {
 
     // ⚙️ CONFIGURA LA RUTA DE TU SERVIDOR DONDE QUIERES GUARDAR LAS FOTOS
-    private const val SERVER_UPLOAD_URL = "http://192.168.1.71:8080/upload_soc_photos.php"
+    private const val SERVER_UPLOAD_URL = "http://192.168.1.162:8080/upload_soc_photos.php"
 
     suspend fun subirFotoAlServidor(
         archivoFoto: File,
