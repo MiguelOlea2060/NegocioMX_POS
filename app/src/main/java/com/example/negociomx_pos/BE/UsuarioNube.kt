@@ -14,3 +14,4 @@ data class UsuarioNube(
     var NombreCuentaVerificada: String? = null,
     var RfcEmpresa: String? = null
 )
+//DATA CLASE CREADA POR MIGUEL

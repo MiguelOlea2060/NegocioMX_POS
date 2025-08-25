@@ -36,6 +36,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
     private var currentPhotoType: Int = 0 // Para saber qué evidencia estamos capturando
     private var fotoUri: Uri? = null
 
+    private var idUsuarioNubeAlta: Int = 905415 // Reemplaza con el ID del usuario actual
+    private var fotosExistentes: Int = 0 // Para controlar cuántas fotos ya existen
+
     // ✅ LAUNCHER PARA ESCÁNER DE CÓDIGOS
     private val barcodeLauncher = registerForActivityResult(ScanContract()) { result ->
         if (result.contents == null) {
@@ -124,7 +127,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
         barcodeLauncher.launch(options)
     }
 
-    private fun consultarVehiculo(vin: String) {
+   /* private fun consultarVehiculo(vin: String) {
         lifecycleScope.launch {
             try {
                 Log.d("Paso1SOC", "🔍 Consultando vehículo con VIN: $vin")
@@ -139,6 +142,47 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     mostrarInformacionVehiculo(vehiculo)
                     mostrarSeccionesSOC()
                     Toast.makeText(this@Paso1SOC_Activity, "✅ Vehículo encontrado", Toast.LENGTH_SHORT).show()
+                } else {
+                    ocultarSeccionesSOC()
+                    Toast.makeText(this@Paso1SOC_Activity, "❌ Vehículo no encontrado", Toast.LENGTH_LONG).show()
+                }
+
+            } catch (e: Exception) {
+                Log.e("Paso1SOC", "💥 Error consultando vehículo: ${e.message}")
+                Toast.makeText(this@Paso1SOC_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }*/
+//nueva
+    private fun consultarVehiculo(vin: String) {
+        lifecycleScope.launch {
+            try {
+                Log.d("Paso1SOC", "🔍 Consultando vehículo con VIN: $vin")
+
+                Toast.makeText(this@Paso1SOC_Activity, "Consultando vehículo...", Toast.LENGTH_SHORT).show()
+
+                val vehiculo = dalVehiculo.consultarVehiculoPorVIN(vin)
+
+                if (vehiculo != null) {
+                    vehiculoActual = vehiculo
+
+                    // ✅ CONSULTAR FOTOS EXISTENTES
+                    fotosExistentes = dalVehiculo.consultarFotosExistentes(vehiculo.Id.toInt())
+
+                    mostrarInformacionVehiculo(vehiculo)
+                    mostrarSeccionesSOC()
+
+                    // ✅ MOSTRAR INFORMACIÓN SOBRE FOTOS EXISTENTES
+                    if (fotosExistentes > 0) {
+                        Toast.makeText(this@Paso1SOC_Activity,
+                            "✅ Vehículo encontrado. Ya tiene $fotosExistentes foto(s) registrada(s)",
+                            Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(this@Paso1SOC_Activity,
+                            "✅ Vehículo encontrado. Sin fotos previas",
+                            Toast.LENGTH_SHORT).show()
+                    }
+
                 } else {
                     ocultarSeccionesSOC()
                     Toast.makeText(this@Paso1SOC_Activity, "❌ Vehículo no encontrado", Toast.LENGTH_LONG).show()
@@ -500,4 +544,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
         evidencia2NombreArchivo = ""
         ocultarSeccionesSOC()
     }
+
+
 }
