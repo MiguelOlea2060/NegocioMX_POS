@@ -300,7 +300,7 @@ class DALVehiculo {
                  Annio annio, Motor, version, idvehiculo from vehiculo
                 		inner join dbo.MarcaAuto on vehiculo.IdMarca=MarcaAuto.IdMarcaAuto
                 		inner join dbo.Modelo on vehiculo.IdModelo=modelo.IdModelo
-                where vehiculo.vin != ?
+                where vehiculo.vin = ?
               
             """.trimIndent()
 
@@ -481,7 +481,8 @@ class DALVehiculo {
         idEntidadArchivoFoto: Int?,
         idUsuarioNubeAlta: Int,
         consecutivo: Short,
-        posicion: Byte?
+        posicion: Byte?,
+        fotoBase64: String?
     ): Boolean = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
@@ -496,8 +497,8 @@ class DALVehiculo {
             }
 
             val query = """
-            INSERT INTO Paso1LogVehiculoFotos (IdPaso1LogVehiculo, IdEntidadArchivoFoto, IdUsuarioNubeAlta, FechaAlta, Consecutivo, Posicion)
-            VALUES (?, ?, ?, GETDATE(), ?, ?)
+            INSERT INTO Paso1LogVehiculoFotos (IdPaso1LogVehiculo, IdEntidadArchivoFoto, IdUsuarioNubeAlta, FechaAlta, Consecutivo, Posicion, FotoBase64)
+            VALUES (?, ?, ?, GETDATE(), ?, ?, ?)
         """.trimIndent()
 
             statement = conexion.prepareStatement(query)
@@ -513,6 +514,11 @@ class DALVehiculo {
                 statement.setNull(5, java.sql.Types.TINYINT)
             } else {
                 statement.setByte(5, posicion)
+                if (fotoBase64 == null) {
+                    statement.setNull(6, java.sql.Types.NVARCHAR)
+                } else {
+                    statement.setString(6, fotoBase64)
+                }
             }
 
             val filasAfectadas = statement.executeUpdate()

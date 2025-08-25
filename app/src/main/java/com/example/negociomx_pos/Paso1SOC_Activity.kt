@@ -16,7 +16,8 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_pos.BE.Vehiculo
 import com.example.negociomx_pos.DAL.DALVehiculo
-import com.example.negociomx_pos.Utils.FileUploadUtil
+//import com.example.negociomx_pos.Utils.FileUploadUtil
+import com.example.negociomx_pos.Utils.ParametrosSistema
 import com.example.negociomx_pos.databinding.ActivityPaso1SocBinding
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
@@ -31,12 +32,18 @@ class Paso1SOC_Activity : AppCompatActivity() {
     private lateinit var binding: ActivityPaso1SocBinding
     private val dalVehiculo = DALVehiculo()
     private var vehiculoActual: Vehiculo? = null
-    private var evidencia1NombreArchivo: String = ""
-    private var evidencia2NombreArchivo: String = ""
+  //  private var evidencia1NombreArchivo: String = ""
+  //  private var evidencia2NombreArchivo: String = ""
+
+    private var evidencia1File: File? = null
+    private var evidencia2File: File? = null
+    private var evidencia1Capturada: Boolean = false
+    private var evidencia2Capturada: Boolean = false
     private var currentPhotoType: Int = 0 // Para saber qué evidencia estamos capturando
     private var fotoUri: Uri? = null
+    private var vehiculo: Vehiculo? = null
 
-    private var idUsuarioNubeAlta: Int = 905415 // Reemplaza con el ID del usuario actual
+    private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.Id?.toInt()!!// Reemplaza con el ID del usuario actual
     private var fotosExistentes: Int = 0 // Para controlar cuántas fotos ya existen
 
     // ✅ LAUNCHER PARA ESCÁNER DE CÓDIGOS
@@ -161,15 +168,18 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
                 Toast.makeText(this@Paso1SOC_Activity, "Consultando vehículo...", Toast.LENGTH_SHORT).show()
 
-                val vehiculo = dalVehiculo.consultarVehiculoPorVIN(vin)
+                 vehiculo = dalVehiculo.consultarVehiculoPorVIN(vin)
+               /* if ( vh != null)
+                 vehiculo =  vh
+                     dalVehiculo.consultarVehiculoPorVIN(vin)*/
 
                 if (vehiculo != null) {
                     vehiculoActual = vehiculo
 
                     // ✅ CONSULTAR FOTOS EXISTENTES
-                    fotosExistentes = dalVehiculo.consultarFotosExistentes(vehiculo.Id.toInt())
+                    fotosExistentes = dalVehiculo.consultarFotosExistentes(vehiculo?.Id?.toInt()!!)
 
-                    mostrarInformacionVehiculo(vehiculo)
+                    mostrarInformacionVehiculo(vehiculo!!)
                     mostrarSeccionesSOC()
 
                     // ✅ MOSTRAR INFORMACIÓN SOBRE FOTOS EXISTENTES
@@ -229,7 +239,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
     }
 
-    private fun capturarEvidencia(numeroEvidencia: Int) {
+   /* private fun capturarEvidencia(numeroEvidencia: Int) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             permisoLauncher.launch(Manifest.permission.CAMERA)
             return
@@ -257,8 +267,85 @@ class Paso1SOC_Activity : AppCompatActivity() {
             Log.e("Paso1SOC", "Error creando archivo de foto: ${e.message}")
             Toast.makeText(this, "Error preparando cámara", Toast.LENGTH_SHORT).show()
         }
-    }
+    }*/
 
+  /*  private fun capturarEvidencia(numeroEvidencia: Int) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            permisoLauncher.launch(Manifest.permission.CAMERA)
+            return
+        }
+
+        // ✅ VALIDAR LÍMITE DE FOTOS
+        val totalFotosPermitidas = if (fotosExistentes == 0) 2 else 2 // Máximo 2 fotos siempre
+        val fotosActuales = fotosExistentes +
+                (if (evidencia1NombreArchivo.isNotEmpty()) 1 else 0) +
+                (if (evidencia2NombreArchivo.isNotEmpty()) 1 else 0)
+
+        if (fotosActuales >= totalFotosPermitidas) {
+            Toast.makeText(this,
+                "Ya se alcanzó el límite máximo de $totalFotosPermitidas fotos para este vehículo",
+                Toast.LENGTH_LONG).show()
+            return
+        }
+
+        try {
+            currentPhotoType = numeroEvidencia
+            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val imageFileName = "SOC_${numeroEvidencia}_${timeStamp}.jpg"
+            val storageDir = File(getExternalFilesDir(null), "SOC_Photos")
+
+            if (!storageDir.exists()) {
+                storageDir.mkdirs()
+            }
+
+            val photoFile = File(storageDir, imageFileName)
+            fotoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
+
+            camaraLauncher.launch(fotoUri)
+
+        } catch (e: Exception) {
+            Log.e("Paso1SOC", "Error creando archivo de foto: ${e.message}")
+            Toast.makeText(this, "Error preparando cámara", Toast.LENGTH_SHORT).show()
+        }
+    }
+*/
+  private fun capturarEvidencia(numeroEvidencia: Int) {
+      if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+          permisoLauncher.launch(Manifest.permission.CAMERA)
+          return
+      }
+
+      // ✅ VALIDAR SI YA TIENE FOTO CAPTURADA
+      if (numeroEvidencia == 1 && evidencia1Capturada) {
+          Toast.makeText(this, "Ya tiene evidencia 1 capturada. Presione Guardar para confirmar.", Toast.LENGTH_SHORT).show()
+          return
+      }
+
+      if (numeroEvidencia == 2 && evidencia2Capturada) {
+          Toast.makeText(this, "Ya tiene evidencia 2 capturada. Presione Guardar para confirmar.", Toast.LENGTH_SHORT).show()
+          return
+      }
+
+      try {
+          currentPhotoType = numeroEvidencia
+          val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+          val imageFileName = "SOC_${numeroEvidencia}_${timeStamp}.jpg"
+          val storageDir = File(getExternalFilesDir(null), "SOC_Photos")
+
+          if (!storageDir.exists()) {
+              storageDir.mkdirs()
+          }
+
+          val photoFile = File(storageDir, imageFileName)
+          fotoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
+
+          camaraLauncher.launch(fotoUri)
+
+      } catch (e: Exception) {
+          Log.e("Paso1SOC", "Error creando archivo de foto: ${e.message}")
+          Toast.makeText(this, "Error preparando cámara", Toast.LENGTH_SHORT).show()
+      }
+  }
 
     private fun obtenerArchivoDesdeUri(uri: Uri): File? {
         return try {
@@ -324,7 +411,65 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
     }
 
+    private fun convertirImagenABase64(archivo: File): String? {
+        return try {
+            val bytes = archivo.readBytes()
+            android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
+        } catch (e: Exception) {
+            Log.e("Paso1SOC", "Error convirtiendo imagen a Base64: ${e.message}")
+            null
+        }
+    }
+
+
     private fun procesarFoto(uri: Uri) {
+        try {
+            Log.d("Paso1SOC", "📸 Procesando foto para evidencia $currentPhotoType")
+
+            val vehiculo = vehiculoActual
+            if (vehiculo == null) {
+                Toast.makeText(this@Paso1SOC_Activity, "Error: No hay vehículo seleccionado", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            // ✅ OBTENER EL ARCHIVO LOCAL DESDE LA URI
+            val archivoLocal = obtenerArchivoDesdeUri(uri)
+
+            if (archivoLocal == null || !archivoLocal.exists()) {
+                Toast.makeText(this@Paso1SOC_Activity, "Error: Archivo de foto no encontrado", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            // ✅ COMPRIMIR IMAGEN SI ES NECESARIO
+            val archivoFinal = if (archivoLocal.length() > 4.5 * 1024 * 1024) {
+                Log.d("Paso1SOC", "📦 Comprimiendo imagen de ${archivoLocal.length()} bytes")
+                comprimirImagen(archivoLocal)
+            } else {
+                archivoLocal
+            }
+
+            // ✅ GUARDAR REFERENCIA DEL ARCHIVO SEGÚN LA EVIDENCIA
+            if (currentPhotoType == 1) {
+                evidencia1File = archivoFinal
+                evidencia1Capturada = true
+                binding.tvEstadoEvidencia1.text = "📷"
+                Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 1 capturada (sin guardar)", Toast.LENGTH_SHORT).show()
+            } else {
+                evidencia2File = archivoFinal
+                evidencia2Capturada = true
+                binding.tvEstadoEvidencia2.text = "📷"
+                Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 2 capturada (sin guardar)", Toast.LENGTH_SHORT).show()
+            }
+
+            Log.d("Paso1SOC", "✅ Evidencia $currentPhotoType lista para guardar")
+
+        } catch (e: Exception) {
+            Log.e("Paso1SOC", "💥 Error procesando foto: ${e.message}")
+            Toast.makeText(this@Paso1SOC_Activity, "Error procesando foto: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+  /*  private fun procesarFoto(uri: Uri) {
         lifecycleScope.launch {
             try {
                 Log.d("Paso1SOC", "📸 Procesando foto para evidencia $currentPhotoType")
@@ -386,7 +531,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                 Toast.makeText(this@Paso1SOC_Activity, "Error procesando foto: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
-    }
+    }*/
 
 
    /* private fun procesarFoto(uri: Uri) {
@@ -476,7 +621,307 @@ class Paso1SOC_Activity : AppCompatActivity() {
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }*/
 
+   /* private suspend fun subirFotosAlServidor(vehiculo: Vehiculo): Pair<String, String> {
+        var evidencia1Nombre = ""
+        var evidencia2Nombre = ""
+
+        try {
+            // ✅ SUBIR EVIDENCIA 1 SI EXISTE
+            if (evidencia1File != null && evidencia1Capturada) {
+                val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+                val nombreArchivo1 = "SOC_${vehiculo.VIN}_EV1_${timeStamp}.jpg"
+
+                Toast.makeText(this@Paso1SOC_Activity, "Subiendo evidencia 1...", Toast.LENGTH_SHORT).show()
+
+                val nombreSubido1 = FileUploadUtil.subirFotoAlServidor(
+                    archivoFoto = evidencia1File!!,
+                    nombreArchivo = nombreArchivo1,
+                    vin = vehiculo.VIN
+                )
+
+                if (nombreSubido1 != null) {
+                    evidencia1Nombre = nombreSubido1
+                    Log.d("Paso1SOC", "✅ Evidencia 1 subida: $nombreSubido1")
+                } else {
+                    throw Exception("Error subiendo evidencia 1")
+                }
+            }
+
+            // ✅ SUBIR EVIDENCIA 2 SI EXISTE
+            if (evidencia2File != null && evidencia2Capturada) {
+                val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+                val nombreArchivo2 = "SOC_${vehiculo.VIN}_EV2_${timeStamp}.jpg"
+
+                Toast.makeText(this@Paso1SOC_Activity, "Subiendo evidencia 2...", Toast.LENGTH_SHORT).show()
+
+                val nombreSubido2 = FileUploadUtil.subirFotoAlServidor(
+                    archivoFoto = evidencia2File!!,
+                    nombreArchivo = nombreArchivo2,
+                    vin = vehiculo.VIN
+                )
+
+                if (nombreSubido2 != null) {
+                    evidencia2Nombre = nombreSubido2
+                    Log.d("Paso1SOC", "✅ Evidencia 2 subida: $nombreSubido2")
+                } else {
+                    throw Exception("Error subiendo evidencia 2")
+                }
+            }
+
+        } catch (e: Exception) {
+            Log.e("Paso1SOC", "💥 Error subiendo fotos: ${e.message}")
+            throw e
+        }
+
+        return Pair(evidencia1Nombre, evidencia2Nombre)
+    }*/
+
+
     private fun guardarSOC() {
+        val vehiculo = vehiculoActual
+        if (vehiculo == null) {
+            Toast.makeText(this, "Primero consulte un vehículo", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val odometroText = binding.etOdometro.text.toString().trim()
+        val bateriaText = binding.etBateria.text.toString().trim()
+
+        if (odometroText.isEmpty() || bateriaText.isEmpty()) {
+            Toast.makeText(this, "Complete todos los campos obligatorios", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val odometro = odometroText.toIntOrNull() ?: 0
+        val bateria = bateriaText.toIntOrNull() ?: 0
+
+        if (bateria < 0 || bateria > 100) {
+            Toast.makeText(this, "El nivel de batería debe estar entre 0 y 100", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        lifecycleScope.launch {
+            try {
+                Toast.makeText(this@Paso1SOC_Activity, "Guardando SOC y fotos...", Toast.LENGTH_SHORT).show()
+
+                // ✅ 1. INSERTAR DATOS SOC EN LA NUEVA TABLA
+                val idPaso1LogVehiculo = dalVehiculo.insertarPaso1LogVehiculo(
+                    idVehiculo = vehiculo.Id.toInt(),
+                    odometro = odometro,
+                    bateria = bateria,
+                    modoTransporte = binding.cbModoTransporte.isChecked,
+                    requiereRecarga = binding.cbRequiereRecarga.isChecked,
+                    idUsuarioNubeAlta = idUsuarioNubeAlta
+                )
+
+                if (idPaso1LogVehiculo > 0) {
+                    Log.d("Paso1SOC", "✅ Datos SOC guardados con ID: $idPaso1LogVehiculo")
+
+                    // ✅ 2. GUARDAR FOTOS DIRECTAMENTE EN BD
+                    var exitoFotos = true
+                    var consecutivo: Short = 1
+
+                    if (evidencia1Capturada && evidencia1File != null) {
+                        val fotoBase64 = convertirImagenABase64(evidencia1File!!)
+                        exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
+                            idPaso1LogVehiculo = idPaso1LogVehiculo,
+                            idEntidadArchivoFoto = null,
+                            idUsuarioNubeAlta = idUsuarioNubeAlta,
+                            consecutivo = consecutivo,
+                            posicion = 1,
+                            fotoBase64 = fotoBase64
+                        )
+                        consecutivo++
+                    }
+
+                    if (evidencia2Capturada && evidencia2File != null) {
+                        val fotoBase64 = convertirImagenABase64(evidencia2File!!)
+                        exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
+                            idPaso1LogVehiculo = idPaso1LogVehiculo,
+                            idEntidadArchivoFoto = null,
+                            idUsuarioNubeAlta = idUsuarioNubeAlta,
+                            consecutivo = consecutivo,
+                            posicion = 2,
+                            fotoBase64 = fotoBase64
+                        )
+                    }
+
+                    if (exitoFotos) {
+                        Toast.makeText(this@Paso1SOC_Activity,
+                            "✅ SOC y fotos guardados exitosamente en la base de datos",
+                            Toast.LENGTH_LONG).show()
+                        limpiarFormulario()
+                    } else {
+                        Toast.makeText(this@Paso1SOC_Activity,
+                            "⚠️ SOC guardado, pero hubo errores guardando las fotos",
+                            Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    Toast.makeText(this@Paso1SOC_Activity, "❌ Error guardando SOC", Toast.LENGTH_LONG).show()
+                }
+
+            } catch (e: Exception) {
+                Log.e("Paso1SOC", "💥 Error guardando SOC: ${e.message}")
+                Toast.makeText(this@Paso1SOC_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+
+       /* lifecycleScope.launch {
+            try {
+                Toast.makeText(this@Paso1SOC_Activity, "Guardando SOC y fotos...", Toast.LENGTH_SHORT).show()
+
+                // ✅ 1. SUBIR FOTOS AL SERVIDOR PRIMERO
+                val (evidencia1Nombre, evidencia2Nombre) = subirFotosAlServidor(vehiculo)
+
+                // ✅ 2. INSERTAR DATOS SOC EN LA NUEVA TABLA
+                val idPaso1LogVehiculo = dalVehiculo.insertarPaso1LogVehiculo(
+                    idVehiculo = vehiculo.Id.toInt(),
+                    odometro = odometro,
+                    bateria = bateria,
+                    modoTransporte = binding.cbModoTransporte.isChecked,
+                    requiereRecarga = binding.cbRequiereRecarga.isChecked,
+                    idUsuarioNubeAlta = idUsuarioNubeAlta
+                )
+
+                if (idPaso1LogVehiculo > 0) {
+                    Log.d("Paso1SOC", "✅ Datos SOC guardados en Paso1LogVehiculo con ID: $idPaso1LogVehiculo")
+
+                    // ✅ 3. INSERTAR FOTOS EN Paso1LogVehiculoFotos
+                    var exitoFotos = true
+                    var consecutivo: Short = 1
+
+                    if (evidencia1Capturada && evidencia1Nombre.isNotEmpty()) {
+                        exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
+                            idPaso1LogVehiculo = idPaso1LogVehiculo,
+                            idEntidadArchivoFoto = null, //
+                            idUsuarioNubeAlta = idUsuarioNubeAlta,
+                            consecutivo = consecutivo,
+                            posicion = 1 // 1 = evidencia 1
+                        )
+                        consecutivo++
+                    }
+
+                    if (evidencia2Capturada && evidencia2Nombre.isNotEmpty()) {
+                        exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
+                            idPaso1LogVehiculo = idPaso1LogVehiculo,
+                            idEntidadArchivoFoto = null,
+                            idUsuarioNubeAlta = idUsuarioNubeAlta,
+                            consecutivo = consecutivo,
+                            posicion = 2 // 2 = evidencia 2
+                        )
+                    }
+
+                    if (exitoFotos) {
+                        Toast.makeText(this@Paso1SOC_Activity,
+                            "✅ SOC y fotos guardados exitosamente en la base de datos",
+                            Toast.LENGTH_LONG).show()
+                        limpiarFormulario()
+                    } else {
+                        Toast.makeText(this@Paso1SOC_Activity,
+                            "⚠️ SOC guardado, pero hubo errores guardando las fotos en BD",
+                            Toast.LENGTH_LONG).show()
+                    }
+
+                } else {
+                    Toast.makeText(this@Paso1SOC_Activity, "❌ Error guardando SOC", Toast.LENGTH_LONG).show()
+                }
+
+            } catch (e: Exception) {
+                Log.e("Paso1SOC", "💥 Error guardando SOC: ${e.message}")
+                Toast.makeText(this@Paso1SOC_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }*/
+    }
+
+
+   /* private fun guardarSOC() {
+        val vehiculo = vehiculoActual
+        if (vehiculo == null) {
+            Toast.makeText(this, "Primero consulte un vehículo", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val odometroText = binding.etOdometro.text.toString().trim()
+        val bateriaText = binding.etBateria.text.toString().trim()
+
+        if (odometroText.isEmpty() || bateriaText.isEmpty()) {
+            Toast.makeText(this, "Complete todos los campos obligatorios", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val odometro = odometroText.toIntOrNull() ?: 0
+        val bateria = bateriaText.toIntOrNull() ?: 0
+
+        if (bateria < 0 || bateria > 100) {
+            Toast.makeText(this, "El nivel de batería debe estar entre 0 y 100", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        lifecycleScope.launch {
+            try {
+                Toast.makeText(this@Paso1SOC_Activity, "Guardando SOC...", Toast.LENGTH_SHORT).show()
+
+                // ✅ 1. INSERTAR EN LA NUEVA TABLA Paso1LogVehiculo
+                val idPaso1LogVehiculo = dalVehiculo.insertarPaso1LogVehiculo(
+                    idVehiculo = vehiculo.Id.toInt(),
+                    odometro = odometro,
+                    bateria = bateria,
+                    modoTransporte = binding.cbModoTransporte.isChecked,
+                    requiereRecarga = binding.cbRequiereRecarga.isChecked,
+                    idUsuarioNubeAlta = idUsuarioNubeAlta
+                )
+
+                if (idPaso1LogVehiculo > 0) {
+                    Log.d("Paso1SOC", "✅ Datos SOC guardados en Paso1LogVehiculo con ID: $idPaso1LogVehiculo")
+
+                    // ✅ 2. INSERTAR FOTOS EN Paso1LogVehiculoFotos
+                    var exitoFotos = true
+                    var consecutivo: Short = (fotosExistentes + 1).toShort()
+
+                    if (evidencia1NombreArchivo.isNotEmpty()) {
+                        exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
+                            idPaso1LogVehiculo = idPaso1LogVehiculo,
+                            idEntidadArchivoFoto = null, //
+                            idUsuarioNubeAlta = idUsuarioNubeAlta,
+                            consecutivo = consecutivo,
+                            posicion = 1 // 1 = foto de antes
+                        )
+                        consecutivo++
+                    }
+
+                    if (evidencia2NombreArchivo.isNotEmpty()) {
+                        exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
+                            idPaso1LogVehiculo = idPaso1LogVehiculo,
+                            idEntidadArchivoFoto = null, //
+                            idUsuarioNubeAlta = idUsuarioNubeAlta,
+                            consecutivo = consecutivo,
+                            posicion = 2 // 2 = foto de después
+                        )
+                    }
+
+                    if (exitoFotos) {
+                        Toast.makeText(this@Paso1SOC_Activity,
+                            "✅ SOC y fotos guardados exitosamente en las nuevas tablas",
+                            Toast.LENGTH_LONG).show()
+                        limpiarFormulario()
+                    } else {
+                        Toast.makeText(this@Paso1SOC_Activity,
+                            "⚠️ SOC guardado, pero hubo errores con las fotos",
+                            Toast.LENGTH_LONG).show()
+                    }
+
+                } else {
+                    Toast.makeText(this@Paso1SOC_Activity, "❌ Error guardando SOC", Toast.LENGTH_LONG).show()
+                }
+
+            } catch (e: Exception) {
+                Log.e("Paso1SOC", "💥 Error guardando SOC: ${e.message}")
+                Toast.makeText(this@Paso1SOC_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }*/
+
+  /*  private fun guardarSOC() {
         val vehiculo = vehiculoActual
         if (vehiculo == null) {
             Toast.makeText(this, "Primero consulte un vehículo", Toast.LENGTH_SHORT).show()
@@ -526,9 +971,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
                 Toast.makeText(this@Paso1SOC_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
-    }
+    }*/
 
-    private fun limpiarFormulario() {
+   /* private fun limpiarFormulario() {
         binding.apply {
             etVIN.setText("")
             etOdometro.setText("")
@@ -543,7 +988,27 @@ class Paso1SOC_Activity : AppCompatActivity() {
         evidencia1NombreArchivo = ""
         evidencia2NombreArchivo = ""
         ocultarSeccionesSOC()
-    }
+        fotosExistentes = 0 // Resetear contador de fotos
+    }*/
+   private fun limpiarFormulario() {
+       binding.apply {
+           etVIN.setText("")
+           etOdometro.setText("")
+           etBateria.setText("")
+           cbModoTransporte.isChecked = false
+           cbRequiereRecarga.isChecked = false
+           tvEstadoEvidencia1.text = "❌"
+           tvEstadoEvidencia2.text = "❌"
+       }
+
+       vehiculoActual = null
+       evidencia1File = null
+       evidencia2File = null
+       evidencia1Capturada = false
+       evidencia2Capturada = false
+       fotosExistentes = 0
+       ocultarSeccionesSOC()
+   }
 
 
 }
