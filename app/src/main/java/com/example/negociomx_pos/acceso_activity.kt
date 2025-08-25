@@ -28,7 +28,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-class acceso_activity : AppCompatActivity() {
+class racceso_activity : AppCompatActivity() {
     lateinit var binding: ActivityAccesoBinding
     lateinit var dal:DALDispotivioAcceso
     lateinit var dalUsu:DALUsuario
