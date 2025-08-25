@@ -11,6 +11,7 @@ object ConexionSQLServer {
     //private const val SERVER = "MIGUELOLEA"
     private const val SERVER = "192.168.1.203"
     private const val DATABASE = "NegocioMX_PatioLaPalma"
+    //hola
     private const val USERNAME = "sa"
     private const val PASSWORD = "NITr11ziu7"
     private const val PORT = "1433"
