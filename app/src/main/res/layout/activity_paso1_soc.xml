@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/card_background"
-            android:padding="16dp"
+            android:padding="10dp"
             android:layout_marginBottom="16dp">
 
             <TextView
@@ -227,11 +227,11 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📸 Evidencias Fotográficas"
+                android:text="📸 Evidencia Inicial"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#E91E63"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="10dp" />
 
             <!-- Evidencia 1 -->
             <LinearLayout
@@ -245,7 +245,7 @@
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:text="📷 Capturar Evidencia 1"
+                    android:text="📷 Foto 1"
                     android:backgroundTint="#9C27B0"
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
@@ -273,7 +273,7 @@
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:text="📷 Capturar Evidencia 2"
+                    android:text="📷 Foto 2"
                     android:backgroundTint="#9C27B0"
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
