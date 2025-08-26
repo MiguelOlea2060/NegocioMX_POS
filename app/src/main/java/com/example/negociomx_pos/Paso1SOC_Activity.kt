@@ -28,7 +28,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class Paso1SOC_Activity : AppCompatActivity() {
-
+//Paso1
     private lateinit var binding: ActivityPaso1SocBinding
     private val dalVehiculo = DALVehiculo()
     private var vehiculoActual: Vehiculo? = null
