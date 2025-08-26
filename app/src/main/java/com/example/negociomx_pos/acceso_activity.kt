@@ -56,7 +56,7 @@ class racceso_activity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding= ActivityAccesoBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+//Hola
         Log.d("AccesoActivity", "🚀 INICIANDO ACTIVIDAD DE ACCESO")
 
         base = POSDatabase.getDatabase(applicationContext)
