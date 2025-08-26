@@ -191,6 +191,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 Log.d("Paso1SOC", "🔍 Consultando vehículo con VIN: $vin")
+                mostrarCargaConsulta()
 
                 Toast.makeText(this@Paso1SOC_Activity, "Consultando vehículo...", Toast.LENGTH_SHORT).show()
 
@@ -227,15 +228,17 @@ class Paso1SOC_Activity : AppCompatActivity() {
                             ).show()
                         }
                     }
-
+                    ocultarCargaConsulta()
                 } else {
                     ocultarSeccionesSOC()
                     Toast.makeText(this@Paso1SOC_Activity, "❌ Vehículo no encontrado", Toast.LENGTH_LONG).show()
+                    ocultarCargaConsulta()
                 }
 
             } catch (e: Exception) {
                 Log.e("Paso1SOC", "💥 Error consultando vehículo: ${e.message}")
                 Toast.makeText(this@Paso1SOC_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                ocultarCargaConsulta()
             }
         }
     }
@@ -746,6 +749,47 @@ class Paso1SOC_Activity : AppCompatActivity() {
         loadingContainer.visibility = View.GONE
         binding.btnGuardarSOC.isEnabled = true
         binding.btnGuardarSOC.alpha = 1.0f
+
+        // Limpiar handlers
+        loadingHandler?.removeCallbacks(loadingRunnable!!)
+        loadingHandler = null
+        loadingRunnable = null
+    }
+
+    private fun mostrarCargaConsulta() {
+        // Mostrar loading
+        loadingContainer.visibility = View.VISIBLE
+        binding.btnConsultarVehiculo.isEnabled = false
+        binding.btnConsultarVehiculo.alpha = 0.5f
+
+        // Mensajes específicos para consulta de vehículo
+        val mensajes = arrayOf(
+            "Buscando vehículo..." to "Consultando base de datos",
+            "Verificando VIN..." to "Validando información",
+            "Cargando datos..." to "Obteniendo detalles del vehículo",
+            "Consultando fotos..." to "Verificando imágenes existentes"
+        )
+
+        var mensajeIndex = 0
+        loadingHandler = Handler(Looper.getMainLooper())
+
+        loadingRunnable = object : Runnable {
+            override fun run() {
+                if (mensajeIndex < mensajes.size) {
+                    tvLoadingText.text = mensajes[mensajeIndex].first
+                    tvLoadingSubtext.text = mensajes[mensajeIndex].second
+                    mensajeIndex++
+                    loadingHandler?.postDelayed(this, 2000) // Cambiar cada 2 segundos (más rápido)
+                }
+            }
+        }
+        loadingRunnable?.let { loadingHandler?.post(it) }
+    }
+
+    private fun ocultarCargaConsulta() {
+        loadingContainer.visibility = View.GONE
+        binding.btnConsultarVehiculo.isEnabled = true
+        binding.btnConsultarVehiculo.alpha = 1.0f
 
         // Limpiar handlers
         loadingHandler?.removeCallbacks(loadingRunnable!!)
