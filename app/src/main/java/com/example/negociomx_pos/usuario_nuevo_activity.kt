@@ -282,7 +282,7 @@ class usuario_nuevo_activity : AppCompatActivity() {
 
     private fun navegarALogin() {
         try {
-            val intent = Intent(this, racceso_activity::class.java) //me dio erro y tuve que agregar r
+            val intent = Intent(this, acceso_activity::class.java) //me dio erro y tuve que agregar r
             // Limpiar el stack de actividades para que no pueda regresar
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)

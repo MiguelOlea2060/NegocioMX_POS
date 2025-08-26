@@ -22,5 +22,6 @@ data class Vehiculo(
     var Evidencia1: String = "",
     var Evidencia2: String = "",
     var FechaActualizacion: String = ""
+
 )
 //DARA CLASE CREADA POR MIGUEL

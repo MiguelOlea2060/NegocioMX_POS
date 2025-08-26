@@ -16,7 +16,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="SOC - State of Charge"
+            android:text="Paso 1 - SOC"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#2E7D32"
@@ -35,7 +35,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🚗 Información del Vehículo"
+                android:text="🚗 Escanea el Codigo QR"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#1976D2"
@@ -52,20 +52,13 @@
                     android:layout_width="0dp"
                     android:layout_height="48dp"
                     android:layout_weight="1"
+                    android:textColor="@color/black"
                     android:hint="Ingrese VIN del vehículo"
                     android:background="@drawable/edittext_background"
                     android:padding="12dp"
                     android:textSize="14sp"
+                    android:singleLine="true"
                     android:layout_marginEnd="8dp" />
-
-                <Button
-                    android:id="@+id/btnEscanearVIN"
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:text="📷"
-                    android:textSize="16sp"
-                    android:backgroundTint="#4CAF50"
-                    android:textColor="@android:color/white" />
 
             </LinearLayout>
 

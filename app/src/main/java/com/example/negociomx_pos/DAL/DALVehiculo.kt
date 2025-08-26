@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.negociomx_pos.BE.DireccionVehiculo
 import com.example.negociomx_pos.BE.Marca
 import com.example.negociomx_pos.BE.Modelo
+import com.example.negociomx_pos.BE.StatusFotoVehiculo
 import com.example.negociomx_pos.BE.Transmision
 import com.example.negociomx_pos.BE.Vehiculo
 import com.example.negociomx_pos.Utils.ConexionSQLServer
@@ -546,11 +547,12 @@ class DALVehiculo {
     }
 
     // ✅ CONSULTAR FOTOS EXISTENTES PARA UN VEHÍCULO
-    suspend fun consultarFotosExistentes(idVehiculo: Int): Int = withContext(Dispatchers.IO) {
+    suspend fun consultarFotosExistentes(idVehiculo: Int): StatusFotoVehiculo? = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
         var resultSet: ResultSet? = null
         var cantidadFotos = 0
+        var status:StatusFotoVehiculo?= null
 
         try {
             Log.d("DALVehiculo", "🔍 Consultando fotos existentes para IdVehiculo: $idVehiculo")
@@ -558,31 +560,47 @@ class DALVehiculo {
             conexion = ConexionSQLServer.obtenerConexion()
             if (conexion == null) {
                 Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
-                return@withContext 0
+                return@withContext status
             }
 
             val query = """
-            SELECT COUNT(*) as CantidadFotos
-            FROM Paso1LogVehiculoFotos pf
+            select (SELECT count(*) FROM Paso1LogVehiculoFotos pf INNER JOIN Paso1LogVehiculo pv ON pf.IdPaso1LogVehiculo = pv.IdPaso1LogVehiculo
+            WHERE pv.IdVehiculo =? and pf.posicion=1) FotosPosicion1,
+		(SELECT count(*) FROM Paso1LogVehiculoFotos pf
             INNER JOIN Paso1LogVehiculo pv ON pf.IdPaso1LogVehiculo = pv.IdPaso1LogVehiculo
-            WHERE pv.IdVehiculo = ?
+            WHERE pv.IdVehiculo =? and pf.posicion=2) FotosPosicion2,
+		(SELECT count(*) FROM Paso1LogVehiculoFotos pf
+            INNER JOIN Paso1LogVehiculo pv ON pf.IdPaso1LogVehiculo = pv.IdPaso1LogVehiculo
+            WHERE pv.IdVehiculo =? and pf.posicion=3) FotosPosicion3,
+		(SELECT count(*) FROM Paso1LogVehiculoFotos pf
+            INNER JOIN Paso1LogVehiculo pv ON pf.IdPaso1LogVehiculo = pv.IdPaso1LogVehiculo
+            WHERE pv.IdVehiculo =? and pf.posicion=4) FotosPosicion4
         """.trimIndent()
 
             statement = conexion.prepareStatement(query)
             statement.setInt(1, idVehiculo)
+            statement.setInt(2, idVehiculo)
+            statement.setInt(3, idVehiculo)
+            statement.setInt(4, idVehiculo)
             resultSet = statement.executeQuery()
 
             if (resultSet.next()) {
-                cantidadFotos = resultSet.getInt("CantidadFotos")
+                val fotosPosicion1:Int= resultSet.getInt("FotosPosicion1").toInt()
+                val fotosPosicion2:Int= resultSet.getInt("FotosPosicion2").toInt()
+                val fotosPosicion3:Int= resultSet.getInt("FotosPosicion3").toInt()
+                val fotosPosicion4:Int= resultSet.getInt("FotosPosicion4").toInt()
+
+                status=StatusFotoVehiculo(FotosPosicion1 =fotosPosicion1, FotosPosicion2 = fotosPosicion2,
+                    FotosPosicion3 = fotosPosicion3, FotosPosicion4 = fotosPosicion4)
             }
 
             Log.d("DALVehiculo", "✅ Fotos existentes para vehículo $idVehiculo: $cantidadFotos")
-            return@withContext cantidadFotos
+            //return@withContext status
 
         } catch (e: Exception) {
             Log.e("DALVehiculo", "💥 Error consultando fotos existentes: ${e.message}")
             e.printStackTrace()
-            return@withContext 0
+            //return@withContext 0
         } finally {
             try {
                 resultSet?.close()
@@ -592,6 +610,7 @@ class DALVehiculo {
                 Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
             }
         }
+        return@withContext status
     }
 
 

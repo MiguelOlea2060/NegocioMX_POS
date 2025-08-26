@@ -28,7 +28,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-class racceso_activity : AppCompatActivity() {
+class acceso_activity : AppCompatActivity() {
     lateinit var binding: ActivityAccesoBinding
     lateinit var dal:DALDispotivioAcceso
     lateinit var dalUsu:DALUsuario
@@ -56,7 +56,6 @@ class racceso_activity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding= ActivityAccesoBinding.inflate(layoutInflater)
         setContentView(binding.root)
-//Hola
         Log.d("AccesoActivity", "🚀 INICIANDO ACTIVIDAD DE ACCESO")
 
         base = POSDatabase.getDatabase(applicationContext)

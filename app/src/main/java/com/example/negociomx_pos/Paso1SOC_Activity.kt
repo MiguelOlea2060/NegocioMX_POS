@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.KeyEvent
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
+import com.example.negociomx_pos.BE.StatusFotoVehiculo
 import com.example.negociomx_pos.BE.Vehiculo
 import com.example.negociomx_pos.DAL.DALVehiculo
 //import com.example.negociomx_pos.Utils.FileUploadUtil
@@ -45,6 +47,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
     private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.Id?.toInt()!!// Reemplaza con el ID del usuario actual
     private var fotosExistentes: Int = 0 // Para controlar cuántas fotos ya existen
+    private var status:StatusFotoVehiculo?=null
+
 
     // ✅ LAUNCHER PARA ESCÁNER DE CÓDIGOS
     private val barcodeLauncher = registerForActivityResult(ScanContract()) { result ->
@@ -89,18 +93,18 @@ class Paso1SOC_Activity : AppCompatActivity() {
         // ✅ BOTÓN ESCANEAR VIN
         binding.etVIN.requestFocus()
 
-        binding.btnEscanearVIN.setOnClickListener {
-            iniciarEscaneoVIN()
+        // Configurando Captura de enter en el QR del VIN
+        binding.etVIN.setOnKeyListener { v, keyCode, event ->
+            if(keyCode==KeyEvent.KEYCODE_ENTER && event.action== KeyEvent.ACTION_UP)
+            {
+                verificaVINSuministrado()
+                return@setOnKeyListener true
+            }
+            false
         }
-
         // ✅ BOTÓN CONSULTAR VEHÍCULO
         binding.btnConsultarVehiculo.setOnClickListener {
-            val vin = binding.etVIN.text.toString().trim()
-            if (vin.isNotEmpty()) {
-                consultarVehiculo(vin)
-            } else {
-                Toast.makeText(this, "Ingrese un VIN válido", Toast.LENGTH_SHORT).show()
-            }
+            verificaVINSuministrado()
         }
 
         // ✅ BOTONES DE EVIDENCIAS
@@ -118,22 +122,19 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
     }
 
+    private fun verificaVINSuministrado() {
+        val vin = binding.etVIN.text.toString().trim()
+        if (vin.isNotEmpty()) {
+            consultarVehiculo(vin)
+        } else {
+            Toast.makeText(this, "Ingrese un VIN válido", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun verificarPermisos() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             permisoLauncher.launch(Manifest.permission.CAMERA)
         }
-    }
-
-    private fun iniciarEscaneoVIN() {
-        val options = ScanOptions()
-        options.setDesiredBarcodeFormats(ScanOptions.ALL_CODE_TYPES)
-        options.setPrompt("Escanee el código VIN del vehículo")
-        options.setCameraId(0)
-        options.setBeepEnabled(true)
-        options.setBarcodeImageEnabled(true)
-        options.setOrientationLocked(false)
-
-        barcodeLauncher.launch(options)
     }
 
    /* private fun consultarVehiculo(vin: String) {
@@ -179,20 +180,29 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     vehiculoActual = vehiculo
 
                     // ✅ CONSULTAR FOTOS EXISTENTES
-                    fotosExistentes = dalVehiculo.consultarFotosExistentes(vehiculo?.Id?.toInt()!!)
+                    status = dalVehiculo.consultarFotosExistentes(vehiculo?.Id?.toInt()!!)
 
                     mostrarInformacionVehiculo(vehiculo!!)
                     mostrarSeccionesSOC()
 
                     // ✅ MOSTRAR INFORMACIÓN SOBRE FOTOS EXISTENTES
-                    if (fotosExistentes > 0) {
-                        Toast.makeText(this@Paso1SOC_Activity,
-                            "✅ Vehículo encontrado. Ya tiene $fotosExistentes foto(s) registrada(s)",
-                            Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(this@Paso1SOC_Activity,
-                            "✅ Vehículo encontrado. Sin fotos previas",
-                            Toast.LENGTH_SHORT).show()
+                    if(status!=null) {
+                        fotosExistentes=status?.FotosPosicion1!!+status?.FotosPosicion2!!+
+                                status?.FotosPosicion3!!+status?.FotosPosicion4!!
+
+                        if (fotosExistentes > 0) {
+                            Toast.makeText(
+                                this@Paso1SOC_Activity,
+                                "✅ Vehículo encontrado. Ya tiene $fotosExistentes foto(s) registrada(s)",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                this@Paso1SOC_Activity,
+                                "✅ Vehículo encontrado. Sin fotos previas",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
 
                 } else {
