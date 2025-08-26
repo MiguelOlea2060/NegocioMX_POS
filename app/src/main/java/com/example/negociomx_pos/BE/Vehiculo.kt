@@ -6,13 +6,16 @@ data class Vehiculo(
     var Marca: String = "",
     var Modelo: String = "",
     var Anio: Int = 0,
-    var Color: String = "",
+    var ColorExterior: String = "",
+    var ColorInterior: String = "",
     var Placa: String = "",
     var NumeroSerie: String = "",
     var IdEmpresa: String = "",
     var Activo: Boolean = true,
     var FechaCreacion: String = "",
     var FechaModificacion: String = "",
+    var TipoCombustible:String="",
+    var TipoVehiculo:String="",
 
     // ✅ CAMPOS SOC (State of Charge)
     var Odometro: Int = 0,

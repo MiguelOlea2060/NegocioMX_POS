@@ -317,7 +317,7 @@ class DALVehiculo {
                     Marca = resultSet.getString("Marca") ?: "",
                     Modelo = resultSet.getString("Modelo") ?: "",
                     Anio = resultSet.getInt("Annio"),
-                    Color = resultSet.getString("Version") ?: "", // Usamos Version como Color temporalmente
+                    ColorExterior = resultSet.getString("Version") ?: "", // Usamos Version como Color temporalmente
                     Placa = "", // No existe en el esquema actual
                     NumeroSerie = resultSet.getString("Motor") ?: "",
                     IdEmpresa = "", // No existe en el esquema actual

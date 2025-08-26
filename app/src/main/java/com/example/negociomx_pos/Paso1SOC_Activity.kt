@@ -22,7 +22,6 @@ import com.example.negociomx_pos.DAL.DALVehiculo
 import com.example.negociomx_pos.Utils.ParametrosSistema
 import com.example.negociomx_pos.databinding.ActivityPaso1SocBinding
 import com.journeyapps.barcodescanner.ScanContract
-import com.journeyapps.barcodescanner.ScanOptions
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
@@ -196,10 +195,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
                 Toast.makeText(this@Paso1SOC_Activity, "Consultando vehículo...", Toast.LENGTH_SHORT).show()
 
                  vehiculo = dalVehiculo.consultarVehiculoPorVIN(vin)
-               /* if ( vh != null)
-                 vehiculo =  vh
-                     dalVehiculo.consultarVehiculoPorVIN(vin)*/
-
                 if (vehiculo != null) {
                     vehiculoActual = vehiculo
 
@@ -245,10 +240,11 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
     private fun mostrarInformacionVehiculo(vehiculo: Vehiculo) {
         binding.apply {
-            tvMarcaModelo.text = "Marca y Modelo: ${vehiculo.Marca} ${vehiculo.Modelo}"
-            tvAnio.text = "Año: ${vehiculo.Anio}"
-            tvColor.text = "Color: ${vehiculo.Color}"
-            tvPlaca.text = "Placa: ${vehiculo.Placa}"
+            tvMarcaModeloAnnio.text = "Marca - Modelo, Año: ${vehiculo.Marca} - ${vehiculo.Modelo}, ${vehiculo.Anio}"
+            tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
+            tvColorInterior.text = "Color Int.: ${vehiculo.ColorInterior}"
+            tvTipoCombustible.text = "Combustible: ${vehiculo.TipoCombustible}"
+            tvTipoVehiculo.text = "Tipo de Vehiculo: ${vehiculo.TipoVehiculo}"
 
             // Mostrar datos SOC existentes
             etOdometro.setText(vehiculo.Odometro.toString())
@@ -763,17 +759,17 @@ class Paso1SOC_Activity : AppCompatActivity() {
         binding.btnConsultarVehiculo.alpha = 0.5f
 
         // Mensajes específicos para consulta de vehículo
-        val mensajes = arrayOf(
+/*        val mensajes = arrayOf(
             "Buscando vehículo..." to "Consultando base de datos",
             "Verificando VIN..." to "Validando información",
             "Cargando datos..." to "Obteniendo detalles del vehículo",
             "Consultando fotos..." to "Verificando imágenes existentes"
-        )
+        )*/
 
         var mensajeIndex = 0
-        loadingHandler = Handler(Looper.getMainLooper())
+        //loadingHandler = Handler(Looper.getMainLooper())
 
-        loadingRunnable = object : Runnable {
+        /*loadingRunnable = object : Runnable {
             override fun run() {
                 if (mensajeIndex < mensajes.size) {
                     tvLoadingText.text = mensajes[mensajeIndex].first
@@ -782,8 +778,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     loadingHandler?.postDelayed(this, 2000) // Cambiar cada 2 segundos (más rápido)
                 }
             }
-        }
-        loadingRunnable?.let { loadingHandler?.post(it) }
+        }*/
+        //loadingRunnable?.let { loadingHandler?.post(it) }
     }
 
     private fun ocultarCargaConsulta() {

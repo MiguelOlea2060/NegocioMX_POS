@@ -94,7 +94,7 @@
                 android:layout_marginBottom="12dp" />
 
             <TextView
-                android:id="@+id/tvMarcaModelo"
+                android:id="@+id/tv_marca_modelo_annio"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Marca y Modelo: -"
@@ -103,28 +103,36 @@
                 android:layout_marginBottom="4dp" />
 
             <TextView
-                android:id="@+id/tvAnio"
+                android:id="@+id/tv_color_exterior"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Año: -"
+                android:text="Color Ext: -"
                 android:textSize="16sp"
                 android:textColor="#424242"
                 android:layout_marginBottom="4dp" />
 
             <TextView
-                android:id="@+id/tvColor"
+                android:id="@+id/tvColorInterior"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Color: -"
+                android:text="Color Int.: -"
                 android:textSize="16sp"
                 android:textColor="#424242"
                 android:layout_marginBottom="4dp" />
 
             <TextView
-                android:id="@+id/tvPlaca"
+                android:id="@+id/tvTipoCombustible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Placa: -"
+                android:text="Combustible: -"
+                android:textSize="16sp"
+                android:textColor="#424242" />
+
+            <TextView
+                android:id="@+id/tvTipoVehiculo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tipo vehiculo: -"
                 android:textSize="16sp"
                 android:textColor="#424242" />
 
