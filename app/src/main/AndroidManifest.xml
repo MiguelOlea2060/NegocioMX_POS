@@ -77,7 +77,7 @@
             android:name=".usuarios_activity"
             android:exported="false" />
         <activity
-            android:name=".acceso_activity"
+            android:name=".racceso_activity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
