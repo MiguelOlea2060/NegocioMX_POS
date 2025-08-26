@@ -291,6 +291,44 @@
 
         </LinearLayout>
 
+
+
+        <LinearLayout
+            android:id="@+id/loadingContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                style="?android:attr/progressBarStyleLarge"
+                android:indeterminateTint="#2196F3" />
+
+            <TextView
+                android:id="@+id/tvLoadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Preparando datos..."
+                android:textSize="16sp"
+                android:textColor="#2196F3" />
+
+            <TextView
+                android:id="@+id/tvLoadingSubtext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Esto puede tomar unos momentos"
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray" />
+
+        </LinearLayout>
+
         <!-- Botón Guardar -->
         <Button
             android:id="@+id/btnGuardarSOC"

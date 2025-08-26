@@ -29,6 +29,14 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
+
+import android.os.Handler
+import android.os.Looper
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Button
+
+
 class Paso1SOC_Activity : AppCompatActivity() {
 //Paso1
     private lateinit var binding: ActivityPaso1SocBinding
@@ -36,6 +44,12 @@ class Paso1SOC_Activity : AppCompatActivity() {
     private var vehiculoActual: Vehiculo? = null
   //  private var evidencia1NombreArchivo: String = ""
   //  private var evidencia2NombreArchivo: String = ""
+  private lateinit var loadingContainer: LinearLayout
+    private lateinit var tvLoadingText: TextView
+    private lateinit var tvLoadingSubtext: TextView
+    private lateinit var btnGuardar: Button
+    private var loadingHandler: Handler? = null
+    private var loadingRunnable: Runnable? = null
 
     private var evidencia1File: File? = null
     private var evidencia2File: File? = null
@@ -117,9 +131,18 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
 
         // ✅ BOTÓN GUARDAR SOC
-        binding.btnGuardarSOC.setOnClickListener {
+       binding.btnGuardarSOC.setOnClickListener {
             guardarSOC()
         }
+        // Cambiar de:
+     //   btnGuardar = findViewById(R.id.btnGuardarSOC)
+
+// A: (solo si tienes esta línea, si no, ignórala)
+// Ya no necesitas esta línea porque usas binding.btnGuardarSOC
+
+        loadingContainer = findViewById(R.id.loadingContainer)
+        tvLoadingText = findViewById(R.id.tvLoadingText)
+        tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
     }
 
     private fun verificaVINSuministrado() {
@@ -688,6 +711,49 @@ class Paso1SOC_Activity : AppCompatActivity() {
         return Pair(evidencia1Nombre, evidencia2Nombre)
     }*/
 
+    private fun mostrarCargaConMensajes() {
+        // Mostrar loading
+        loadingContainer.visibility = View.VISIBLE
+        binding.btnGuardarSOC.isEnabled = false
+        binding.btnGuardarSOC.alpha = 0.5f
+
+        // Mensajes dinámicos para mantener al usuario informado
+        val mensajes = arrayOf(
+            "Preparando datos..." to "Organizando información",
+            "Comprimiendo fotos..." to "Optimizando imágenes",
+            "Enviando a servidor..." to "Transfiriendo información",
+            "Procesando..." to "Guardando en base de datos",
+            "Finalizando..." to "Últimos detalles"
+        )
+
+        var mensajeIndex = 0
+        loadingHandler = Handler(Looper.getMainLooper())
+
+        loadingRunnable = object : Runnable {
+            override fun run() {
+                if (mensajeIndex < mensajes.size) {
+                    tvLoadingText.text = mensajes[mensajeIndex].first
+                    tvLoadingSubtext.text = mensajes[mensajeIndex].second
+                    mensajeIndex++
+                    loadingHandler?.postDelayed(this, 3000) // Cambiar cada 3 segundos
+                }
+            }
+        }
+        loadingRunnable?.let { loadingHandler?.post(it) }
+    }
+
+    private fun ocultarCarga() {
+        loadingContainer.visibility = View.GONE
+        binding.btnGuardarSOC.isEnabled = true
+        binding.btnGuardarSOC.alpha = 1.0f
+
+        // Limpiar handlers
+        loadingHandler?.removeCallbacks(loadingRunnable!!)
+        loadingHandler = null
+        loadingRunnable = null
+    }
+
+
 
     private fun guardarSOC() {
         val vehiculo = vehiculoActual
@@ -711,7 +777,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
             Toast.makeText(this, "El nivel de batería debe estar entre 0 y 100", Toast.LENGTH_SHORT).show()
             return
         }
-
+// Justo antes de lifecycleScope.launch {
+        mostrarCargaConMensajes()
         lifecycleScope.launch {
             try {
                 Toast.makeText(this@Paso1SOC_Activity, "Guardando SOC y fotos...", Toast.LENGTH_SHORT).show()
@@ -758,21 +825,25 @@ class Paso1SOC_Activity : AppCompatActivity() {
                         )
                     }
 
-                    if (exitoFotos) {
+                    if (exitoFotos){
+                        ocultarCarga()
                         Toast.makeText(this@Paso1SOC_Activity,
                             "✅ SOC y fotos guardados exitosamente en la base de datos",
                             Toast.LENGTH_LONG).show()
                         limpiarFormulario()
                     } else {
+                        ocultarCarga()
                         Toast.makeText(this@Paso1SOC_Activity,
                             "⚠️ SOC guardado, pero hubo errores guardando las fotos",
                             Toast.LENGTH_LONG).show()
                     }
                 } else {
+                    ocultarCarga()
                     Toast.makeText(this@Paso1SOC_Activity, "❌ Error guardando SOC", Toast.LENGTH_LONG).show()
                 }
 
             } catch (e: Exception) {
+                ocultarCarga()
                 Log.e("Paso1SOC", "💥 Error guardando SOC: ${e.message}")
                 Toast.makeText(this@Paso1SOC_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
@@ -1022,5 +1093,10 @@ class Paso1SOC_Activity : AppCompatActivity() {
        ocultarSeccionesSOC()
    }
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+        loadingHandler?.removeCallbacks(loadingRunnable!!)
+    }
 
 }
