@@ -87,6 +87,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
     private fun configurarEventos() {
         // ✅ BOTÓN ESCANEAR VIN
+        binding.etVIN.requestFocus()
+
         binding.btnEscanearVIN.setOnClickListener {
             iniciarEscaneoVIN()
         }
