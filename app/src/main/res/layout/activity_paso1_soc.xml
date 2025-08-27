@@ -306,6 +306,69 @@
 
             </LinearLayout>
 
+            <!-- Evidencia 3 (solo visible si ya hay 2 fotos) -->
+            <LinearLayout
+                android:id="@+id/layoutEvidencia3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp"
+                android:visibility="gone">
+
+                <Button
+                    android:id="@+id/btnEvidencia3"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="📷 Foto 3"
+                    android:backgroundTint="#9C27B0"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvEstadoEvidencia3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="❌"
+                    android:textSize="24sp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <!-- Evidencia 4 (solo visible si ya hay 2 fotos) -->
+            <LinearLayout
+                android:id="@+id/layoutEvidencia4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone">
+
+                <Button
+                    android:id="@+id/btnEvidencia4"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="📷 Foto 4"
+                    android:backgroundTint="#9C27B0"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvEstadoEvidencia4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="❌"
+                    android:textSize="24sp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+
+
+
         </LinearLayout>
 
 

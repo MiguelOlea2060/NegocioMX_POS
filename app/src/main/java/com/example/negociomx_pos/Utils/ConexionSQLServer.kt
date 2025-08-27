@@ -9,7 +9,7 @@ object ConexionSQLServer {
     // ⚙️ CONFIGURA ESTOS DATOS CON TU SERVIDOR SQL
     //private const val SERVER = "127.0.0.1"
     //private const val SERVER = "MIGUELOLEA"
-    private const val SERVER = "192.168.1.203"
+    private const val SERVER = "192.168.1.204"
     private const val DATABASE = "NegocioMX_PatioLaPalma"
     //hola
 

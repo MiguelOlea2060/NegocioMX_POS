@@ -624,6 +624,84 @@ class DALVehiculo {
 
 
 
+    suspend fun consultarDatosSOCExistentes(idVehiculo: Int): Vehiculo? = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+        var vehiculoSOC: Vehiculo? = null
+
+        try {
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) return@withContext null
+
+            val query = """
+            SELECT TOP 1 Odometro, Bateria, ModoTransporte, RequiereRecarga, FechaAlta
+            FROM Paso1LogVehiculo 
+            WHERE IdVehiculo = ? 
+            ORDER BY FechaAlta DESC
+        """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setInt(1, idVehiculo)
+            resultSet = statement.executeQuery()
+
+            if (resultSet.next()) {
+                vehiculoSOC = Vehiculo().apply {
+                    Odometro = resultSet.getInt("Odometro")
+                    Bateria = resultSet.getInt("Bateria")
+                    ModoTransporte = resultSet.getBoolean("ModoTransporte")
+                    RequiereRecarga = resultSet.getBoolean("RequiereRecarga")
+                    FechaActualizacion = resultSet.getString("FechaAlta") ?: ""
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "Error consultando datos SOC: ${e.message}")
+        } finally {
+            resultSet?.close()
+            statement?.close()
+            conexion?.close()
+        }
+
+        return@withContext vehiculoSOC
+    }
+
+
+    suspend fun obtenerFotoBase64(idVehiculo: Int, posicion: Int): String? = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) return@withContext null
+
+            val query = """
+            SELECT TOP 1 FotoBase64 
+            FROM Paso1LogVehiculoFotos pf 
+            INNER JOIN Paso1LogVehiculo pv ON pf.IdPaso1LogVehiculo = pv.IdPaso1LogVehiculo
+            WHERE pv.IdVehiculo = ? AND pf.Posicion = ?
+            ORDER BY pf.FechaAlta DESC
+        """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setInt(1, idVehiculo)
+            statement.setInt(2, posicion)
+            resultSet = statement.executeQuery()
+
+            if (resultSet.next()) {
+                return@withContext resultSet.getString("FotoBase64")
+            }
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "Error obteniendo foto: ${e.message}")
+        } finally {
+            resultSet?.close()
+            statement?.close()
+            conexion?.close()
+        }
+
+        return@withContext null
+    }
+
 
 
 
