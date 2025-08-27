@@ -121,7 +121,7 @@ class menu_principal_activity : AppCompatActivity() {
         val btnEmpresas = findViewById<Button>(R.id.btnEmpresas)
         val btnConfigs = findViewById<Button>(R.id.btnConfiguraciones)
         val btnRadmin = findViewById<Button>(R.id.btnRadminVPN)
-        val btnLectorQR = findViewById<Button>(R.id.btnLectorQR)
+        val btnConsultaDiariaVehiculos = findViewById<Button>(R.id.btnConsultaDiaria)
         val btnPaso1SOC =findViewById<Button>(R.id.btnPaso1SOC)
         val btnVehiculo = findViewById<Button>(R.id.btnVehiculo)
 
@@ -141,6 +141,7 @@ class menu_principal_activity : AppCompatActivity() {
         btnSincronizacion.isVisible=visibleBtns
         btnConfigs.isVisible=visibleBtns
         btnRadmin.isVisible=visibleBtns
+        btnEmpresas.isVisible=visibleBtns
 
         btnUm.setOnClickListener {
             val intent = Intent(this, unidadmedida_activity::class.java)
@@ -222,10 +223,6 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, vpn_connect_activity::class.java)
             startActivity(intent)
         }
-        /*btnLectorQR.setOnClickListener {
-            val intent = Intent(this, LectorQR_activity::class.java)
-            startActivity(intent)
-        }*/
         btnPaso1SOC.setOnClickListener{
             val intent = Intent(this, Paso1SOC_Activity::class.java)
             startActivity(intent)
@@ -998,7 +995,7 @@ class menu_principal_activity : AppCompatActivity() {
                             res1->
                         if(res1!=null)
                             ParametrosSistema.cfgNV=res1
-                        verificarCatalogosDeNubePorActualizarLocalmente();
+                        //verificarCatalogosDeNubePorActualizarLocalmente();
                     }
                 }
                 else

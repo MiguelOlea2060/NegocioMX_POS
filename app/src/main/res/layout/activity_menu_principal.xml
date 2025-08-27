@@ -176,27 +176,31 @@
 
     <LinearLayout
         android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <Button
-            android:layout_marginLeft="10dp"
-            android:id="@+id/btnLectorQR"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Lector QR" />
-        <Button
-            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
             android:id="@+id/btnPaso1SOC"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Paso 1 - SOC" />
 
         <Button
-            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp"
+            android:id="@+id/btnConsultaDiaria"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Consulta" />
+
+        <Button
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp"
             android:id="@+id/btnVehiculo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
