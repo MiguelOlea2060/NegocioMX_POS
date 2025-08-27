@@ -9,6 +9,7 @@
 
     <LinearLayout
         android:layout_marginTop="10dp"
+        android:layout_gravity="center_vertical"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -20,8 +21,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:layout_marginLeft="10dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/transvision_logo_chico250px" />
+            app:srcCompat="@drawable/transvisionlogo_380x260" />
 
         <ImageView
             android:layout_gravity="top"
@@ -29,6 +31,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_marginRight="15dp"
+            android:layout_marginLeft="5dp"
             android:layout_marginTop="40dp"
             app:srcCompat="@drawable/logout_icono_64x64" />
 
