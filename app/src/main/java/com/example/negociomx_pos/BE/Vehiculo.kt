@@ -16,6 +16,7 @@ data class Vehiculo(
     var FechaModificacion: String = "",
     var TipoCombustible:String="",
     var TipoVehiculo:String="",
+    var BL:String="",
 
     // ✅ CAMPOS SOC (State of Charge)
     var Odometro: Int = 0,

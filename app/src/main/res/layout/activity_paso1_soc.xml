@@ -49,27 +49,28 @@
 
                 <EditText
                     android:id="@+id/etVIN"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:layout_weight="1"
                     android:textColor="@color/black"
                     android:hint="Ingrese VIN del vehículo"
                     android:background="@drawable/edittext_background"
-                    android:padding="12dp"
-                    android:textSize="14sp"
+                    android:padding="5dp"
+                    android:textSize="18sp"
                     android:singleLine="true"
                     android:layout_marginEnd="8dp" />
 
-            </LinearLayout>
+                <Button
+                    android:layout_weight="2"
+                    android:id="@+id/btnConsultarVehiculo"
+                    android:layout_width="70dp"
+                    android:layout_height="48dp"
+                    android:text="🔍 Consultar"
+                    android:backgroundTint="#2196F3"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
 
-            <Button
-                android:id="@+id/btnConsultarVehiculo"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="🔍 Consultar Vehículo"
-                android:backgroundTint="#2196F3"
-                android:textColor="@android:color/white"
-                android:textSize="16sp" />
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -93,6 +94,14 @@
                 android:textColor="#388E3C"
                 android:layout_marginBottom="12dp" />
 
+            <TextView
+                android:id="@+id/tv_bl_vehiculo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="MBL: -"
+                android:textSize="16sp"
+                android:textColor="#424242"
+                android:layout_marginBottom="4dp" />
             <TextView
                 android:id="@+id/tv_marca_modelo_annio"
                 android:layout_width="match_parent"

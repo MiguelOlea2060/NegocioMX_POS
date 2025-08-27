@@ -240,7 +240,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
     private fun mostrarInformacionVehiculo(vehiculo: Vehiculo) {
         binding.apply {
-            tvMarcaModeloAnnio.text = "Marca - Modelo, Año: ${vehiculo.Marca} - ${vehiculo.Modelo}, ${vehiculo.Anio}"
+            tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
+            tvMarcaModeloAnnio.text = "${vehiculo.Marca} - ${vehiculo.Modelo}, ${vehiculo.Anio}"
             tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
             tvColorInterior.text = "Color Int.: ${vehiculo.ColorInterior}"
             tvTipoCombustible.text = "Combustible: ${vehiculo.TipoCombustible}"

@@ -295,13 +295,19 @@ class DALVehiculo {
             }
 
             // ✅ QUERY CORREGIDO PARA EL ESQUEMA REAL DE LA BASE DE DATOS
-            val query = """
-                
-                select vin, vehiculo.idmarca, vehiculo.idmodelo, marcaauto.nombre Marca, modelo.nombre Modelo,
-                 Annio annio, Motor, version, idvehiculo from vehiculo
-                		inner join dbo.MarcaAuto on vehiculo.IdMarca=MarcaAuto.IdMarcaAuto
-                		inner join dbo.Modelo on vehiculo.IdModelo=modelo.IdModelo
-                where vehiculo.vin = ?
+            val query = """                
+                select v.vin, v.idmarca, v.idmodelo, marcaauto.nombre Marca, modelo.nombre Modelo, v.Annio, Motor, 
+                        v.idvehiculo, ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, 
+                        tv.Nombre TipoVehiculo, bl
+                from vehiculo v inner join dbo.MarcaAuto on v.IdMarca=MarcaAuto.IdMarcaAuto
+                        inner join dbo.Modelo on v.IdModelo=modelo.IdModelo
+                        left join dbo.VehiculoColor vc on v.IdVehiculo=vc.IdVehiculo
+                        left join dbo.Color ce on vc.IdColor=ce.IdColor
+                        left join dbo.Color ci on vc.IdColorInterior=ci.IdColor
+                        left join dbo.TipoCombustible tc on v.idtipocombustible=tc.idtipocombustible
+                        left join dbo.tipovehiculo tv on v.idtipovehiculo=tv.idtipovehiculo
+                        left join dbo.bl b on v.idbl=b.idbl
+                where v.vin = ?
               
             """.trimIndent()
 
@@ -317,9 +323,12 @@ class DALVehiculo {
                     Marca = resultSet.getString("Marca") ?: "",
                     Modelo = resultSet.getString("Modelo") ?: "",
                     Anio = resultSet.getInt("Annio"),
-                    ColorExterior = resultSet.getString("Version") ?: "", // Usamos Version como Color temporalmente
-                    Placa = "", // No existe en el esquema actual
-                    NumeroSerie = resultSet.getString("Motor") ?: "",
+                    ColorExterior = resultSet.getString("ColorExterior") ?: "",
+                    ColorInterior = resultSet.getString("ColorInterior") ?: "",
+                    BL = resultSet.getString("ColorInterior") ?: "",
+                    NumeroSerie = resultSet.getString("BL") ?: "",
+                    TipoVehiculo = resultSet.getString("TipoVehiculo") ?: "",
+                    TipoCombustible = resultSet.getString("TipoCombustible") ?: "",
                     IdEmpresa = "", // No existe en el esquema actual
                     Activo = true, // Asumimos que está activo si existe
                     FechaCreacion = "", // No existe en el esquema actual
