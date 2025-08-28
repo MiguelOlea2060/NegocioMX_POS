@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Título -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Paso 2 - Evidencia Final"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#2E7D32"
+            android:gravity="center"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Sección VIN -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="10dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🚗 Escanea el Codigo QR"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#1976D2"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <EditText
+                    android:id="@+id/etVIN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:textColor="@color/black"
+                    android:hint="Ingrese VIN del vehículo"
+                    android:background="@drawable/edittext_background"
+                    android:padding="5dp"
+                    android:textSize="18sp"
+                    android:singleLine="true"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:layout_weight="2"
+                    android:id="@+id/btnConsultarVehiculo"
+                    android:layout_width="70dp"
+                    android:layout_height="48dp"
+                    android:text="🔍 Consultar"
+                    android:backgroundTint="#2196F3"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Información del Vehículo -->
+        <LinearLayout
+            android:id="@+id/layoutInfoVehiculo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/info_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📋 Datos del Vehículo"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#388E3C"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tv_bl_vehiculo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="MBL: -"
+                android:textSize="16sp"
+                android:textColor="#424242"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tv_marca_modelo_annio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Marca y Modelo: -"
+                android:textSize="16sp"
+                android:textColor="#424242"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tv_color_exterior"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Color Ext: -"
+                android:textSize="16sp"
+                android:textColor="#424242"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvColorInterior"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Color Int.: -"
+                android:textSize="16sp"
+                android:textColor="#424242"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvTipoCombustible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Combustible: -"
+                android:textSize="16sp"
+                android:textColor="#424242" />
+
+            <TextView
+                android:id="@+id/tvTipoVehiculo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tipo vehiculo: -"
+                android:textSize="16sp"
+                android:textColor="#424242" />
+
+        </LinearLayout>
+
+        <!-- Sección Evidencias (4 fotos) -->
+        <LinearLayout
+            android:id="@+id/layoutEvidencias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📸 Evidencia Final (1-4 fotos)"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#E91E63"
+                android:layout_marginBottom="10dp" />
+
+            <!-- Evidencia 1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <Button
+                    android:id="@+id/btnEvidencia1"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="📷 Foto 1"
+                    android:backgroundTint="#FF5722"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvEstadoEvidencia1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="❌"
+                    android:textSize="24sp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <!-- Evidencia 2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <Button
+                    android:id="@+id/btnEvidencia2"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="📷 Foto 2"
+                    android:backgroundTint="#FF5722"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvEstadoEvidencia2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="❌"
+                    android:textSize="24sp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <!-- Evidencia 3 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <Button
+                    android:id="@+id/btnEvidencia3"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="📷 Foto 3"
+                    android:backgroundTint="#FF5722"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvEstadoEvidencia3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="❌"
+                    android:textSize="24sp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <!-- Evidencia 4 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <Button
+                    android:id="@+id/btnEvidencia4"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="📷 Foto 4"
+                    android:backgroundTint="#FF5722"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvEstadoEvidencia4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="❌"
+                    android:textSize="24sp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Loading Container -->
+        <LinearLayout
+            android:id="@+id/loadingContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                style="?android:attr/progressBarStyleLarge"
+                android:indeterminateTint="#2196F3" />
+
+            <TextView
+                android:id="@+id/tvLoadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Preparando datos..."
+                android:textSize="16sp"
+                android:textColor="#2196F3" />
+
+            <TextView
+                android:id="@+id/tvLoadingSubtext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Esto puede tomar unos momentos"
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray" />
+
+        </LinearLayout>
+
+        <!-- Botón Guardar -->
+        <Button
+            android:id="@+id/btnGuardarPaso2"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="💾 GUARDAR EVIDENCIA FINAL"
+            android:backgroundTint="#4CAF50"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</ScrollView>
