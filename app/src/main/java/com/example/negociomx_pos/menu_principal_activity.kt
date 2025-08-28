@@ -124,6 +124,7 @@ class menu_principal_activity : AppCompatActivity() {
         val btnConsultaDiariaVehiculos = findViewById<Button>(R.id.btnConsultaDiaria)
         val btnPaso1SOC =findViewById<Button>(R.id.btnPaso1SOC)
         val btnVehiculo = findViewById<Button>(R.id.btnVehiculo)
+        val btnPaso2Accesorios=findViewById<Button>(R.id.btnPaso2Accesorios)
 
         getEmpresaNubeCfgNubeCfgNVNube()
 
@@ -224,6 +225,10 @@ class menu_principal_activity : AppCompatActivity() {
             startActivity(intent)
         }
         btnPaso1SOC.setOnClickListener{
+            val intent = Intent(this, Paso1SOC_Activity::class.java)
+            startActivity(intent)
+        }
+        btnPaso2Accesorios.setOnClickListener{
             val intent = Intent(this, Paso1SOC_Activity::class.java)
             startActivity(intent)
         }
