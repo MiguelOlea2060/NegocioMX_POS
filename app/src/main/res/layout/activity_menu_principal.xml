@@ -177,6 +177,29 @@
 
     </LinearLayout>
 
+    <TextView
+        android:textColor="@color/black"
+        android:textAlignment="textStart"
+        android:padding="5dp"
+        android:textStyle="bold"
+        android:background="@color/naranja"
+        android:layout_marginLeft="10dp"
+        android:text="Opciones"
+        android:textSize="22dp"
+        android:layout_marginRight="10dp"
+        android:paddingLeft="7dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    </TextView>
+    <View
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/deep_blue"
+        android:layout_width="match_parent"
+        android:layout_height="2dp">
+    </View>
     <LinearLayout
         android:layout_marginTop="20dp"
         android:layout_marginLeft="5dp"
@@ -209,6 +232,16 @@
             android:layout_height="wrap_content"
             android:text="Vehículo" />
     </LinearLayout>
+
+    <View
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/deep_blue"
+        android:layout_width="match_parent"
+        android:layout_height="2dp">
+    </View>
+
     <LinearLayout
         android:layout_marginTop="20dp"
         android:layout_marginLeft="5dp"

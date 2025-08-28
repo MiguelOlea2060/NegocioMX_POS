@@ -14,9 +14,11 @@
 
         <!-- Título -->
         <TextView
+            android:paddingLeft="3dp"
+            android:background="@color/naranja_ligero"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Paso 2 - Evidencia Final"
+            android:text="Paso 2 - Accesorios"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#2E7D32"
@@ -63,9 +65,9 @@
                 <Button
                     android:layout_weight="2"
                     android:id="@+id/btnConsultarVehiculo"
-                    android:layout_width="70dp"
+                    android:layout_width="85dp"
                     android:layout_height="48dp"
-                    android:text="🔍 Consultar"
+                    android:text="🔍 Buscar"
                     android:backgroundTint="#2196F3"
                     android:textColor="@android:color/white"
                     android:textSize="16sp" />
@@ -162,7 +164,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="📸 Evidencia Final (1-4 fotos)"
+                android:text="📸 Evidencias (1-4 fotos)"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#E91E63"
@@ -324,7 +326,7 @@
             android:id="@+id/btnGuardarPaso2"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="💾 GUARDAR EVIDENCIA FINAL"
+            android:text="💾 GUARDAR"
             android:backgroundTint="#4CAF50"
             android:textColor="@android:color/white"
             android:textSize="18sp"

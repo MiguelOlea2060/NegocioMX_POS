@@ -204,12 +204,14 @@ class Paso2SOC_Activity : AppCompatActivity() {
                     ocultarSecciones()
                     Toast.makeText(this@Paso2SOC_Activity, "❌ Vehículo no encontrado", Toast.LENGTH_LONG).show()
                     ocultarCargaConsulta()
+                    binding.etVIN.selectAll()
                 }
 
             } catch (e: Exception) {
                 Log.e("Paso2SOC", "💥 Error consultando vehículo: ${e.message}")
                 Toast.makeText(this@Paso2SOC_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
                 ocultarCargaConsulta()
+                binding.etVIN.selectAll()
             }
         }
     }

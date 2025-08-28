@@ -182,15 +182,11 @@ class Paso1SOC_Activity : AppCompatActivity() {
                 capturarEvidencia(4)
             }
         }
-
-
-
-
     }
 
     private fun verificaVINSuministrado() {
         val vin = binding.etVIN.text.toString().trim()
-        if (vin.isNotEmpty()) {
+        if (vin.isNotEmpty() && vin.length>16) {
             consultarVehiculo(vin)
         } else {
             Toast.makeText(this, "Ingrese un VIN válido", Toast.LENGTH_SHORT).show()
@@ -320,12 +316,15 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     ocultarSeccionesSOC()
                     Toast.makeText(this@Paso1SOC_Activity, "❌ Vehículo no encontrado", Toast.LENGTH_LONG).show()
                     ocultarCargaConsulta()
+
+                    binding.etVIN.selectAll()
                 }
 
             } catch (e: Exception) {
                 Log.e("Paso1SOC", "💥 Error consultando vehículo: ${e.message}")
                 Toast.makeText(this@Paso1SOC_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
                 ocultarCargaConsulta()
+                binding.etVIN.selectAll()
             }
         }
     }

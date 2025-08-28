@@ -8,4 +8,6 @@
     <color name="blue_white_normal">#a9ecff</color>
     <color name="deep_blue">#00aaff</color>
     <color name="blue_normal_deep">#62daff</color>
+    <color name="naranja">#FFA500</color>
+    <color name="naranja_ligero">#FFC82F</color>
 </resources>
