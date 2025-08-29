@@ -157,8 +157,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@drawable/card_background"
-            android:padding="16dp"
-            android:layout_marginBottom="16dp"
+            android:padding="15dp"
+            android:layout_marginBottom="10dp"
             android:visibility="gone">
 
             <TextView
@@ -170,70 +170,89 @@
                 android:textColor="#FF6F00"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Odómetro -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🛣️ Odómetro (km)"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#424242"
-                android:layout_marginBottom="8dp" />
-
-            <EditText
-                android:maxLength="3"
-                android:textColor="@color/black"
-                android:id="@+id/etOdometro"
+            <LinearLayout
+                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:hint="Ingrese kilometraje actual"
-                android:inputType="number"
-                android:background="@drawable/edittext_background"
-                android:padding="12dp"
-                android:textSize="16sp"
-                android:layout_marginBottom="16dp" />
+                android:layout_height="wrap_content">
+
+            <!-- Odómetro -->
+                <TextView
+                    android:layout_marginRight="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🛣️ Odómetro (km)"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#424242"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:textStyle="bold"
+                    android:maxLength="3"
+                    android:textColor="@color/black"
+                    android:id="@+id/etOdometro"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Ingrese kilometraje actual"
+                    android:inputType="number"
+                    android:background="@drawable/edittext_background"
+                    android:padding="12dp"
+                    android:textSize="20sp"
+                    android:layout_marginBottom="16dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
             <!-- Batería -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🔋 Nivel de Batería (%)"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="#424242"
-                android:layout_marginBottom="8dp" />
+                <TextView
+                    android:layout_marginRight="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔋 Nivel de Batería (%)"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#424242"
+                    android:layout_marginBottom="8dp" />
 
-            <EditText
-                android:maxLength="3"
-                android:textColor="@color/black"
-                android:id="@+id/etBateria"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:hint="Ingrese porcentaje de batería (0-100)"
-                android:inputType="number"
-                android:background="@drawable/edittext_background"
-                android:padding="12dp"
-                android:textSize="16sp"
-                android:layout_marginBottom="16dp" />
+                <EditText
+                    android:textStyle="bold"
+                    android:layout_marginLeft="5dp"
+                    android:maxLength="3"
+                    android:textColor="@color/black"
+                    android:id="@+id/etBateria"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Ingrese porcentaje de batería (0-100)"
+                    android:inputType="number"
+                    android:background="@drawable/edittext_background"
+                    android:padding="12dp"
+                    android:textSize="20sp"
+                    android:layout_marginBottom="16dp" />
+            </LinearLayout>
 
             <!-- Checkboxes -->
             <CheckBox
+                android:textStyle="bold"
                 android:id="@+id/cbModoTransporte"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="🚛 Modo Transporte Activo"
-                android:textSize="16sp"
+                android:text="🚛 Modo Transporte"
+                android:textSize="18sp"
                 android:textColor="#424242"
                 android:layout_marginBottom="8dp" />
 
             <CheckBox
+                android:textStyle="bold"
                 android:id="@+id/cbRequiereRecarga"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="⚡ Requiere Recarga Inmediata"
-                android:textSize="16sp"
+                android:text="⚡ Requiere Recarga"
+                android:textSize="18sp"
                 android:textColor="#424242"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="10dp" />
 
         </LinearLayout>
 
@@ -377,9 +396,6 @@
 
 
         </LinearLayout>
-
-
-
         <LinearLayout
             android:id="@+id/loadingContainer"
             android:layout_width="match_parent"
