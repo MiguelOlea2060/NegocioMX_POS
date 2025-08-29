@@ -175,6 +175,13 @@
             android:layout_height="wrap_content"
             android:text="Ventas" />
 
+        <Button
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp"
+            android:id="@+id/btnVehiculo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vehículo" />
     </LinearLayout>
 
     <TextView
@@ -224,13 +231,6 @@
             android:layout_height="wrap_content"
             android:text="Consulta" />
 
-        <Button
-            android:layout_weight="1"
-            android:layout_marginLeft="5dp"
-            android:id="@+id/btnVehiculo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Vehículo" />
     </LinearLayout>
 
     <View

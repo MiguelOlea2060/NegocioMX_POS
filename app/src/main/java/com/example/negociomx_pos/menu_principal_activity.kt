@@ -143,6 +143,7 @@ class menu_principal_activity : AppCompatActivity() {
         btnConfigs.isVisible=visibleBtns
         btnRadmin.isVisible=visibleBtns
         btnEmpresas.isVisible=visibleBtns
+        btnVehiculo.isVisible=visibleBtns
 
         btnUm.setOnClickListener {
             val intent = Intent(this, unidadmedida_activity::class.java)

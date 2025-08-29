@@ -34,6 +34,7 @@ import android.os.Looper
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Button
+import androidx.core.util.rangeTo
 
 
 class Paso1SOC_Activity : AppCompatActivity() {
@@ -118,6 +119,16 @@ class Paso1SOC_Activity : AppCompatActivity() {
             if(keyCode==KeyEvent.KEYCODE_ENTER && event.action== KeyEvent.ACTION_UP)
             {
                 verificaVINSuministrado()
+                return@setOnKeyListener true
+            }
+            false
+        }
+        // Configurando Captura de enter en el QR del VIN
+        binding.etOdometro.setOnKeyListener { v, keyCode, event ->
+            if(keyCode==KeyEvent.KEYCODE_ENTER && event.action== KeyEvent.ACTION_UP)
+            {
+                binding.etBateria.selectAll()
+                binding.etBateria.requestFocus()
                 return@setOnKeyListener true
             }
             false
@@ -287,6 +298,19 @@ class Paso1SOC_Activity : AppCompatActivity() {
                         tieneRegistroSOC = true
                         mostrarDatosSOCExistentes(datosSOCExistentes)
                     }
+                    else
+                    {
+                        binding.apply {
+                            etOdometro.isEnabled = true
+                            etBateria.isEnabled = true
+                            cbModoTransporte.isEnabled = true
+                            cbRequiereRecarga.isEnabled = true
+
+                            etOdometro.requestFocus()
+                            etOdometro.selectAll()
+                        }
+                    }
+
 
                     mostrarSeccionesSOC()
 
@@ -653,8 +677,15 @@ class Paso1SOC_Activity : AppCompatActivity() {
             val bitmap = BitmapFactory.decodeFile(archivoOriginal.absolutePath)
 
             // Calcular nuevo tamaño manteniendo proporción (máximo 2048px)
-            val maxSize = 2048
-            val ratio = minOf(maxSize.toFloat() / bitmap.width, maxSize.toFloat() / bitmap.height)
+            val maxSize = 3072
+//            val maxSize = 2048
+//            val ratio = minOf(maxSize.toFloat() / bitmap.width, maxSize.toFloat() / bitmap.height)
+            var ratio:Float =1.0F
+            if(bitmap.width>bitmap.height)
+                ratio= maxSize.toFloat() / bitmap.width
+            else
+                ratio = maxSize.toFloat() / bitmap.height
+
             val newWidth = (bitmap.width * ratio).toInt()
             val newHeight = (bitmap.height * ratio).toInt()
 
@@ -755,7 +786,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
                 return
             }
 
-            val archivoFinal = if (archivoLocal.length() > 4.5 * 1024 * 1024) {
+            var tamanoFisicoArchivo:Long=archivoLocal.length()
+            var tamanoFisicoMaxArchivo:Long=(2.2 * 1024 * 1024).toLong()
+            val archivoFinal = if (tamanoFisicoArchivo > tamanoFisicoMaxArchivo) {
                 Log.d("Paso1SOC", "📦 Comprimiendo imagen de ${archivoLocal.length()} bytes")
                 comprimirImagen(archivoLocal)
             } else {
@@ -1093,7 +1126,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
     private fun guardarSOC() {
         val vehiculo = vehiculoActual
         if (vehiculo == null) {
-            Toast.makeText(this, "Primero consulte un vehículo", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Primero escanea el codigo QR", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -1102,6 +1135,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
         if (odometroText.isEmpty() || bateriaText.isEmpty()) {
             Toast.makeText(this, "Complete todos los campos obligatorios", Toast.LENGTH_SHORT).show()
+
+            binding.etOdometro.selectAll()
+            binding.etOdometro.requestFocus()
             return
         }
 
@@ -1110,6 +1146,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
         if (bateria < 0 || bateria > 100) {
             Toast.makeText(this, "El nivel de batería debe estar entre 0 y 100", Toast.LENGTH_SHORT).show()
+            binding.etBateria.selectAll()
+            binding.etBateria.requestFocus()
             return
         }
 // Justo antes de lifecycleScope.launch {

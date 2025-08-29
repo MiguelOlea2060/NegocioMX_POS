@@ -181,6 +181,7 @@
                 android:layout_marginBottom="8dp" />
 
             <EditText
+                android:maxLength="3"
                 android:textColor="@color/black"
                 android:id="@+id/etOdometro"
                 android:layout_width="match_parent"
@@ -203,6 +204,7 @@
                 android:layout_marginBottom="8dp" />
 
             <EditText
+                android:maxLength="3"
                 android:textColor="@color/black"
                 android:id="@+id/etBateria"
                 android:layout_width="match_parent"
