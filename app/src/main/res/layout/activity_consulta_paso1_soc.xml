@@ -7,20 +7,20 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#F5F5F5"
-    android:padding="16dp"
+    android:padding="6dp"
     tools:context=".ConsultaPaso1Soc_Activity">
 
     <!-- Título -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="📊 Consulta Paso 1 SOC"
+        android:text="📊 Consultas SOC"
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="#2E7D32"
         android:gravity="center"
         android:background="@color/naranja_ligero"
-        android:padding="12dp"
+        android:padding="7dp"
         android:layout_marginBottom="16dp" />
 
     <!-- Sección de Filtros -->
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@drawable/card_background"
-        android:padding="16dp"
+        android:padding="10dp"
         android:layout_marginBottom="16dp">
 
         <TextView
@@ -54,7 +54,7 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_weight="1"
-                android:text="Hoy"
+                android:text="Fecha"
                 android:textSize="16sp"
                 android:textColor="#424242"
                 android:gravity="center_vertical"
@@ -66,24 +66,16 @@
                 android:clickable="true"
                 android:focusable="true" />
 
-
             <Button
                 android:id="@+id/btnConsultar"
-                android:layout_width="120dp"
+                android:layout_width="140dp"
                 android:layout_height="48dp"
-                android:text="🔍 Consultar"
+                android:text="🔍 Buscar"
                 android:backgroundTint="#2196F3"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
 
         </LinearLayout>
-
-        <!-- Calendar inicialmente oculto -->
-        <CalendarView
-            android:id="@+id/calendarView"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:visibility="gone" />
 
     </LinearLayout>
 

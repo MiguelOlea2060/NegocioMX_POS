@@ -121,7 +121,7 @@ class ventasa_activity : AppCompatActivity() {
         }
 
         muestraClientesPOS()
-        muestraListaVentas("")
+        //muestraListaVentas("")
     }
 
     private fun muestraClientesPOS() {

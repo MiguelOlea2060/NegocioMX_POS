@@ -1,10 +1,17 @@
 package com.example.negociomx_pos
 
+import android.app.Dialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.widget.*
+import android.view.Window
+import android.widget.Button
+import android.widget.CalendarView
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,12 +20,15 @@ import com.example.negociomx_pos.BE.Paso1SOCItem
 import com.example.negociomx_pos.DAL.DALPaso1SOC
 import com.example.negociomx_pos.adapters.Paso1SOCAdapter
 import kotlinx.coroutines.launch
+import net.sourceforge.jtds.jdbc.DateTime
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
+
 
 class ConsultaPaso1Soc_Activity : AppCompatActivity() {
 
-    private lateinit var calendarView: CalendarView
+    //private lateinit var calendarView: CalendarView
     private lateinit var btnConsultar: Button
     private lateinit var tvFechaSeleccionada: TextView
     private lateinit var recyclerViewRegistros: RecyclerView
@@ -58,8 +68,6 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
     }
 
     private fun inicializarComponentes() {
-        calendarView = findViewById(R.id.calendarView)
-        Toast.makeText(this, "CalendarView encontrado: ${calendarView != null}", Toast.LENGTH_SHORT).show()
         btnConsultar = findViewById(R.id.btnConsultar)
         tvFechaSeleccionada = findViewById(R.id.tvFechaSeleccionada)
         recyclerViewRegistros = findViewById(R.id.recyclerViewRegistros)
@@ -80,42 +88,18 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
     private fun configurarEventos() {
         // NUEVO: Evento para mostrar/ocultar calendario al hacer clic en la fecha
         tvFechaSeleccionada.setOnClickListener {
-            Toast.makeText(this, "Click detectado", Toast.LENGTH_SHORT).show()
-            toggleCalendario()
-        }
-
-        // Evento del calendario (MODIFICADO: ahora oculta el calendario al seleccionar)
-        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            val calendar = Calendar.getInstance()
-            calendar.set(year, month, dayOfMonth)
-
-            val formatoFecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            fechaSeleccionada = formatoFecha.format(calendar.time)
-
-            val formatoMostrar = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            tvFechaSeleccionada.text = formatoMostrar.format(calendar.time)
-
-            // NUEVO: Ocultar calendario automáticamente después de seleccionar fecha
-            ocultarCalendario()
-
-            // NUEVO: Consultar automáticamente al seleccionar fecha
-            consultarRegistrosPorFecha(fechaSeleccionada)
+            mostrarCalendario()
         }
 
         // Botón consultar (SIN CAMBIOS)
         btnConsultar.setOnClickListener {
-            if (fechaSeleccionada.isNotEmpty()) {
-                // NUEVO: Ocultar calendario al consultar
-                ocultarCalendario()
-                consultarRegistrosPorFecha(fechaSeleccionada)
-            } else {
-                Toast.makeText(this, "Seleccione una fecha", Toast.LENGTH_SHORT).show()
-            }
+            Toast.makeText(this, "Mostrando calendario", Toast.LENGTH_SHORT).show()
+            consultarRegistrosPorFecha(fechaSeleccionada)
         }
     }
 
     // NUEVA FUNCIÓN: Alternar visibilidad del calendario
-    private fun toggleCalendario() {
+    /*private fun toggleCalendario() {
         Toast.makeText(this, "toggleCalendario llamado - Visible actual: $calendarioVisible", Toast.LENGTH_LONG).show()
 
         if (calendarioVisible) {
@@ -125,26 +109,65 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
             Toast.makeText(this, "Intentando mostrar calendario", Toast.LENGTH_SHORT).show()
             mostrarCalendario()
         }
-    }
+    }*/
 
     // NUEVA FUNCIÓN: Mostrar calendario
     private fun mostrarCalendario() {
-        Toast.makeText(this, "mostrarCalendario() ejecutándose", Toast.LENGTH_SHORT).show()
+        val formatoFecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val formatoMostrar = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
-        calendarView.visibility = View.VISIBLE
-        calendarioVisible = true
+        val dialog = Dialog(this)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.item_calendario)
 
-        Toast.makeText(this, "Calendar visibility establecida a VISIBLE", Toast.LENGTH_SHORT).show()
-        Toast.makeText(this, "calendarioVisible = $calendarioVisible", Toast.LENGTH_SHORT).show()
+        val calendario: CalendarView = dialog.findViewById(R.id.dtFechaCal)
+        val imgAceptar: ImageView = dialog.findViewById(R.id.imgAceptarCalendario)
+        val imgCancelar: ImageView = dialog.findViewById(R.id.imgCancelarCalendario)
 
-        val fechaActual = tvFechaSeleccionada.text.toString()
-        if (!fechaActual.contains("(Toque para ocultar)")) {
-            tvFechaSeleccionada.text = "$fechaActual (Toque para ocultar)"
+        var annio:Int=0
+        var mes:Int=0
+        var dia:Int=0
+        calendario.setOnDateChangeListener{ view,year, month,dayOfMonth->
+            annio=year
+            mes=month+1
+            dia=dayOfMonth
         }
+        // Establecer fecha en el calendario
+        val fechaActual :Calendar=Calendar.getInstance()
+        if (fechaSeleccionada.length ==0)
+        {
+            fechaSeleccionada = formatoFecha.format(fechaActual.time)
+            tvFechaSeleccionada.text = formatoMostrar.format(fechaActual.time)
+            calendario.date=fechaActual.timeInMillis
+        }
+        else
+        {
+            var pedazos=fechaSeleccionada.split("-")
+            annio=pedazos[0].toInt()
+            mes=pedazos[1].toInt()
+            dia=pedazos[2].toInt()
+
+            calendario.setDate(
+                SimpleDateFormat("yyyy-MM-dd").parse(fechaSeleccionada).getTime(),
+                true,
+                true)
+        }
+
+        imgAceptar.setOnClickListener{
+            fechaSeleccionada= annio.toString()+"-"+mes.toString()+"-"+dia.toString()
+
+            tvFechaSeleccionada.text=dia.toString()+"/"+mes.toString()+"/"+annio.toString()
+            dialog.dismiss()
+        }
+        imgCancelar.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     // NUEVA FUNCIÓN: Ocultar calendario
-    private fun ocultarCalendario() {
+    /*private fun ocultarCalendario() {
         calendarView.visibility = View.GONE
         calendarioVisible = false
 
@@ -153,7 +176,7 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         if (fechaTexto.contains("(Seleccione fecha)")) {
             tvFechaSeleccionada.text = fechaTexto.replace(" (Seleccione fecha)", "")
         }
-    }
+    }*/
 
     private fun configurarRecyclerView() {
         adapter = Paso1SOCAdapter(emptyList()) { registro ->
@@ -174,7 +197,7 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         tvFechaSeleccionada.text = formatoMostrar.format(fechaActual.time)
 
         // Establecer fecha en el calendario
-        calendarView.date = fechaActual.timeInMillis
+        //calendarView.date = fechaActual.timeInMillis
     }
 
     private fun realizarConsultaInicial() {
@@ -186,12 +209,14 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 mostrarCargando()
-
                 // Consultar registros
                 val registros = dalConsultaSOC.consultarPaso1SOCPorFecha(fecha)
 
-                // Consultar estadísticas
-                val estadisticas = dalConsultaSOC.obtenerEstadisticasPorFecha(fecha)
+                // Calculas estadísticas
+                val estadisticas= mutableMapOf<String,Int>()
+                estadisticas["TotalRegistros"] = 1
+                estadisticas["VehiculosUnicos"] = 3
+                estadisticas["TotalFotos"] = 4
 
                 ocultarCargando()
 
