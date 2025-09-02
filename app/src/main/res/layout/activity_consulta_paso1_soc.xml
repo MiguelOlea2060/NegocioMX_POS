@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#F5F5F5"
-    android:padding="6dp"
+    android:padding="4dp"
     tools:context=".ConsultaPaso1Soc_Activity">
 
     <!-- Título -->
@@ -15,12 +15,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="📊 Consultas SOC"
-        android:textSize="24sp"
+        android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="#2E7D32"
         android:gravity="center"
         android:background="@color/naranja_ligero"
-        android:padding="7dp"
+        android:padding="6dp"
         android:layout_marginBottom="16dp" />
 
     <!-- Sección de Filtros -->
@@ -30,16 +30,16 @@
         android:orientation="vertical"
         android:background="@drawable/card_background"
         android:padding="10dp"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="8dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="📅 Seleccionar Fecha"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="#1976D2"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="8dp" />
 
         <!-- Sección compacta de fecha -->
         <LinearLayout
@@ -47,9 +47,10 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="6dp">
 
             <TextView
+                android:textStyle="bold"
                 android:id="@+id/tvFechaSeleccionada"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
@@ -59,10 +60,10 @@
                 android:textColor="#424242"
                 android:gravity="center_vertical"
                 android:background="@drawable/edittext_background"
-                android:padding="12dp"
+                android:padding="8dp"
                 android:layout_marginEnd="8dp"
                 android:drawableStart="@android:drawable/ic_menu_today"
-                android:drawablePadding="8dp"
+                android:drawablePadding="4dp"
                 android:clickable="true"
                 android:focusable="true" />
 
@@ -73,7 +74,7 @@
                 android:text="🔍 Buscar"
                 android:backgroundTint="#2196F3"
                 android:textColor="@android:color/white"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -86,19 +87,9 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="@drawable/info_background"
-        android:padding="12dp"
-        android:layout_marginBottom="16dp"
+        android:padding="8dp"
+        android:layout_marginBottom="14dp"
         android:visibility="gone">
-
-        <TextView
-            android:id="@+id/tvTotalRegistros"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="📋 0 registros"
-            android:textSize="12sp"
-            android:textColor="#424242"
-            android:gravity="center" />
 
         <TextView
             android:id="@+id/tvVehiculosUnicos"
@@ -129,7 +120,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="20dp"
+        android:padding="14dp"
         android:visibility="gone">
 
         <ProgressBar
@@ -165,7 +156,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:background="@android:color/white"
-        android:padding="8dp"
+        android:padding="5dp"
         tools:listitem="@layout/item_consulta_paso1_soc" />
 
     <!-- Mensaje Sin Resultados -->

@@ -20,7 +20,6 @@ import com.example.negociomx_pos.BE.Paso1SOCItem
 import com.example.negociomx_pos.DAL.DALPaso1SOC
 import com.example.negociomx_pos.adapters.Paso1SOCAdapter
 import kotlinx.coroutines.launch
-import net.sourceforge.jtds.jdbc.DateTime
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -28,7 +27,6 @@ import java.util.Locale
 
 class ConsultaPaso1Soc_Activity : AppCompatActivity() {
 
-    //private lateinit var calendarView: CalendarView
     private lateinit var btnConsultar: Button
     private lateinit var tvFechaSeleccionada: TextView
     private lateinit var recyclerViewRegistros: RecyclerView
@@ -39,7 +37,6 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
     private lateinit var tvLoadingSubtext: TextView
 
     // Estadísticas
-    private lateinit var tvTotalRegistros: TextView
     private lateinit var tvVehiculosUnicos: TextView
     private lateinit var tvTotalFotos: TextView
 
@@ -78,7 +75,6 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
 
         // Estadísticas
-        tvTotalRegistros = findViewById(R.id.tvTotalRegistros)
         tvVehiculosUnicos = findViewById(R.id.tvVehiculosUnicos)
         tvTotalFotos = findViewById(R.id.tvTotalFotos)
 
@@ -97,19 +93,6 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
             consultarRegistrosPorFecha(fechaSeleccionada)
         }
     }
-
-    // NUEVA FUNCIÓN: Alternar visibilidad del calendario
-    /*private fun toggleCalendario() {
-        Toast.makeText(this, "toggleCalendario llamado - Visible actual: $calendarioVisible", Toast.LENGTH_LONG).show()
-
-        if (calendarioVisible) {
-            Toast.makeText(this, "Intentando ocultar calendario", Toast.LENGTH_SHORT).show()
-            ocultarCalendario()
-        } else {
-            Toast.makeText(this, "Intentando mostrar calendario", Toast.LENGTH_SHORT).show()
-            mostrarCalendario()
-        }
-    }*/
 
     // NUEVA FUNCIÓN: Mostrar calendario
     private fun mostrarCalendario() {
@@ -154,10 +137,14 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         }
 
         imgAceptar.setOnClickListener{
+            val fechaSel=fechaSeleccionada
             fechaSeleccionada= annio.toString()+"-"+mes.toString()+"-"+dia.toString()
 
             tvFechaSeleccionada.text=dia.toString()+"/"+mes.toString()+"/"+annio.toString()
             dialog.dismiss()
+
+            if(!fechaSel.equals(fechaSeleccionada))
+                consultarRegistrosPorFecha(fechaSeleccionada)
         }
         imgCancelar.setOnClickListener {
             dialog.dismiss()
@@ -165,18 +152,6 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
 
         dialog.show()
     }
-
-    // NUEVA FUNCIÓN: Ocultar calendario
-    /*private fun ocultarCalendario() {
-        calendarView.visibility = View.GONE
-        calendarioVisible = false
-
-        // Restaurar texto del campo fecha
-        val fechaTexto = tvFechaSeleccionada.text.toString()
-        if (fechaTexto.contains("(Seleccione fecha)")) {
-            tvFechaSeleccionada.text = fechaTexto.replace(" (Seleccione fecha)", "")
-        }
-    }*/
 
     private fun configurarRecyclerView() {
         adapter = Paso1SOCAdapter(emptyList()) { registro ->
@@ -214,9 +189,18 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
 
                 // Calculas estadísticas
                 val estadisticas= mutableMapOf<String,Int>()
+                var totalVehiculos=0
+                var totalFotos=0
+                if(registros!=null && registros.count()>0)
+                {
+                    totalVehiculos=registros.count()
+                    registros.forEach { Unit->
+                        totalFotos+= Unit.CantidadFotos
+                    }
+                }
                 estadisticas["TotalRegistros"] = 1
-                estadisticas["VehiculosUnicos"] = 3
-                estadisticas["TotalFotos"] = 4
+                estadisticas["VehiculosUnicos"] = totalVehiculos
+                estadisticas["TotalFotos"] = totalFotos
 
                 ocultarCargando()
 
@@ -241,7 +225,6 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
 
         // Mostrar estadísticas
         layoutEstadisticas.visibility = View.VISIBLE
-        tvTotalRegistros.text = "📋 ${estadisticas["TotalRegistros"] ?: 0} registros"
         tvVehiculosUnicos.text = "🚗 ${estadisticas["VehiculosUnicos"] ?: 0} vehículos"
         tvTotalFotos.text = "📸 ${estadisticas["TotalFotos"] ?: 0} fotos"
 
@@ -322,16 +305,15 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
             VIN: ${registro.VIN}
             BL: ${registro.BL}
             Vehículo: ${registro.Marca} ${registro.Modelo} ${registro.Anio}
-            Motor: ${registro.NumeroMotor}
+            Num. de Motor: ${registro.NumeroMotor}
             
             📊 DATOS SOC:
             Odómetro: ${registro.Odometro} km
-            Batería: ${registro.Bateria}%
+            SOC: ${registro.Bateria}%
             Modo Transporte: ${if (registro.ModoTransporte) "Sí" else "No"}
             Requiere Recarga: ${if (registro.RequiereRecarga) "Sí" else "No"}
             
             📸 Fotos: ${registro.CantidadFotos}
-            👤 Usuario: ${registro.UsuarioAlta}
             📅 Fecha: ${registro.FechaAlta}
         """.trimIndent()
 

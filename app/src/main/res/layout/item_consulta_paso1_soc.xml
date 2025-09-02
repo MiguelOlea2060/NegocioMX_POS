@@ -3,23 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="4dp"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="6dp"
+    app:cardElevation="10dp"
     android:foreground="?android:attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="10dp">
 
         <!-- Header con VIN y BL -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="4dp">
 
             <TextView
                 android:id="@+id/tvVIN"
@@ -32,14 +32,16 @@
                 android:textColor="#1976D2" />
 
             <TextView
+
+                android:textStyle="bold"
                 android:id="@+id/tvBL"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="BL: XXXX"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:textColor="#666666"
                 android:background="@drawable/edittext_background"
-                android:padding="4dp" />
+                android:padding="2dp" />
 
         </LinearLayout>
 
@@ -48,7 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="5dp">
 
             <TextView
                 android:id="@+id/tvMarcaModelo"
@@ -61,11 +63,12 @@
                 android:textColor="#424242" />
 
             <TextView
+                android:textStyle="bold"
                 android:id="@+id/tvAnio"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Año: 2024"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textColor="#666666" />
 
         </LinearLayout>
@@ -75,7 +78,7 @@
             android:id="@+id/tvColores"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ext: Color | Int: Color"
+            android:text="Colores -> Ext: Color | Int: Color"
             android:textSize="12sp"
             android:textColor="#666666"
             android:layout_marginBottom="4dp" />
@@ -85,7 +88,7 @@
             android:id="@+id/tvNumeroMotor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Motor: XXXXXXXXX"
+            android:text="Numero de Motor: XXXXXXXXX"
             android:textSize="12sp"
             android:textColor="#666666"
             android:layout_marginBottom="8dp" />
@@ -95,8 +98,8 @@
             android:id="@+id/tvDatosSOC"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Odómetro: 0 km | Batería: 0% | Transporte: No | Recarga: No"
-            android:textSize="11sp"
+            android:text="Odómetro: 0 km | Batería: 0% | Modo Transporte: No | Se Recarga: No"
+            android:textSize="14sp"
             android:textColor="#FF6F00"
             android:background="#FFF3E0"
             android:padding="6dp"
@@ -114,7 +117,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="📸 0 foto(s)"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:textColor="#9C27B0"
                 android:background="#F3E5F5"
                 android:padding="4dp" />
@@ -125,11 +128,12 @@
                 android:layout_weight="1" />
 
             <TextView
+                android:textStyle="bold"
                 android:id="@+id/tvFechaHora"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="2024-01-01 12:00:00"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 android:textColor="#999999" />
 
         </LinearLayout>

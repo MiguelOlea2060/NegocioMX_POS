@@ -38,12 +38,12 @@ class Paso1SOCAdapter(
         holder.tvBL.text = "BL: ${registro.BL}"
         holder.tvMarcaModelo.text = "${registro.Marca} ${registro.Modelo}"
         holder.tvAnio.text = "Año: ${registro.Anio}"
-        holder.tvColores.text = "Ext: ${registro.ColorExterior} | Int: ${registro.ColorInterior}"
+        holder.tvColores.text = "Colores -> Ext: ${registro.ColorExterior} | Int: ${registro.ColorInterior}"
         holder.tvNumeroMotor.text = "Motor: ${registro.NumeroMotor}"
 
         val modoTransporte = if (registro.ModoTransporte) "Sí" else "No"
         val requiereRecarga = if (registro.RequiereRecarga) "Sí" else "No"
-        holder.tvDatosSOC.text = "Odómetro: ${registro.Odometro} km | Batería: ${registro.Bateria}% | Transporte: $modoTransporte | Recarga: $requiereRecarga"
+        holder.tvDatosSOC.text = "Odómetro: ${registro.Odometro} km | SOC: ${registro.Bateria}% | Modo Transporte: $modoTransporte | Se Recargo: $requiereRecarga"
 
         holder.tvFotos.text = "📸 ${registro.CantidadFotos} foto(s)"
         holder.tvFechaHora.text = registro.FechaAlta
