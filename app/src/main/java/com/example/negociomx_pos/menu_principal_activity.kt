@@ -239,7 +239,7 @@ class menu_principal_activity : AppCompatActivity() {
             startActivity(intent)
         }
         btnConsultaPaso2.setOnClickListener{
-            val intent = Intent(this, Paso2SOC_Activity::class.java)
+            val intent = Intent(this, ConsultaPaso2_Activity::class.java)
             startActivity(intent)
         }
 
@@ -291,7 +291,7 @@ class menu_principal_activity : AppCompatActivity() {
     private fun ejecutaSeleccionSistemaOnlineUOffline() {
         bllUtil.MessageShow(this,"Aceptar","",
             "Desea seguir trabajando con el sistema OFFLINE","Pregunta",){
-            res->
+                res->
             if(res==1)
             {
                 ParametrosSistema.TipoUsoSistema=TipoUsoSistemaEnum.OnLine
@@ -354,7 +354,7 @@ class menu_principal_activity : AppCompatActivity() {
             fun asyncFun() = scope.launch {
                 resultado.observe(this@menu_principal_activity)
                 {
-                    res1 ->
+                        res1 ->
                     if (res1 != null) {
                         listaUMlocales = res1
 
@@ -383,7 +383,7 @@ class menu_principal_activity : AppCompatActivity() {
         }
 
         obtenMarcasNube(){
-            res->
+                res->
             if (res != null) {
                 listaMarcasNube = res!!
                 listaMarcasNubeTotal=res!!
@@ -584,7 +584,7 @@ class menu_principal_activity : AppCompatActivity() {
         btnActEmp.setOnClickListener {
             actualizaEmpresaNubeALocal(empresaNube!!)
             {
-            actualizada,mensajeError->
+                    actualizada,mensajeError->
                 if(actualizada) {
                     btnActEmp.isVisible = false
                     lblCatalogoEmp.setText("1. Datos de Empresa (Listo)")
@@ -594,7 +594,7 @@ class menu_principal_activity : AppCompatActivity() {
         btnActConfig.setOnClickListener {
             actualizaConfigsLocalmente()
             {
-                idCfg,agregado->
+                    idCfg,agregado->
                 if(agregado) {
                     if(agregado)
                     {
@@ -676,7 +676,7 @@ class menu_principal_activity : AppCompatActivity() {
                     if(listaArtsAct!=null && listaArtsAct.count()>0)
                     {
                         dalArt.updateArtAct(listaArtsAct){
-                            res->
+                                res->
                             if(res)
                             {
                                 dialog.dismiss()
@@ -846,7 +846,7 @@ class menu_principal_activity : AppCompatActivity() {
         val scope = MainScope()
         fun asyncFun() = scope.launch {
             var item=base.configDAO().getByFilters(null,idNube,idEmpresa)
-                onFinishReadConfig(item.value)
+            onFinishReadConfig(item.value)
         }
         asyncFun()
     }
@@ -978,7 +978,7 @@ class menu_principal_activity : AppCompatActivity() {
                         cfgNV.PrefijoFolioNV,
                         cfgNV.IdTipoPagoPredeterminado.toString(),
                         cfgNV.NombreTipoPagoPredeterminado
-                ))
+                    ))
                 onFinishActNV(true)
             }
             catch (ex:Exception)
@@ -1027,20 +1027,20 @@ class menu_principal_activity : AppCompatActivity() {
         bllUtil.MessageShow(this,"Articulo Nube","Articulo Local","Opcion a Ejecutar",
             "Pregunta")
         {
-            res->
+                res->
             if(res==2)
                 ejecutaPantallaArticuloLocal()
-         //   else
-               // ejecutaPantallaArticuloNube()
+            //   else
+            // ejecutaPantallaArticuloNube()
         }
     }
 
-  /*  private fun ejecutaPantallaArticuloNube()
-    {
-        val intent= Intent(this,articulo_nube_activity::class.java)
-        intent.putExtra("tipoArticulo",2)
-        startActivity(intent)
-    }*/
+    /*  private fun ejecutaPantallaArticuloNube()
+      {
+          val intent= Intent(this,articulo_nube_activity::class.java)
+          intent.putExtra("tipoArticulo",2)
+          startActivity(intent)
+      }*/
 
     private fun ejecutaPantallaArticuloLocal()
     {
