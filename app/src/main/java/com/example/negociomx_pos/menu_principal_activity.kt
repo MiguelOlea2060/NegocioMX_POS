@@ -136,7 +136,7 @@ class menu_principal_activity : AppCompatActivity() {
         btnUm.isVisible=visibleBtns
         btnAltaArticulo.isVisible=visibleBtns
         btnConsultaArticulo.isVisible=visibleBtns
-        //btnVentas.isVisible=visibleBtns
+        btnVentas.isVisible=visibleBtns
         btnImpuesto.isVisible=visibleBtns
         btnTipoPago.isVisible=visibleBtns
         btnCliente.isVisible=visibleBtns
