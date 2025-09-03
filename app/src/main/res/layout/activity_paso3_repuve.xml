@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        Título
+        <TextView
+            android:padding="3dp"
+            android:background="@color/naranja_ligero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Paso 3 - REPUVE"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#2E7D32"
+            android:gravity="center"
+            android:layout_marginBottom="24dp" />
+
+        Sección VIN
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="10dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🚗 Escanea el Codigo QR"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#1976D2"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <EditText
+                    android:maxLength="19"
+                    android:id="@+id/etVIN"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:textColor="@color/black"
+                    android:hint="Ingrese VIN del vehículo"
+                    android:background="@drawable/edittext_background"
+                    android:padding="5dp"
+                    android:textSize="18sp"
+                    android:singleLine="true"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:layout_weight="2"
+                    android:id="@+id/btnConsultarVehiculo"
+                    android:layout_width="85dp"
+                    android:layout_height="48dp"
+                    android:text="🔍 Buscar"
+                    android:backgroundTint="#2196F3"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        Información del Vehículo
+        <LinearLayout
+            android:id="@+id/layoutInfoVehiculo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/info_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📋 Datos del Vehículo"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#388E3C"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvBlVehiculo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="MBL: -"
+                android:textSize="16sp"
+                android:textColor="#424242"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvMarcaModeloAnnio"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Marca y Modelo: -"
+                android:textSize="16sp"
+                android:textColor="#424242"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvColorExterior"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Color Ext: -"
+                android:textSize="16sp"
+                android:textColor="#424242"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvColorInterior"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Color Int.: -"
+                android:textSize="16sp"
+                android:textColor="#424242"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvTipoCombustible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Combustible: -"
+                android:textSize="16sp"
+                android:textColor="#424242" />
+
+            <TextView
+                android:id="@+id/tvTipoVehiculo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tipo vehiculo: -"
+                android:textSize="16sp"
+                android:textColor="#424242" />
+
+        </LinearLayout>
+
+        Sección Evidencia REPUVE (1 sola foto)
+        <LinearLayout
+            android:id="@+id/layoutEvidencia"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📸 Evidencia REPUVE (Obligatoria)"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#E91E63"
+                android:layout_marginBottom="16dp" />
+
+
+            Botón de evidencia
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <Button
+                    android:id="@+id/btnEvidencia"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="📷 Tomar Foto REPUVE"
+                    android:backgroundTint="#FF5722"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvEstadoEvidencia"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="❌"
+                    android:textSize="24sp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            Mensaje informativo
+            <TextView
+                android:id="@+id/tvMensajeInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ℹ️ Esta foto es obligatoria y solo se puede tomar una vez"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:textStyle="italic"
+                android:gravity="center"
+                android:padding="8dp"
+                android:background="#F0F0F0" />
+
+        </LinearLayout>
+
+        Loading Container
+        <LinearLayout
+            android:id="@+id/loadingContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:gravity="center">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                style="?android:attr/progressBarStyleLarge"
+                android:indeterminateTint="#2196F3" />
+
+            <TextView
+                android:id="@+id/tvLoadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Preparando datos..."
+                android:textSize="16sp"
+                android:textColor="#2196F3" />
+
+            <TextView
+                android:id="@+id/tvLoadingSubtext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Esto puede tomar unos momentos"
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray" />
+
+        </LinearLayout>
+
+        Botón Guardar
+        <Button
+            android:id="@+id/btnGuardarPaso3"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="💾 GUARDAR REPUVE"
+            android:backgroundTint="#4CAF50"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+
+
+
+
+    </LinearLayout>
+
+</ScrollView>

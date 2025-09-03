@@ -126,6 +126,8 @@ class menu_principal_activity : AppCompatActivity() {
         val btnPaso1SOC =findViewById<Button>(R.id.btnPaso1SOC)
         val btnVehiculo = findViewById<Button>(R.id.btnVehiculo)
         val btnPaso2Accesorios=findViewById<Button>(R.id.btnPaso2Accesorios)
+        val btnPaso3Repuve =findViewById<Button>(R.id.btnPaso3Repuve)
+        val btnConsultaPaso3 =findViewById<Button>(R.id.btnConsultaPaso3)
 
         getEmpresaNubeCfgNubeCfgNVNube()
 
@@ -145,6 +147,7 @@ class menu_principal_activity : AppCompatActivity() {
         btnRadmin.isVisible=visibleBtns
         btnEmpresas.isVisible=visibleBtns
         btnVehiculo.isVisible=visibleBtns
+
 
         btnUm.setOnClickListener {
             val intent = Intent(this, unidadmedida_activity::class.java)
@@ -234,12 +237,20 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, Paso2SOC_Activity::class.java)
             startActivity(intent)
         }
+        btnPaso3Repuve.setOnClickListener{
+            val intent = Intent(this, Paso3Repuve_Activity::class.java)
+            startActivity(intent)
+        }
         btnConsultaPaso1.setOnClickListener{
             val intent = Intent(this, ConsultaPaso1Soc_Activity::class.java)
             startActivity(intent)
         }
         btnConsultaPaso2.setOnClickListener{
             val intent = Intent(this, ConsultaPaso2_Activity::class.java)
+            startActivity(intent)
+        }
+        btnConsultaPaso3.setOnClickListener{
+            val intent = Intent(this, ConsultaPaso3_Activity::class.java)
             startActivity(intent)
         }
 

@@ -5,6 +5,7 @@ import com.example.negociomx_pos.BE.DireccionVehiculo
 import com.example.negociomx_pos.BE.Marca
 import com.example.negociomx_pos.BE.Modelo
 import com.example.negociomx_pos.BE.Paso2LogVehiculo
+import com.example.negociomx_pos.BE.Paso3LogVehiculo
 import com.example.negociomx_pos.BE.StatusFotoVehiculo
 import com.example.negociomx_pos.BE.Transmision
 import com.example.negociomx_pos.BE.Vehiculo
@@ -541,6 +542,10 @@ class DALVehiculo {
         }
     }
 
+
+
+
+
     // ✅ ACTUALIZAR FOTO EN PASO2LOGVEHICULO
     suspend fun actualizarFotoPaso2(
         idPaso2LogVehiculo: Int,
@@ -720,7 +725,153 @@ class DALVehiculo {
 
 
 
+    // ✅ MÉTODOS PARA PASO 3 - REPUVE
 
+    // ✅ INSERTAR REGISTRO EN PASO3LOGVEHICULO
+    suspend fun insertarPaso3LogVehiculo(
+        idVehiculo: Int,
+        idUsuarioNube: Int,
+        fotoBase64: String
+    ): Int = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var generatedKey: Int = -1
+
+        try {
+            Log.d("DALVehiculo", "💾 Insertando registro en Paso3LogVehiculo para IdVehiculo: $idVehiculo")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext -1
+            }
+
+            val nombreArchivo = "Paso3Foto_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())}.jpg"
+
+            val query = """
+                INSERT INTO Paso3LogVehiculo (IdVehiculo, IdUsuarioNube, FechaAlta, Foto, Tienefoto, NombreArchivoFoto)
+                VALUES (?, ?, GETDATE(), ?, 1, ?)
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)
+            statement.setInt(1, idVehiculo)
+            statement.setInt(2, idUsuarioNube)
+            statement.setString(3, fotoBase64)
+            statement.setString(4, nombreArchivo)
+
+            statement.executeUpdate()
+
+            val rs = statement.generatedKeys
+            if (rs.next()) {
+                generatedKey = rs.getInt(1)
+            }
+
+            Log.d("DALVehiculo", "✅ Registro Paso3 insertado exitosamente. Id generado: $generatedKey")
+            return@withContext generatedKey
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error insertando registro Paso3: ${e.message}")
+            e.printStackTrace()
+            return@withContext -1
+        } finally {
+            try {
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+    }
+
+    // ✅ CONSULTAR FOTO PASO3 EXISTENTE
+    suspend fun consultarFotoPaso3Existente(idVehiculo: Int): Paso3LogVehiculo? = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+        var paso3LogVehiculo: Paso3LogVehiculo? = null
+
+        try {
+            Log.d("DALVehiculo", "🔍 Consultando foto Paso3 existente para IdVehiculo: $idVehiculo")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext null
+            }
+
+            val query = """
+                SELECT TOP 1 IdPaso3LogVehiculo, Tienefoto, NombreArchivoFoto, FechaAlta
+                FROM Paso3LogVehiculo 
+                WHERE IdVehiculo = ?
+                ORDER BY IdPaso3LogVehiculo DESC
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setInt(1, idVehiculo)
+            resultSet = statement.executeQuery()
+
+            if (resultSet.next()) {
+                paso3LogVehiculo = Paso3LogVehiculo(
+                    IdPaso3LogVehiculo = resultSet.getInt("IdPaso3LogVehiculo"),
+                    IdVehiculo = idVehiculo,
+                    TieneFoto = resultSet.getBoolean("Tienefoto"),
+                    NombreArchivoFoto = resultSet.getString("NombreArchivoFoto") ?: "",
+                    FechaAlta = resultSet.getString("FechaAlta") ?: ""
+                )
+            }
+
+            Log.d("DALVehiculo", "✅ Consulta Paso3 completada")
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error consultando foto Paso3: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+
+        return@withContext paso3LogVehiculo
+    }
+
+    // ✅ OBTENER FOTO BASE64 PASO3
+    suspend fun obtenerFotoBase64Paso3(idVehiculo: Int): String? = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) return@withContext null
+
+            val query = """
+                SELECT TOP 1 Foto 
+                FROM Paso3LogVehiculo 
+                WHERE IdVehiculo = ? AND Foto IS NOT NULL
+                ORDER BY IdPaso3LogVehiculo DESC
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setInt(1, idVehiculo)
+            resultSet = statement.executeQuery()
+
+            if (resultSet.next()) {
+                return@withContext resultSet.getString("Foto")
+            }
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "Error obteniendo foto Paso3: ${e.message}")
+        } finally {
+            resultSet?.close()
+            statement?.close()
+            conexion?.close()
+        }
+
+        return@withContext null
+    }
 
 
 
