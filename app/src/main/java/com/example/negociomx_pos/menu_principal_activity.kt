@@ -250,7 +250,7 @@ class menu_principal_activity : AppCompatActivity() {
             startActivity(intent)
         }
         btnConsultaPaso3.setOnClickListener{
-            val intent = Intent(this, ConsultaPaso3_Activity::class.java)
+            val intent = Intent(this, ConsultaPaso3Repuve_Activity::class.java)
             startActivity(intent)
         }
 

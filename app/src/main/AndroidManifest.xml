@@ -36,7 +36,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".Paso3Repuve_Activity"
+            android:name=".ConsultaPaso3Repuve_Activity"
             android:exported="false" />
         <activity
             android:name=".ConsultaPaso2_Activity"
@@ -45,6 +45,10 @@
             android:name=".ConsultaPaso1Soc_Activity"
             android:exported="false" />
         <activity
+            android:name=".Paso3Repuve_Activity"
+            android:exported="false" />
+        <activity
+
             android:name=".Paso2SOC_Activity"
             android:exported="false" />
         <activity
