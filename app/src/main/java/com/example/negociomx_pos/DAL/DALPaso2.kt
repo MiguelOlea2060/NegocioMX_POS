@@ -28,8 +28,7 @@ class DALPaso2 {
             }
 
             val query = """
-                SELECT DISTINCT
-                    v.IdVehiculo, 
+                SELECT v.IdVehiculo, 
                     p.IdPaso2LogVehiculo, 
                     v.Vin, 
                     ISNULL(b.BL, '') as BL, 
@@ -46,19 +45,23 @@ class DALPaso2 {
                     CONVERT(varchar, p.Fechaaltafoto1, 120) as FechaAltaFoto1,
                     CONVERT(varchar, p.Fechaaltafoto2, 120) as FechaAltaFoto2,
                     CONVERT(varchar, p.Fechaaltafoto3, 120) as FechaAltaFoto3,
-                    CONVERT(varchar, p.Fechaaltafoto4, 120) as FechaAltaFoto4
+                    CONVERT(varchar, p.Fechaaltafoto4, 120) as FechaAltaFoto4,
+                    TieneFoto1,
+                    TieneFoto2,
+                    TieneFoto3,
+                    TieneFoto4
                 FROM dbo.Paso2LogVehiculo p 
-                INNER JOIN dbo.vehiculo v ON p.IdVehiculo = v.IdVehiculo 
-                INNER JOIN dbo.MarcaAuto m ON v.IdMarca = m.IdMarcaAuto
-                INNER JOIN dbo.Modelo mo ON v.IdMarca = mo.IdMarca AND v.IdModelo = mo.IdModelo
-                LEFT JOIN dbo.VehiculoColor vc ON v.IdVehiculo = vc.IdVehiculo
-                LEFT JOIN dbo.Color c ON vc.IdColor = c.IdColor
-                LEFT JOIN dbo.Color c1 ON vc.IdColorInterior = c1.IdColor
-                LEFT JOIN dbo.bl b ON v.IdBL = b.IdBL
-                WHERE (CONVERT(date, p.Fechaaltafoto1) = ? OR p.Fechaaltafoto1 IS NULL)
-                   OR (CONVERT(date, p.Fechaaltafoto2) = ? OR p.Fechaaltafoto2 IS NULL)
-                   OR (CONVERT(date, p.Fechaaltafoto3) = ? OR p.Fechaaltafoto3 IS NULL)
-                   OR (CONVERT(date, p.Fechaaltafoto4) = ? OR p.Fechaaltafoto4 IS NULL)
+                INNER JOIN dbo.vehiculo v with (nolock) ON p.IdVehiculo = v.IdVehiculo 
+                INNER JOIN dbo.MarcaAuto m with (nolock) ON v.IdMarca = m.IdMarcaAuto
+                INNER JOIN dbo.Modelo mo with (nolock) ON v.IdMarca = mo.IdMarca AND v.IdModelo = mo.IdModelo
+                LEFT JOIN dbo.VehiculoColor vc with (nolock) ON v.IdVehiculo = vc.IdVehiculo
+                LEFT JOIN dbo.Color c with (nolock) ON vc.IdColor = c.IdColor
+                LEFT JOIN dbo.Color c1 with (nolock) ON vc.IdColorInterior = c1.IdColor
+                LEFT JOIN dbo.bl b with (nolock) ON v.IdBL = b.IdBL
+                WHERE (CONVERT(date, p.Fechaaltafoto1) = ?)
+                   OR (CONVERT(date, p.Fechaaltafoto2) = ?)
+                   OR (CONVERT(date, p.Fechaaltafoto3) = ?)
+                   OR (CONVERT(date, p.Fechaaltafoto4) = ?)
                 ORDER BY v.Vin
             """.trimIndent()
 
@@ -86,15 +89,19 @@ class DALPaso2 {
                     FechaAltaFoto1 = resultSet.getString("FechaAltaFoto1") ?: "",
                     FechaAltaFoto2 = resultSet.getString("FechaAltaFoto2") ?: "",
                     FechaAltaFoto3 = resultSet.getString("FechaAltaFoto3") ?: "",
-                    FechaAltaFoto4 = resultSet.getString("FechaAltaFoto4") ?: ""
+                    FechaAltaFoto4 = resultSet.getString("FechaAltaFoto4") ?: "",
+                    TieneFoto1 = resultSet.getBoolean("TieneFoto1"),
+                    TieneFoto2 = resultSet.getBoolean("TieneFoto2"),
+                    TieneFoto3 = resultSet.getBoolean("TieneFoto3"),
+                    TieneFoto4 = resultSet.getBoolean("TieneFoto4")
                 )
 
                 // Calcular cantidad de fotos
                 var cantidadFotos = 0
-                if (registro.FechaAltaFoto1.isNotEmpty()) cantidadFotos++
-                if (registro.FechaAltaFoto2.isNotEmpty()) cantidadFotos++
-                if (registro.FechaAltaFoto3.isNotEmpty()) cantidadFotos++
-                if (registro.FechaAltaFoto4.isNotEmpty()) cantidadFotos++
+                if (registro.TieneFoto1==true) cantidadFotos++
+                if (registro.TieneFoto2==true) cantidadFotos++
+                if (registro.TieneFoto3==true) cantidadFotos++
+                if (registro.TieneFoto4==true) cantidadFotos++
                 registro.CantidadFotos = cantidadFotos
 
                 registros.add(registro)
@@ -116,55 +123,5 @@ class DALPaso2 {
         }
 
         return@withContext registros
-    }
-
-    // ✅ OBTENER ESTADÍSTICAS DEL DÍA
-    suspend fun obtenerEstadisticasPaso2PorFecha(fecha: String): Map<String, Int> = withContext(Dispatchers.IO) {
-        val estadisticas = mutableMapOf<String, Int>()
-        var conexion: Connection? = null
-        var statement: PreparedStatement? = null
-        var resultSet: ResultSet? = null
-
-        try {
-            conexion = ConexionSQLServer.obtenerConexion()
-            if (conexion == null) return@withContext estadisticas
-
-            val query = """
-                SELECT 
-                    COUNT(DISTINCT p.IdVehiculo) as VehiculosUnicos,
-                    COUNT(*) as TotalRegistros,
-                    SUM(CASE WHEN p.Fechaaltafoto1 IS NOT NULL THEN 1 ELSE 0 END) +
-                    SUM(CASE WHEN p.Fechaaltafoto2 IS NOT NULL THEN 1 ELSE 0 END) +
-                    SUM(CASE WHEN p.Fechaaltafoto3 IS NOT NULL THEN 1 ELSE 0 END) +
-                    SUM(CASE WHEN p.Fechaaltafoto4 IS NOT NULL THEN 1 ELSE 0 END) as TotalFotos
-                FROM dbo.Paso2LogVehiculo p
-                WHERE CONVERT(date, p.Fechaaltafoto1) = ? 
-                   OR CONVERT(date, p.Fechaaltafoto2) = ?
-                   OR CONVERT(date, p.Fechaaltafoto3) = ?
-                   OR CONVERT(date, p.Fechaaltafoto4) = ?
-            """.trimIndent()
-
-            statement = conexion.prepareStatement(query)
-            statement.setString(1, fecha)
-            statement.setString(2, fecha)
-            statement.setString(3, fecha)
-            statement.setString(4, fecha)
-            resultSet = statement.executeQuery()
-
-            if (resultSet.next()) {
-                estadisticas["VehiculosUnicos"] = resultSet.getInt("VehiculosUnicos")
-                estadisticas["TotalRegistros"] = resultSet.getInt("TotalRegistros")
-                estadisticas["TotalFotos"] = resultSet.getInt("TotalFotos")
-            }
-
-        } catch (e: Exception) {
-            Log.e("DALVehiculo_ConsultaPaso2", "Error obteniendo estadísticas: ${e.message}")
-        } finally {
-            resultSet?.close()
-            statement?.close()
-            conexion?.close()
-        }
-
-        return@withContext estadisticas
     }
 }

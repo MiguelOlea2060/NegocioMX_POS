@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -33,6 +34,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
     private lateinit var tvVehiculosUnicos: TextView
     private lateinit var tvTotalFotos: TextView
     private lateinit var tvMensajeSinResultados: TextView
+    private lateinit var btnConsultar:Button
 
     private lateinit var adapter: Paso2Adapter
     private val dalConsultaPaso2 = DALPaso2()
@@ -62,6 +64,8 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         tvVehiculosUnicos = findViewById(R.id.tvVehiculosUnicos)
         tvTotalFotos = findViewById(R.id.tvTotalFotos)
         tvMensajeSinResultados = findViewById(R.id.tvMensajeSinResultados)
+
+        btnConsultar=findViewById(R.id.btnConsultarPaso2)
     }
 
     private fun configurarRecyclerView() {
@@ -80,7 +84,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         }
 
         // Botón consultar
-        findViewById<android.widget.Button>(R.id.btnConsultar).setOnClickListener {
+        findViewById<android.widget.Button>(R.id.btnConsultarPaso2).setOnClickListener {
             if (fechaSeleccionada.isNotEmpty()) {
                 ejecutarConsulta()
             } else {
@@ -117,6 +121,9 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         val datePickerDialog = DatePickerDialog(
             this,
             { _, year, month, dayOfMonth ->
+
+                val fechaAux=fechaSeleccionada
+
                 val fechaSeleccionadaCalendar = Calendar.getInstance()
                 fechaSeleccionadaCalendar.set(year, month, dayOfMonth)
 
@@ -125,6 +132,8 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
 
                 fechaSeleccionada = formatoFecha.format(fechaSeleccionadaCalendar.time)
                 tvFechaSeleccionada.text = formatoMostrar.format(fechaSeleccionadaCalendar.time)
+                if(!fechaAux.equals(fechaSeleccionada))
+                    ejecutarConsultaAutomatica()
             },
             calendario.get(Calendar.YEAR),
             calendario.get(Calendar.MONTH),
@@ -141,6 +150,8 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
     }
 
     private fun ejecutarConsulta() {
+        tvFechaSeleccionada.isEnabled=false
+        btnConsultar.isEnabled = false
         lifecycleScope.launch {
             try {
                 mostrarCarga()
@@ -152,7 +163,20 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
                 val registros = dalConsultaPaso2.consultarPaso2PorFecha(fechaSeleccionada)
 
                 // Consultar estadísticas
-                val estadisticas = dalConsultaPaso2.obtenerEstadisticasPaso2PorFecha(fechaSeleccionada)
+                val estadisticas= mutableMapOf<String,Int>()
+                var totalVehiculos=0
+                var totalFotos=0
+                if(registros!=null && registros.count()>0)
+                {
+                    totalVehiculos=registros.count()
+                    registros.forEach { Unit->
+                        totalFotos+= Unit.CantidadFotos
+                    }
+                }
+
+                estadisticas["TotalRegistros"] = 1
+                estadisticas["VehiculosUnicos"] = totalVehiculos
+                estadisticas["TotalFotos"] = totalFotos
 
                 ocultarCarga()
 
@@ -176,6 +200,9 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
                     Toast.LENGTH_LONG).show()
                 mostrarSinResultados()
             }
+
+            btnConsultar.isEnabled=true
+            tvFechaSeleccionada.isEnabled=true
         }
     }
 
@@ -285,19 +312,19 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
             mensaje.append("❌ Sin fotos registradas\n")
         }
 
-        dialog.setTitle("📋 Detalle del Registro Paso 2")
+        dialog.setTitle("📋 Detalle de Accesorios")
         dialog.setMessage(mensaje.toString())
         dialog.setPositiveButton("Cerrar") { dialogInterface, _ ->
             dialogInterface.dismiss()
         }
 
         // Opcional: Agregar botón para ver fotos (si implementas visualización de fotos)
-        if (registro.CantidadFotos > 0) {
+/*        if (registro.CantidadFotos > 0) {
             dialog.setNeutralButton("Ver Fotos") { _, _ ->
                 // Aquí puedes implementar la visualización de fotos si lo deseas
                 Toast.makeText(this, "Función de ver fotos - Por implementar", Toast.LENGTH_SHORT).show()
             }
-        }
+        }*/
 
         dialog.show()
     }

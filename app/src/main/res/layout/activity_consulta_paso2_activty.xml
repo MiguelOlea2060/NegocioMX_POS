@@ -68,7 +68,7 @@
                 android:focusable="true" />
 
             <Button
-                android:id="@+id/btnConsultar"
+                android:id="@+id/btnConsultarPaso2"
                 android:layout_width="140dp"
                 android:layout_height="48dp"
                 android:text="🔍 Buscar"

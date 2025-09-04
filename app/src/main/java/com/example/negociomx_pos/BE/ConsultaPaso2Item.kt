@@ -21,5 +21,10 @@ data class ConsultaPaso2Item(
     var FechaAltaFoto2: String = "",
     var FechaAltaFoto3: String = "",
     var FechaAltaFoto4: String = "",
-    var CantidadFotos: Int = 0
+    var CantidadFotos: Int = 0,
+
+    var TieneFoto1:Boolean=false,
+    var TieneFoto2:Boolean=false,
+    var TieneFoto3:Boolean=false,
+    var TieneFoto4:Boolean=false
 )
