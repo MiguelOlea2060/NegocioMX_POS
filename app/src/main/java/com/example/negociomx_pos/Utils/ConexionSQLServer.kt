@@ -21,6 +21,7 @@ object ConexionSQLServer {
     private const val PASSWORD = "NITr2025MX.#MXL1c"
     private const val PORT = "1433"
 
+
     fun obtenerConexion(): Connection? {
         return try {
             Class.forName("net.sourceforge.jtds.jdbc.Driver")

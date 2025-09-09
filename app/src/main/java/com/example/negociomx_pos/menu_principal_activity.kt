@@ -128,6 +128,11 @@ class menu_principal_activity : AppCompatActivity() {
         val btnPaso2Accesorios=findViewById<Button>(R.id.btnPaso2Accesorios)
         val btnPaso3Repuve =findViewById<Button>(R.id.btnPaso3Repuve)
         val btnConsultaPaso3 =findViewById<Button>(R.id.btnConsultaPaso3)
+        val btnPaso4Fotos=findViewById<Button>(R.id.btnPaso4Fotos)
+        val btnConsultaPaso4 =findViewById<Button>(R.id.btnConsultaPaso4)
+
+
+
 
         getEmpresaNubeCfgNubeCfgNVNube()
 
@@ -239,6 +244,10 @@ class menu_principal_activity : AppCompatActivity() {
         }
         btnPaso3Repuve.setOnClickListener{
             val intent = Intent(this, Paso3Repuve_Activity::class.java)
+            startActivity(intent)
+        }
+        btnPaso4Fotos.setOnClickListener{
+            val intent = Intent(this, Paso4Llantas_Activity::class.java)
             startActivity(intent)
         }
         btnConsultaPaso1.setOnClickListener{

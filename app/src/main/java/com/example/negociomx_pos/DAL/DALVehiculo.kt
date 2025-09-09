@@ -876,6 +876,218 @@ class DALVehiculo {
 
 
 
+    // ✅ MÉTODOS PARA PASO 4 - LLANTAS
+
+    // ✅ INSERTAR REGISTRO EN PASO4LOGVEHICULO
+    suspend fun insertarPaso4LogVehiculo(
+        idVehiculo: Int,
+        idUsuarioNubeAlta: Int
+    ): Int = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var generatedKey: Int = -1
+
+        try {
+            Log.d("DALVehiculo", "💾 Insertando registro en Paso4LogVehiculo para IdVehiculo: $idVehiculo")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext -1
+            }
+
+            val query = """
+                INSERT INTO Paso4LogVehiculo (IdVehiculo, FechaAlta, IdUsuarioNubeAlta)
+                VALUES (?, GETDATE(), ?)
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)
+            statement.setInt(1, idVehiculo)
+            statement.setInt(2, idUsuarioNubeAlta)
+
+            statement.executeUpdate()
+
+            val rs = statement.generatedKeys
+            if (rs.next()) {
+                generatedKey = rs.getInt(1)
+            }
+
+            Log.d("DALVehiculo", "✅ Registro Paso4 insertado exitosamente. Id generado: $generatedKey")
+            return@withContext generatedKey
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error insertando registro Paso4: ${e.message}")
+            e.printStackTrace()
+            return@withContext -1
+        } finally {
+            try {
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+    }
+
+    // ✅ INSERTAR FOTO DE LLANTA
+    suspend fun insertarFotoPaso4(
+        idPaso4LogVehiculo: Int,
+        idUsuarioNubeAlta: Int,
+        posicion: Byte,
+        verificada: Boolean,
+        fotoBase64: String?
+    ): Boolean = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+
+        try {
+            Log.d("DALVehiculo", "💾 Insertando foto Paso4 posición $posicion")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext false
+            }
+
+            val nombreArchivo = if (fotoBase64 != null) {
+                "Paso4Llanta${posicion}_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())}.jpg"
+            } else null
+
+            val query = """
+                INSERT INTO Paso4LogVehiculoFotos (IdPaso4LogVehiculo, IdUsuarioNubeAlta, FechaAlta, Consecutivo, Posicion, Verificada, Foto, NombreArchivo)
+                VALUES (?, ?, GETDATE(), 1, ?, ?, ?, ?)
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setInt(1, idPaso4LogVehiculo)
+            statement.setInt(2, idUsuarioNubeAlta)
+            statement.setByte(3, posicion)
+            statement.setBoolean(4, verificada)
+            statement.setString(5, fotoBase64)
+            statement.setString(6, nombreArchivo)
+
+            val filasAfectadas = statement.executeUpdate()
+
+            if (filasAfectadas > 0) {
+                Log.d("DALVehiculo", "✅ Foto Paso4 posición $posicion insertada exitosamente")
+                return@withContext true
+            } else {
+                Log.w("DALVehiculo", "⚠️ No se insertó la foto Paso4 posición $posicion")
+                return@withContext false
+            }
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error insertando foto Paso4: ${e.message}")
+            e.printStackTrace()
+            return@withContext false
+        } finally {
+            try {
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+    }
+
+    // ✅ CONSULTAR DATOS PASO4 EXISTENTES
+    suspend fun consultarPaso4Existente(idVehiculo: Int): Map<Byte, Pair<Boolean, Boolean>> = withContext(Dispatchers.IO) {
+        val resultado = mutableMapOf<Byte, Pair<Boolean, Boolean>>() // Posicion -> (Verificada, TieneFoto)
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            Log.d("DALVehiculo", "🔍 Consultando datos Paso4 existentes para IdVehiculo: $idVehiculo")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext resultado
+            }
+
+            val query = """
+                SELECT f.Posicion, f.Verificada, CASE WHEN f.Foto IS NOT NULL THEN 1 ELSE 0 END as TieneFoto
+                FROM Paso4LogVehiculo p
+                INNER JOIN Paso4LogVehiculoFotos f ON p.IdPaso4LogVehiculo = f.IdPaso4LogVehiculo
+                WHERE p.IdVehiculo = ?
+                ORDER BY f.Posicion
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setInt(1, idVehiculo)
+            resultSet = statement.executeQuery()
+
+            while (resultSet.next()) {
+                val posicion = resultSet.getByte("Posicion")
+                val verificada = resultSet.getBoolean("Verificada")
+                val tieneFoto = resultSet.getBoolean("TieneFoto")
+                resultado[posicion] = Pair(verificada, tieneFoto)
+            }
+
+            Log.d("DALVehiculo", "✅ Consulta Paso4 completada. Encontradas ${resultado.size} llantas")
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error consultando datos Paso4: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+
+        return@withContext resultado
+    }
+
+    // ✅ OBTENER FOTO BASE64 PASO4
+    suspend fun obtenerFotoBase64Paso4(idVehiculo: Int, posicion: Byte): String? = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) return@withContext null
+
+            val query = """
+                SELECT f.Foto 
+                FROM Paso4LogVehiculo p
+                INNER JOIN Paso4LogVehiculoFotos f ON p.IdPaso4LogVehiculo = f.IdPaso4LogVehiculo
+                WHERE p.IdVehiculo = ? AND f.Posicion = ? AND f.Foto IS NOT NULL
+                ORDER BY f.FechaAlta DESC
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setInt(1, idVehiculo)
+            statement.setByte(2, posicion)
+            resultSet = statement.executeQuery()
+
+            if (resultSet.next()) {
+                return@withContext resultSet.getString("Foto")
+            }
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "Error obteniendo foto Paso4: ${e.message}")
+        } finally {
+            resultSet?.close()
+            statement?.close()
+            conexion?.close()
+        }
+
+        return@withContext null
+    }
+
+
+
+
+
+
+
+
+
     // ✅ INSERTAR DATOS DE FOTOS EN LA NUEVA TABLA
     suspend fun insertarPaso1LogVehiculoFotos(
         idPaso1LogVehiculo: Int,
