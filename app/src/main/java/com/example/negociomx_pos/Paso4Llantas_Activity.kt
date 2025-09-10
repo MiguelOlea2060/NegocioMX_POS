@@ -68,19 +68,24 @@ class Paso4Llantas_Activity : AppCompatActivity() {
     private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.Id?.toInt()!!
     private var datosExistentes: Map<Byte, Pair<Boolean, Boolean>> = emptyMap() // Posicion -> (Verificada, TieneFoto)
 
-    // Variables para captura de fotos (DESHABILITADAS INICIALMENTE)
-    private var fotoHabilitada: Boolean = false
+    // ✅ VARIABLES PARA CAPTURA DE FOTOS (ADAPTADAS DE PASO3)
+    private var fotoHabilitada: Boolean = true // HABILITADA AHORA
     private var posicionFotoActual: Byte = 0
     private var fotoUri: Uri? = null
 
+    // Variables para manejo de fotos por posición
+    private val fotosCapturadas = mutableMapOf<Byte, File>() // Posicion -> Archivo
+    private val estadoCaptura = mutableMapOf<Byte, Boolean>() // Posicion -> Capturada
+
     // ✅ LAUNCHER PARA CÁMARA (PREPARADO PERO DESHABILITADO)
+    // ✅ LAUNCHER PARA CÁMARA (ADAPTADO DE PASO3)
     private val camaraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-        if (success && fotoHabilitada) {
+        if (success) {
             fotoUri?.let { uri ->
                 procesarFoto(uri, posicionFotoActual)
             }
         } else {
-            Toast.makeText(this, "Captura de foto deshabilitada", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Error capturando foto", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -252,21 +257,21 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         // Actualizar mensaje informativo
         val totalLlantas = datosExistentes.size
         val totalFotos = datosExistentes.values.count { it.second }
-        tvMensajeInfo.text = "ℹ️ $totalLlantas llantas registradas, $totalFotos con foto. Captura deshabilitada."
+        val totalCapturadas = estadoCaptura.values.count { it }
+        tvMensajeInfo.text = "ℹ️ $totalLlantas llantas registradas, $totalFotos con foto guardada, $totalCapturadas nuevas capturadas."
     }
 
     private fun manejarClicLlanta(posicion: Int) {
-        if (!fotoHabilitada) {
-            Toast.makeText(this, "Captura de fotos deshabilitada temporalmente", Toast.LENGTH_SHORT).show()
-            return
-        }
-
         val posicionByte = posicion.toByte()
         val tieneFoto = datosExistentes[posicionByte]?.second ?: false
+        val fotoCapturada = estadoCaptura[posicionByte] ?: false
 
         if (tieneFoto) {
-            // Mostrar foto existente
+            // Mostrar foto existente guardada en BD
             mostrarFotoExistente(posicionByte)
+        } else if (fotoCapturada) {
+            // Mostrar foto capturada pero no guardada
+            mostrarFotoCapturadaLocal(posicionByte)
         } else {
             // Capturar nueva foto
             capturarFotoLlanta(posicionByte)
@@ -276,6 +281,18 @@ class Paso4Llantas_Activity : AppCompatActivity() {
     private fun capturarFotoLlanta(posicion: Byte) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             permisoLauncher.launch(Manifest.permission.CAMERA)
+            return
+        }
+
+        // ✅ VALIDAR SI YA TIENE FOTO CAPTURADA
+        if (estadoCaptura[posicion] == true) {
+            Toast.makeText(this, "Ya tiene foto capturada para esta llanta. Presione Guardar para confirmar.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // ✅ VALIDAR SI YA EXISTE EN BD
+        if (datosExistentes[posicion]?.second == true) {
+            Toast.makeText(this, "Esta llanta ya tiene foto registrada", Toast.LENGTH_LONG).show()
             return
         }
 
@@ -301,8 +318,43 @@ class Paso4Llantas_Activity : AppCompatActivity() {
     }
 
     private fun procesarFoto(uri: Uri, posicion: Byte) {
-        // Implementar procesamiento de foto cuando se habilite
-        Toast.makeText(this, "Foto capturada para llanta $posicion (función en desarrollo)", Toast.LENGTH_SHORT).show()
+        try {
+            Log.d("Paso4LLANTAS", "📸 Procesando foto llanta posición $posicion")
+
+            val vehiculo = vehiculoActual
+            if (vehiculo == null) {
+                Toast.makeText(this@Paso4Llantas_Activity, "Error: No hay vehículo seleccionado", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            val archivoLocal = obtenerArchivoDesdeUri(uri)
+
+            if (archivoLocal == null || !archivoLocal.exists()) {
+                Toast.makeText(this@Paso4Llantas_Activity, "Error: Archivo de foto no encontrado", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            val archivoFinal = if (archivoLocal.length() > 2.2 * 1024 * 1024) {
+                Log.d("Paso4LLANTAS", "📦 Comprimiendo imagen de ${archivoLocal.length()} bytes")
+                comprimirImagen(archivoLocal, posicion)
+            } else {
+                archivoLocal
+            }
+
+            fotosCapturadas[posicion] = archivoFinal
+            estadoCaptura[posicion] = true
+
+            // Actualizar UI para mostrar que la foto fue capturada
+            actualizarEstadoFotoUI(posicion, true)
+
+            Toast.makeText(this@Paso4Llantas_Activity, "✅ Foto llanta $posicion capturada (sin guardar)", Toast.LENGTH_SHORT).show()
+
+            Log.d("Paso4LLANTAS", "✅ Foto llanta $posicion lista para guardar")
+
+        } catch (e: Exception) {
+            Log.e("Paso4LLANTAS", "💥 Error procesando foto: ${e.message}")
+            Toast.makeText(this@Paso4Llantas_Activity, "Error procesando foto: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun mostrarFotoExistente(posicion: Byte) {
@@ -397,7 +449,7 @@ class Paso4Llantas_Activity : AppCompatActivity() {
 
                 var exitoso = true
 
-                // Guardar estado de cada llanta
+                // Guardar estado de cada llanta CON FOTOS
                 if (idPaso4LogVehiculo > 0 || datosExistentes.isNotEmpty()) {
                     val checkboxes = mapOf(
                         1.toByte() to cbLlanta1.isChecked,
@@ -409,12 +461,19 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                     for ((posicion, verificada) in checkboxes) {
                         val yaExiste = datosExistentes.containsKey(posicion)
                         if (!yaExiste) {
+                            // Obtener foto si fue capturada
+                            var fotoBase64: String? = null
+                            val archivoFoto = fotosCapturadas[posicion]
+                            if (archivoFoto != null) {
+                                fotoBase64 = convertirImagenABase64(archivoFoto)
+                            }
+
                             val resultado = dalVehiculo.insertarFotoPaso4(
                                 idPaso4LogVehiculo = idPaso4LogVehiculo,
                                 idUsuarioNubeAlta = idUsuarioNubeAlta,
                                 posicion = posicion,
                                 verificada = verificada,
-                                fotoBase64 = null // Sin foto por ahora
+                                fotoBase64 = fotoBase64
                             )
                             if (!resultado) exitoso = false
                         }
@@ -431,6 +490,11 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                     // Actualizar datos existentes
                     datosExistentes = dalVehiculo.consultarPaso4Existente(vehiculo.Id.toInt())
                     cargarDatosExistentes()
+
+                    // Limpiar fotos capturadas después de guardar exitosamente
+                    fotosCapturadas.clear()
+                    estadoCaptura.clear()
+
                 } else {
                     Toast.makeText(this@Paso4Llantas_Activity,
                         "❌ Error guardando verificación",
@@ -493,6 +557,159 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         btnConsultarVehiculo.isEnabled = true
         btnConsultarVehiculo.alpha = 1.0f
     }
+
+
+
+    // ✅ MÉTODOS AUXILIARES ADAPTADOS DE PASO3
+
+    private fun obtenerArchivoDesdeUri(uri: Uri): File? {
+        return try {
+            val path = uri.path
+            if (path != null) {
+                val file = File(path)
+                if (file.exists()) {
+                    return file
+                }
+            }
+
+            val inputStream = contentResolver.openInputStream(uri)
+            if (inputStream != null) {
+                val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+                val tempFile = File(getExternalFilesDir(null), "temp_paso4_photo_$timeStamp.jpg")
+
+                tempFile.outputStream().use { output ->
+                    inputStream.copyTo(output)
+                }
+                inputStream.close()
+
+                return tempFile
+            }
+
+            null
+        } catch (e: Exception) {
+            Log.e("Paso4LLANTAS", "Error obteniendo archivo desde URI: ${e.message}")
+            null
+        }
+    }
+
+    private fun comprimirImagen(archivoOriginal: File, posicion: Byte): File {
+        return try {
+            val bitmap = BitmapFactory.decodeFile(archivoOriginal.absolutePath)
+
+            val maxSize = 3072
+            var ratio: Float = 1.0F
+            if (bitmap.width > bitmap.height)
+                ratio = maxSize.toFloat() / bitmap.width
+            else
+                ratio = maxSize.toFloat() / bitmap.height
+
+            val newWidth = (bitmap.width * ratio).toInt()
+            val newHeight = (bitmap.height * ratio).toInt()
+
+            val bitmapRedimensionado = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+
+            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val archivoComprimido = File(getExternalFilesDir(null), "compressed_paso4_llanta${posicion}_$timeStamp.jpg")
+
+            val outputStream = FileOutputStream(archivoComprimido)
+            bitmapRedimensionado.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
+            outputStream.close()
+
+            bitmap.recycle()
+            bitmapRedimensionado.recycle()
+
+            Log.d("Paso4LLANTAS", "✅ Imagen comprimida: ${archivoComprimido.length()} bytes")
+            archivoComprimido
+
+        } catch (e: Exception) {
+            Log.e("Paso4LLANTAS", "Error comprimiendo imagen: ${e.message}")
+            archivoOriginal
+        }
+    }
+
+    private fun convertirImagenABase64(archivo: File): String? {
+        return try {
+            val bytes = archivo.readBytes()
+            android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
+        } catch (e: Exception) {
+            Log.e("Paso4LLANTAS", "Error convirtiendo imagen a Base64: ${e.message}")
+            null
+        }
+    }
+
+    private fun actualizarEstadoFotoUI(posicion: Byte, capturada: Boolean) {
+        val nombrePosicion = when (posicion) {
+            1.toByte() -> "Delantera Izq"
+            2.toByte() -> "Delantera Der"
+            3.toByte() -> "Trasera Izq"
+            4.toByte() -> "Trasera Der"
+            else -> "Posición $posicion"
+        }
+
+        // Actualizar mensaje informativo
+        val totalCapturadas = estadoCaptura.values.count { it }
+        val totalGuardadas = datosExistentes.values.count { it.second }
+        tvMensajeInfo.text = "ℹ️ $totalGuardadas fotos guardadas, $totalCapturadas nuevas capturadas. Toque imagen para ver/capturar."
+    }
+
+    private fun mostrarFotoCapturadaLocal(posicion: Byte) {
+        val archivo = fotosCapturadas[posicion]
+        if (archivo != null && archivo.exists()) {
+            try {
+                val bitmap = BitmapFactory.decodeFile(archivo.absolutePath)
+                if (bitmap != null) {
+                    mostrarDialogoFotoLocal(bitmap, posicion)
+                } else {
+                    Toast.makeText(this, "Error cargando foto capturada", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("Paso4LLANTAS", "Error mostrando foto local: ${e.message}")
+                Toast.makeText(this, "Error mostrando foto", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun mostrarDialogoFotoLocal(bitmap: Bitmap, posicion: Byte) {
+        val dialog = android.app.AlertDialog.Builder(this)
+        val imageView = android.widget.ImageView(this)
+
+        imageView.setImageBitmap(bitmap)
+        imageView.scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+        imageView.adjustViewBounds = true
+
+        val nombrePosicion = when (posicion) {
+            1.toByte() -> "Delantera Izquierda"
+            2.toByte() -> "Delantera Derecha"
+            3.toByte() -> "Trasera Izquierda"
+            4.toByte() -> "Trasera Derecha"
+            else -> "Posición $posicion"
+        }
+
+        dialog.setTitle("Paso 4 - Llanta $nombrePosicion (Sin Guardar)")
+        dialog.setView(imageView)
+        dialog.setPositiveButton("Retomar Foto") { _, _ ->
+            // Permitir retomar la foto
+            estadoCaptura[posicion] = false
+            fotosCapturadas.remove(posicion)
+            capturarFotoLlanta(posicion)
+        }
+        dialog.setNegativeButton("Cerrar") { dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }
+
+        val alertDialog = dialog.create()
+        alertDialog.show()
+
+        val window = alertDialog.window
+        window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.9).toInt(),
+            (resources.displayMetrics.heightPixels * 0.7).toInt()
+        )
+    }
+
+
+
+
 
     override fun onDestroy() {
         super.onDestroy()

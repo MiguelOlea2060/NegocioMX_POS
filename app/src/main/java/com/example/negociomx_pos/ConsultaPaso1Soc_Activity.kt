@@ -7,7 +7,9 @@ import android.os.Looper
 import android.view.View
 import android.view.Window
 import android.widget.Button
-import android.widget.CalendarView
+//import android.widget.CalendarView
+import android.app.DatePickerDialog
+import android.util.Log
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -47,7 +49,7 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
     private var loadingRunnable: Runnable? = null
 
     // NUEVA VARIABLE: Para controlar visibilidad del calendario
-    private var calendarioVisible: Boolean = false
+   // private var calendarioVisible: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +63,7 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         realizarConsultaInicial()
 
         // AGREGAR ESTA LÍNEA:
-        Toast.makeText(this, "Estado inicial - calendarioVisible: $calendarioVisible", Toast.LENGTH_SHORT).show()
+     //   Toast.makeText(this, "Estado inicial - calendarioVisible: $calendarioVisible", Toast.LENGTH_SHORT).show()
     }
 
     private fun inicializarComponentes() {
@@ -82,9 +84,9 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
     }
 
     private fun configurarEventos() {
-        // NUEVO: Evento para mostrar/ocultar calendario al hacer clic en la fecha
+        // CAMBIAR esta línea:
         tvFechaSeleccionada.setOnClickListener {
-            mostrarCalendario()
+            mostrarSelectorFecha()  // Cambiar de mostrarCalendario() a mostrarSelectorFecha()
         }
 
         // Botón consultar (SIN CAMBIOS)
@@ -95,7 +97,7 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
     }
 
     // NUEVA FUNCIÓN: Mostrar calendario
-    private fun mostrarCalendario() {
+  /*  private fun mostrarCalendario() {
         val formatoFecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formatoMostrar = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
@@ -151,6 +153,48 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         }
 
         dialog.show()
+    }*/
+
+    private fun mostrarSelectorFecha() {
+        val calendario = Calendar.getInstance()
+
+        // Si ya hay una fecha seleccionada, usar esa como inicial
+        if (fechaSeleccionada.isNotEmpty()) {
+            try {
+                val formatoFecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val fecha = formatoFecha.parse(fechaSeleccionada)
+                if (fecha != null) {
+                    calendario.time = fecha
+                }
+            } catch (e: Exception) {
+                Log.e("ConsultaPaso1SOC", "Error parseando fecha: ${e.message}")
+            }
+        }
+
+        val datePickerDialog = DatePickerDialog(
+            this,
+            { _, year, month, dayOfMonth ->
+                val fechaAux = fechaSeleccionada
+
+                val fechaSeleccionadaCalendar = Calendar.getInstance()
+                fechaSeleccionadaCalendar.set(year, month, dayOfMonth)
+
+                val formatoFecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val formatoMostrar = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+                fechaSeleccionada = formatoFecha.format(fechaSeleccionadaCalendar.time)
+                tvFechaSeleccionada.text = formatoMostrar.format(fechaSeleccionadaCalendar.time)
+
+                if (!fechaAux.equals(fechaSeleccionada)) {
+                    consultarRegistrosPorFecha(fechaSeleccionada)
+                }
+            },
+            calendario.get(Calendar.YEAR),
+            calendario.get(Calendar.MONTH),
+            calendario.get(Calendar.DAY_OF_MONTH)
+        )
+
+        datePickerDialog.show()
     }
 
     private fun configurarRecyclerView() {

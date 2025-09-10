@@ -291,6 +291,8 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         mensaje.append("Motor: ${registro.NumeroMotor}\n")
         mensaje.append("Color Exterior: ${registro.ColorExterior}\n")
         mensaje.append("Color Interior: ${registro.ColorInterior}\n\n")
+        mensaje.append("Color Interior: ${registro.ColorInterior}\n\n")
+
 
         mensaje.append("📸 INFORMACIÓN DE FOTOS\n\n")
         mensaje.append("Total de fotos: ${registro.CantidadFotos}\n\n")

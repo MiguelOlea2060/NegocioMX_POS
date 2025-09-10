@@ -122,19 +122,9 @@
                 android:background="#F3E5F5"
                 android:padding="4dp" />
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
 
-            <TextView
-                android:textStyle="bold"
-                android:id="@+id/tvFechaHora"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="2024-01-01 12:00:00"
-                android:textSize="12sp"
-                android:textColor="#999999" />
+
+
 
         </LinearLayout>
 

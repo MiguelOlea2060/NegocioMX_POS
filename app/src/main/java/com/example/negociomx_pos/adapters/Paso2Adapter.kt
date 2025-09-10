@@ -22,7 +22,7 @@ class Paso2Adapter(
         val tvNumeroMotor: TextView = view.findViewById(R.id.tvNumeroMotor)
         val tvDatosSOC: TextView = view.findViewById(R.id.tvDatosSOC)
         val tvFotos: TextView = view.findViewById(R.id.tvFotos)
-        val tvFechaHora: TextView = view.findViewById(R.id.tvFechaHora)
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -57,7 +57,7 @@ class Paso2Adapter(
         holder.tvFotos.text = "📸 ${registro.CantidadFotos} foto(s)"
 
         // Mostrar la fecha más reciente
-        val fechaReciente = listOf(
+       /* val fechaReciente = listOf(
             registro.FechaAltaFoto1,
             registro.FechaAltaFoto2,
             registro.FechaAltaFoto3,
@@ -68,7 +68,7 @@ class Paso2Adapter(
             fechaReciente.substring(0, 19) // YYYY-MM-DD HH:mm:ss
         } else {
             "Sin fecha"
-        }
+        }*/
 
         // ✅ CONFIGURAR EL CLIC EN EL ITEM
         holder.itemView.setOnClickListener {

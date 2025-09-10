@@ -22,7 +22,7 @@ class Paso1SOCAdapter(
         val tvNumeroMotor: TextView = view.findViewById(R.id.tvNumeroMotor)
         val tvDatosSOC: TextView = view.findViewById(R.id.tvDatosSOC)
         val tvFotos: TextView = view.findViewById(R.id.tvFotos)
-        val tvFechaHora: TextView = view.findViewById(R.id.tvFechaHora)
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -39,14 +39,14 @@ class Paso1SOCAdapter(
         holder.tvMarcaModelo.text = "${registro.Marca} ${registro.Modelo}"
         holder.tvAnio.text = "Año: ${registro.Anio}"
         holder.tvColores.text = "Colores -> Ext: ${registro.ColorExterior} | Int: ${registro.ColorInterior}"
-        holder.tvNumeroMotor.text = "Motor: ${registro.NumeroMotor}"
+        holder.tvNumeroMotor.text = "Numero de Motor: ${registro.NumeroMotor}"
 
         val modoTransporte = if (registro.ModoTransporte) "Sí" else "No"
         val requiereRecarga = if (registro.RequiereRecarga) "Sí" else "No"
         holder.tvDatosSOC.text = "Odómetro: ${registro.Odometro} km | SOC: ${registro.Bateria}% | Modo Transporte: $modoTransporte | Se Recargo: $requiereRecarga"
 
         holder.tvFotos.text = "📸 ${registro.CantidadFotos} foto(s)"
-        holder.tvFechaHora.text = registro.FechaAlta
+
 
         holder.itemView.setOnClickListener {
             onItemClick(registro)

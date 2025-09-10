@@ -437,7 +437,7 @@
             android:id="@+id/btnGuardarSOC"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="💾 GUARDAR SOC"
+            android:text="💾 GUARDAR "
             android:backgroundTint="#4CAF50"
             android:textColor="@android:color/white"
             android:textSize="18sp"
