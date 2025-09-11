@@ -24,7 +24,7 @@
         <ImageView
             android:layout_width="300dp"
             android:layout_height="120dp"
-            android:src="@drawable/logo_transvision"
+            android:src="@drawable/transvision_logo_clean"
             android:scaleType="fitCenter"
             android:layout_marginBottom="12dp"
             android:contentDescription="Transvision" />

@@ -8,13 +8,13 @@
     android:orientation="vertical"
     android:background="#F5F5F5"
     android:padding="4dp"
-    tools:context=".ConsultaPaso2_Activity">
+    tools:context=".ConsultaPaso4Llantas_Activity">
 
-    Título
+    <!-- Título -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text=" 📊 Consulta Paso 2 - Accesorios "
+        android:text=" 📊 Consulta Paso 4 - Llantas "
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="#2E7D32"
@@ -23,7 +23,7 @@
         android:padding="6dp"
         android:layout_marginBottom="16dp" />
 
-    Sección de Filtros
+    <!-- Sección de Filtros -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
             android:textColor="#1976D2"
             android:layout_marginBottom="8dp" />
 
-        Sección compacta de fecha
+        <!-- Sección compacta de fecha -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
                 android:focusable="true" />
 
             <Button
-                android:id="@+id/btnConsultarPaso2"
+                android:id="@+id/btnConsultar"
                 android:layout_width="140dp"
                 android:layout_height="48dp"
                 android:text=" 🔍 "
@@ -80,7 +80,7 @@
 
     </LinearLayout>
 
-    Estadísticas
+    <!-- Estadísticas -->
     <LinearLayout
         android:id="@+id/layoutEstadisticas"
         android:layout_width="match_parent"
@@ -113,7 +113,7 @@
 
     </LinearLayout>
 
-    Loading
+    <!-- Loading -->
     <LinearLayout
         android:id="@+id/loadingContainer"
         android:layout_width="match_parent"
@@ -134,7 +134,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Consultando registros Paso 2..."
+            android:text="Consultando registros Paso 4..."
             android:textSize="16sp"
             android:textColor="#2196F3" />
 
@@ -149,7 +149,7 @@
 
     </LinearLayout>
 
-    Lista de Resultados
+    <!-- Lista de Resultados -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewRegistros"
         android:layout_width="match_parent"
@@ -157,9 +157,9 @@
         android:layout_weight="1"
         android:background="@android:color/white"
         android:padding="5dp"
-        tools:listitem="@layout/item_consulta_paso2" />
+        tools:listitem="@layout/item_consulta_paso4" />
 
-    Mensaje Sin Resultados
+    <!-- Mensaje Sin Resultados -->
     <LinearLayout
         android:id="@+id/layoutSinResultados"
         android:layout_width="match_parent"

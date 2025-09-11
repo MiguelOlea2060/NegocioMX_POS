@@ -18,7 +18,7 @@
             android:background="@color/naranja_ligero"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Paso 2 - Accesorios"
+            android:text=" Paso 2 - Accesorios "
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#2E7D32"
@@ -67,7 +67,7 @@
                     android:id="@+id/btnConsultarVehiculo"
                     android:layout_width="85dp"
                     android:layout_height="48dp"
-                    android:text="🔍 Buscar"
+                    android:text=" 🔍 "
                     android:backgroundTint="#2196F3"
                     android:textColor="@android:color/white"
                     android:textSize="16sp" />

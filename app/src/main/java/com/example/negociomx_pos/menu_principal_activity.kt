@@ -262,6 +262,10 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, ConsultaPaso3Repuve_Activity::class.java)
             startActivity(intent)
         }
+        btnConsultaPaso4.setOnClickListener{
+            val intent = Intent(this, ConsultaPaso4Llantas_Activity::class.java)
+            startActivity(intent)
+        }
 
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
