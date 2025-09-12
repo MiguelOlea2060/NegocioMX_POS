@@ -9,6 +9,7 @@ import com.example.negociomx_pos.BE.Paso3LogVehiculo
 import com.example.negociomx_pos.BE.StatusFotoVehiculo
 import com.example.negociomx_pos.BE.Transmision
 import com.example.negociomx_pos.BE.Vehiculo
+import com.example.negociomx_pos.BE.VehiculoPaso1
 import com.example.negociomx_pos.Utils.ConexionSQLServer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -287,8 +288,8 @@ class DALVehiculo {
         var statement: PreparedStatement? = null
         var resultSet: ResultSet? = null
 
-        try {
-            Log.d("DALVehiculo", "🔍 Consultando vehículo con VIN: $vin")
+        try  {
+            //Log.d("DALVehiculo", "🔍 Consultando vehículo con VIN: $vin")
 
             conexion = ConexionSQLServer.obtenerConexion()
             if (conexion == null) {
@@ -298,17 +299,17 @@ class DALVehiculo {
 
             // ✅ QUERY CORREGIDO PARA EL ESQUEMA REAL DE LA BASE DE DATOS
             val query = """                
-                select v.vin, v.idmarca, v.idmodelo, marcaauto.nombre Marca, modelo.nombre Modelo, v.Annio, Motor, 
+                select v.vin, v.idmarca, v.idmodelo, ma.nombre Marca, m.nombre Modelo, v.Annio, Motor, 
                         v.idvehiculo, ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, 
                         tv.Nombre TipoVehiculo, bl
-                from vehiculo v inner join dbo.MarcaAuto on v.IdMarca=MarcaAuto.IdMarcaAuto
-                        inner join dbo.Modelo on v.IdModelo=modelo.IdModelo
-                        left join dbo.VehiculoColor vc on v.IdVehiculo=vc.IdVehiculo
-                        left join dbo.Color ce on vc.IdColor=ce.IdColor
-                        left join dbo.Color ci on vc.IdColorInterior=ci.IdColor
-                        left join dbo.TipoCombustible tc on v.idtipocombustible=tc.idtipocombustible
-                        left join dbo.tipovehiculo tv on v.idtipovehiculo=tv.idtipovehiculo
-                        left join dbo.bl b on v.idbl=b.idbl
+                from vehiculo v inner join dbo.MarcaAuto ma with (nolock) on v.IdMarca=ma.IdMarcaAuto
+                        inner join dbo.Modelo m with (nolock) on v.IdModelo=m.IdModelo
+                        left join dbo.VehiculoColor vc with (nolock) on v.IdVehiculo=vc.IdVehiculo
+                        left join dbo.Color ce with (nolock) on vc.IdColor=ce.IdColor
+                        left join dbo.Color ci with (nolock) on vc.IdColorInterior=ci.IdColor
+                        left join dbo.TipoCombustible tc with (nolock) on v.idtipocombustible=tc.idtipocombustible
+                        left join dbo.tipovehiculo tv with (nolock) on v.idtipovehiculo=tv.idtipovehiculo
+                        left join dbo.bl b with (nolock) on v.idbl=b.idbl
                 where v.vin = ?
               
             """.trimIndent()
@@ -344,9 +345,9 @@ class DALVehiculo {
                     Evidencia2 = "",
                     FechaActualizacion = ""
                 )
-                Log.d("DALVehiculo", "✅ Vehículo encontrado: ${vehiculo.Marca} ${vehiculo.Modelo} ${vehiculo.Anio}")
+                //Log.d("DALVehiculo", "✅ Vehículo encontrado: ${vehiculo.Marca} ${vehiculo.Modelo} ${vehiculo.Anio}")
             } else {
-                Log.d("DALVehiculo", "❌ No se encontró vehículo con VIN: $vin")
+                //Log.d("DALVehiculo", "❌ No se encontró vehículo con VIN: $vin")
             }
 
         } catch (e: Exception) {
@@ -361,7 +362,104 @@ class DALVehiculo {
                 Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
             }
         }
+        return@withContext vehiculo
+    }
 
+    suspend fun consultarVehiculoPorVINParaPaso1(vin: String): VehiculoPaso1? = withContext(Dispatchers.IO) {
+        var vehiculo: VehiculoPaso1? = null
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try  {
+            //Log.d("DALVehiculo", "🔍 Consultando vehículo con VIN: $vin")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext null
+            }
+
+            // ✅ QUERY CORREGIDO PARA EL ESQUEMA REAL DE LA BASE DE DATOS
+            val query = """                
+                select p.IdPaso1LogVehiculo, p.Odometro, p.Bateria, p.ModoTransporte, p.RequiereRecarga, p.FechaAlta
+				        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=1) FotosPosicion1
+				        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=2) FotosPosicion2
+				        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pf.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=3) FotosPosicion3
+				        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pf.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=4) FotosPosicion4                        
+                        ,v.vin, v.idmarca, v.idmodelo, ma.nombre Marca, m.nombre Modelo, v.Annio, Motor, 
+                        v.idvehiculo, ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, 
+                        tv.Nombre TipoVehiculo, bl
+                from vehiculo v inner join dbo.MarcaAuto ma with (nolock) on v.IdMarca=ma.IdMarcaAuto
+                        inner join dbo.Modelo m with (nolock) on v.IdModelo=m.IdModelo
+                        left join dbo.VehiculoColor vc with (nolock) on v.IdVehiculo=vc.IdVehiculo
+                        left join dbo.Color ce with (nolock) on vc.IdColor=ce.IdColor
+                        left join dbo.Color ci with (nolock) on vc.IdColorInterior=ci.IdColor
+                        left join dbo.TipoCombustible tc with (nolock) on v.idtipocombustible=tc.idtipocombustible
+                        left join dbo.tipovehiculo tv with (nolock) on v.idtipovehiculo=tv.idtipovehiculo
+                        left join dbo.bl b with (nolock) on v.idbl=b.idbl
+						left join dbo.Paso1LogVehiculo p on p.IdVehiculo=v.IdVehiculo
+                where v.vin = ?
+              
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setString(1, vin)
+
+            resultSet = statement.executeQuery()
+
+            if (resultSet.next()) {
+                vehiculo = VehiculoPaso1(
+                    Id = resultSet.getInt("IdVehiculo").toString(),
+                    VIN = resultSet.getString("Vin") ?: "",
+                    Marca = resultSet.getString("Marca") ?: "",
+                    Modelo = resultSet.getString("Modelo") ?: "",
+                    Anio = resultSet.getInt("Annio"),
+                    ColorExterior = resultSet.getString("ColorExterior") ?: "",
+                    ColorInterior = resultSet.getString("ColorInterior") ?: "",
+                    BL = resultSet.getString("ColorInterior") ?: "",
+                    NumeroSerie = resultSet.getString("BL") ?: "",
+                    TipoVehiculo = resultSet.getString("TipoVehiculo") ?: "",
+                    TipoCombustible = resultSet.getString("TipoCombustible") ?: "",
+                    IdEmpresa = "", // No existe en el esquema actual
+                    Activo = true, // Asumimos que está activo si existe
+                    FechaCreacion = "", // No existe en el esquema actual
+                    // FechaModificacion = resultSet.getString("FechaModificacion") ?: "",
+                    // CAMPOS SOC - Valores por defecto ya que no existen en la BD actual
+                    Odometro = resultSet.getInt("Odometro")?:0,
+                    Bateria = resultSet.getInt("Bateria")?:0,
+                    ModoTransporte = resultSet.getBoolean("ModoTransporte")?:false,
+                    RequiereRecarga = resultSet.getBoolean("RequiereRecarga")?:false,
+                    Evidencia1 = "",
+                    Evidencia2 = "",
+                    FechaActualizacion = "",
+
+                    FotosPosicion1 = resultSet.getInt("FotosPosicion1").toInt(),
+                    FotosPosicion2 = resultSet.getInt("FotosPosicion2").toInt(),
+                    FotosPosicion3 = resultSet.getInt("FotosPosicion3").toInt(),
+                    FotosPosicion4 = resultSet.getInt("FotosPosicion4").toInt(),
+
+                    FechaAltaPaso1 = resultSet.getString("FechaAlta")?:"",
+                    IdPaso1LogVehiculo =resultSet.getInt("IdPaso1LogVehiculo") ?:0
+                )
+                //Log.d("DALVehiculo", "✅ Vehículo encontrado: ${vehiculo.Marca} ${vehiculo.Modelo} ${vehiculo.Anio}")
+            } else {
+                //Log.d("DALVehiculo", "❌ No se encontró vehículo con VIN: $vin")
+            }
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error consultando vehículo: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+        var cadena=vehiculo?.Id.toString()
         return@withContext vehiculo
     }
 
@@ -619,11 +717,6 @@ class DALVehiculo {
     }
 
 
-
-
-
-
-
     // ✅ MÉTODOS PARA PASO 2 - EVIDENCIA FINAL
 
     // ✅ INSERTAR REGISTRO EN PASO2LOGVEHICULO
@@ -676,8 +769,6 @@ class DALVehiculo {
             }
         }
     }
-
-
 
 
 
@@ -1214,11 +1305,6 @@ class DALVehiculo {
 
         return@withContext null
     }
-
-
-
-
-
 
 
 

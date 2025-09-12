@@ -1,5 +1,6 @@
 package com.example.negociomx_pos.Utils
 
+import android.os.StrictMode
 import android.util.Log
 import java.sql.Connection
 import java.sql.DriverManager
@@ -24,6 +25,9 @@ object ConexionSQLServer {
 
     fun obtenerConexion(): Connection? {
         return try {
+            val policy=StrictMode.ThreadPolicy.Builder().permitAll().build()
+            StrictMode.setThreadPolicy(policy)
+
             Class.forName("net.sourceforge.jtds.jdbc.Driver")
 
             val connectionString = "jdbc:jtds:sqlserver://$SERVER:$PORT/$DATABASE;instance=SQLEXPRESS;user=$USERNAME;password=$PASSWORD"

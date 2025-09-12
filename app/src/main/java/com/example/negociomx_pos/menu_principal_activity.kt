@@ -132,8 +132,6 @@ class menu_principal_activity : AppCompatActivity() {
         val btnConsultaPaso4 =findViewById<Button>(R.id.btnConsultaPaso4)
 
 
-
-
         getEmpresaNubeCfgNubeCfgNVNube()
 
         var visibleBtns=!ParametrosSistema.usuarioLogueado.IdRol.equals("5")
