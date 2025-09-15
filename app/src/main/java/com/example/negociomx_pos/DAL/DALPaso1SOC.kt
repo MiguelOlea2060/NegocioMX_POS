@@ -61,6 +61,10 @@ class DALPaso1SOC {
                        p.FechaAlta,
                        p.IdUsuarioNubeAlta,
                        (SELECT COUNT(*) FROM Paso1LogVehiculoFotos pf WHERE pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo) AS CantidadFotos
+                    ,Format((SELECT top 1 pf.FechaAlta FROM Paso1LogVehiculoFotos pf WHERE pf.Posicion=1 and pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo), 'dd/MMM/yyyy HH:mm:ss') FechaAltaFoto1
+                    ,Format((SELECT top 1 pf.FechaAlta FROM Paso1LogVehiculoFotos pf WHERE pf.Posicion=2 and pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo), 'dd/MMM/yyyy HH:mm:ss') FechaAltaFoto2
+                    ,Format((SELECT top 1 pf.FechaAlta FROM Paso1LogVehiculoFotos pf WHERE pf.Posicion=3 and pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo), 'dd/MMM/yyyy HH:mm:ss') FechaAltaFoto3
+                    ,Format((SELECT top 1 pf.FechaAlta FROM Paso1LogVehiculoFotos pf WHERE pf.Posicion=4 and pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo), 'dd/MMM/yyyy HH:mm:ss') FechaAltaFoto4
                 FROM dbo.Paso1LogVehiculo p
                 INNER JOIN dbo.Vehiculo v ON p.IdVehiculo = v.IdVehiculo
                 INNER JOIN dbo.MarcaAuto m ON v.IdMarca = m.IdMarcaAuto
@@ -104,7 +108,11 @@ class DALPaso1SOC {
                     RequiereRecarga = resultSet.getBoolean("RequiereRecarga"),
                     FechaAlta = resultSet.getString("FechaAlta") ?: "",
                     UsuarioAlta = resultSet.getInt("IdUsuarioNubeAlta").toString(),
-                    CantidadFotos = resultSet.getInt("CantidadFotos")
+                    CantidadFotos = resultSet.getInt("CantidadFotos"),
+                    FechaAltaFoto1 = resultSet.getString("FechaAltaFoto1")?:" ",
+                    FechaAltaFoto2 = resultSet.getString("FechaAltaFoto2")?:" ",
+                    FechaAltaFoto3 = resultSet.getString("FechaAltaFoto3")?:" ",
+                    FechaAltaFoto4 = resultSet.getString("FechaAltaFoto4")?:" "
                 )
                 registros.add(registro)
             }

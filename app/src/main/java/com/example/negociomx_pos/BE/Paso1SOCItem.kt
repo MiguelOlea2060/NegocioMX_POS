@@ -23,5 +23,10 @@ data class Paso1SOCItem(
     var RequiereRecarga: Boolean = false,
     var FechaAlta: String = "",
     var UsuarioAlta: String = "",
-    var CantidadFotos: Int = 0
+    var CantidadFotos: Int = 0,
+
+    var FechaAltaFoto1:String="",
+    var FechaAltaFoto2:String="",
+    var FechaAltaFoto3:String="",
+    var  FechaAltaFoto4:String=""
 )

@@ -48,9 +48,6 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
     private var loadingHandler: Handler? = null
     private var loadingRunnable: Runnable? = null
 
-    // NUEVA VARIABLE: Para controlar visibilidad del calendario
-   // private var calendarioVisible: Boolean = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_consulta_paso1_soc)
@@ -61,9 +58,6 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
 
         establecerFechaActual()
         realizarConsultaInicial()
-
-        // AGREGAR ESTA LÍNEA:
-     //   Toast.makeText(this, "Estado inicial - calendarioVisible: $calendarioVisible", Toast.LENGTH_SHORT).show()
     }
 
     private fun inicializarComponentes() {
@@ -95,65 +89,6 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
             consultarRegistrosPorFecha(fechaSeleccionada)
         }
     }
-
-    // NUEVA FUNCIÓN: Mostrar calendario
-  /*  private fun mostrarCalendario() {
-        val formatoFecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val formatoMostrar = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
-        val dialog = Dialog(this)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.item_calendario)
-
-        val calendario: CalendarView = dialog.findViewById(R.id.dtFechaCal)
-        val imgAceptar: ImageView = dialog.findViewById(R.id.imgAceptarCalendario)
-        val imgCancelar: ImageView = dialog.findViewById(R.id.imgCancelarCalendario)
-
-        var annio:Int=0
-        var mes:Int=0
-        var dia:Int=0
-        calendario.setOnDateChangeListener{ view,year, month,dayOfMonth->
-            annio=year
-            mes=month+1
-            dia=dayOfMonth
-        }
-        // Establecer fecha en el calendario
-        val fechaActual :Calendar=Calendar.getInstance()
-        if (fechaSeleccionada.length ==0)
-        {
-            fechaSeleccionada = formatoFecha.format(fechaActual.time)
-            tvFechaSeleccionada.text = formatoMostrar.format(fechaActual.time)
-            calendario.date=fechaActual.timeInMillis
-        }
-        else
-        {
-            var pedazos=fechaSeleccionada.split("-")
-            annio=pedazos[0].toInt()
-            mes=pedazos[1].toInt()
-            dia=pedazos[2].toInt()
-
-            calendario.setDate(
-                SimpleDateFormat("yyyy-MM-dd").parse(fechaSeleccionada).getTime(),
-                true,
-                true)
-        }
-
-        imgAceptar.setOnClickListener{
-            val fechaSel=fechaSeleccionada
-            fechaSeleccionada= annio.toString()+"-"+mes.toString()+"-"+dia.toString()
-
-            tvFechaSeleccionada.text=dia.toString()+"/"+mes.toString()+"/"+annio.toString()
-            dialog.dismiss()
-
-            if(!fechaSel.equals(fechaSeleccionada))
-                consultarRegistrosPorFecha(fechaSeleccionada)
-        }
-        imgCancelar.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.show()
-    }*/
 
     private fun mostrarSelectorFecha() {
         val calendario = Calendar.getInstance()
@@ -343,6 +278,19 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
     }
 
     private fun mostrarDetalleRegistro(registro: Paso1SOCItem) {
+        var fecha1:String=""
+        var fecha2:String=""
+        var fecha3:String=""
+        var fecha4:String=""
+        if(registro.FechaAltaFoto1.isNotEmpty() && registro.FechaAltaFoto1.toString().trim().isNotEmpty())
+            fecha1="1 -> "+registro.FechaAltaFoto1
+        if(registro.FechaAltaFoto2.isNotEmpty() && registro.FechaAltaFoto2.toString().trim().isNotEmpty())
+            fecha2="2 -> "+registro.FechaAltaFoto2
+        if(registro.FechaAltaFoto3.isNotEmpty() && registro.FechaAltaFoto3.toString().trim().isNotEmpty())
+            fecha3="3 -> "+registro.FechaAltaFoto3
+        if(registro.FechaAltaFoto4.isNotEmpty() && registro.FechaAltaFoto4.toString().trim().isNotEmpty())
+            fecha4="4 -> "+registro.FechaAltaFoto4
+
         val mensaje = """
             🚗 DETALLE DEL REGISTRO
             
@@ -358,7 +306,11 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
             Requiere Recarga: ${if (registro.RequiereRecarga) "Sí" else "No"}
             
             📸 Fotos: ${registro.CantidadFotos}
-            📅 Fecha: ${registro.FechaAlta}
+            📅 ${"Fechas de Fotos"}
+             ${fecha1}
+             ${fecha2}
+             ${fecha3}
+             ${fecha4}
         """.trimIndent()
 
         android.app.AlertDialog.Builder(this)
