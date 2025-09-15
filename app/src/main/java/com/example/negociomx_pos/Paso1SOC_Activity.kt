@@ -245,7 +245,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     // Miguelon esta consulta es innecesario, modifique el script anterior para que traiga esots
                     // datos
                     //val datosSOCExistentes = dalVehiculo.consultarDatosSOCExistentes(vehiculo?.Id?.toInt()!!)
-                    val datosSOCExistentes=vehiculo
+                    var datosSOCExistentes:Vehiculo?=null
+                    if(vehiculoPaso1!=null && vehiculoPaso1?.IdPaso1LogVehiculo!!>0)
+                        datosSOCExistentes=vehiculo
 
                     //Miguelon, esta consulta es innecesaria porque tambien lo agrege a la primera consulta de la linea 238
                     //solo era agregarla a la consulta
@@ -294,7 +296,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     mostrarInformacionVehiculo(vehiculo!!)
 
                     // ✅ MOSTRAR DATOS SOC SI EXISTEN
-                    if (datosSOCExistentes != null) {
+                    if (datosSOCExistentes != null && vehiculoPaso1?.IdPaso1LogVehiculo!!>0) {
                         tieneRegistroSOC = true
                         mostrarDatosSOCExistentes(datosSOCExistentes)
                     } else {
