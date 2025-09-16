@@ -9,6 +9,7 @@ import com.example.negociomx_pos.DAL.DALEmpresa
 import com.example.negociomx_pos.DAL.DALUsuario
 import com.example.negociomx_pos.adapters.SpinnerAdapter
 import com.example.negociomx_pos.adapters.UsuarioNubeAdapter
+import com.example.negociomx_pos.databinding.ActivityUsuarioAdminBinding
 import com.example.negociomx_pos.databinding.ActivityUsuariosBinding
 import com.example.negociomx_pos.room.BLL.BLLUtil
 import com.example.negociomx_pos.room.entities.Admins.Rol
