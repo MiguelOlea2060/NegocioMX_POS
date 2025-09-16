@@ -133,6 +133,7 @@ class menu_principal_activity : AppCompatActivity() {
         val btnPaso4Fotos=findViewById<Button>(R.id.btnPaso4Fotos)
         val btnConsultaPaso4 =findViewById<Button>(R.id.btnConsultaPaso4)
         val btnCargaMasivaVins =findViewById<Button>(R.id.btnCargaMasivaXls)
+        val btnAdminUsuarios =findViewById<Button>(R.id.btnAdminUsuarios)
 
 
         getEmpresaNubeCfgNubeCfgNVNube()
@@ -153,6 +154,7 @@ class menu_principal_activity : AppCompatActivity() {
         btnRadmin.isVisible=visibleBtns
         btnEmpresas.isVisible=visibleBtns
         btnVehiculo.isVisible=visibleBtns
+        btnCargaMasivaVins.isVisible=visibleBtns
         btnCargaMasivaVins.isVisible=visibleBtns
 
         btnUm.setOnClickListener {
@@ -265,6 +267,10 @@ class menu_principal_activity : AppCompatActivity() {
         }
         btnConsultaPaso4.setOnClickListener{
             val intent = Intent(this, ConsultaPaso4Llantas_Activity::class.java)
+            startActivity(intent)
+        }
+        btnAdminUsuarios.setOnClickListener {
+            val intent = Intent(this, usuario_admin_activity::class.java)
             startActivity(intent)
         }
 

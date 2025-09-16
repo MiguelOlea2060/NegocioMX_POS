@@ -179,11 +179,19 @@
         <Button
             android:layout_weight="1"
             android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:id="@+id/btnVehiculo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Vehículo" />
 
+        <Button
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp"
+            android:id="@+id/btnAdminUsuarios"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Admin Usuarios" />
         <Button
             android:layout_weight="1"
             android:layout_marginLeft="5dp"

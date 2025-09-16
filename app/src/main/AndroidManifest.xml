@@ -36,6 +36,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".usuario_admin_activity"
+            android:exported="false" />
+        <activity
             android:name=".ConsultaPaso4Llantas_Activity"
             android:exported="false" />
         <activity
