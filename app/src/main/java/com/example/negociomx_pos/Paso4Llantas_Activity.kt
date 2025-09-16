@@ -17,8 +17,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.negociomx_pos.BE.Vehiculo
+import com.example.negociomx_pos.BE.VehiculoPaso4
 import com.example.negociomx_pos.DAL.DALVehiculo
+import com.example.negociomx_pos.Utils.BLLUtils
 import com.example.negociomx_pos.Utils.ParametrosSistema
 import kotlinx.coroutines.launch
 import java.io.File
@@ -29,7 +30,7 @@ import java.util.*
 class Paso4Llantas_Activity : AppCompatActivity() {
 
     private val dalVehiculo = DALVehiculo()
-    private var vehiculoActual: Vehiculo? = null
+    private var vehiculoActual: VehiculoPaso4? = null
 
     // Variables de UI
     private lateinit var etVIN: EditText
@@ -66,13 +67,13 @@ class Paso4Llantas_Activity : AppCompatActivity() {
 
     // Variables para control de datos
     private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.Id?.toInt()!!
-    private var datosExistentes: Map<Byte, Pair<Boolean, Boolean>> = emptyMap() // Posicion -> (Verificada, TieneFoto)
 
     // ✅ VARIABLES PARA CAPTURA DE FOTOS (ADAPTADAS DE PASO3)
     private var fotoHabilitada: Boolean = true // HABILITADA AHORA
     private var posicionFotoActual: Byte = 0
     private var fotoUri: Uri? = null
 
+    var bllUtil:BLLUtils?=null
     // Variables para manejo de fotos por posición
     private val fotosCapturadas = mutableMapOf<Byte, File>() // Posicion -> Archivo
     private val estadoCaptura = mutableMapOf<Byte, Boolean>() // Posicion -> Capturada
@@ -101,6 +102,8 @@ class Paso4Llantas_Activity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_paso4_llantas)
+
+        bllUtil= BLLUtils()
 
         inicializarVistas()
         configurarEventos()
@@ -190,21 +193,33 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                 mostrarCargaConsulta()
 
                 Toast.makeText(this@Paso4Llantas_Activity, "Consultando vehículo...", Toast.LENGTH_SHORT).show()
-
-                val vehiculo = dalVehiculo.consultarVehiculoPorVIN(vin)
+                val vehiculo = dalVehiculo.consultarVehiculoPorVINParaPaso4(vin)
                 if (vehiculo != null) {
                     vehiculoActual = vehiculo
-
-                    // ✅ CONSULTAR DATOS PASO4 EXISTENTES
-                    datosExistentes = dalVehiculo.consultarPaso4Existente(vehiculo.Id.toInt())
 
                     mostrarInformacionVehiculo(vehiculo)
                     mostrarSeccionLlantas()
                     cargarDatosExistentes()
 
+                    cbLlanta1.isEnabled=false
+                    cbLlanta2.isEnabled=false
+                    cbLlanta3.isEnabled=false
+                    cbLlanta4.isEnabled=false
+                    ivLlanta1.isEnabled=false
+                    ivLlanta2.isEnabled=false
+                    ivLlanta3.isEnabled=false
+                    ivLlanta4.isEnabled=false
+
+                    configurarBotonGuardar()
+
+                    var verificadas:Int=0
+                    if(vehiculo.Verificada1==true)verificadas++
+                    if(vehiculo.Verificada2==true)verificadas++
+                    if(vehiculo.Verificada3==true)verificadas++
+                    if(vehiculo.Verificada4==true)verificadas++
                     Toast.makeText(
                         this@Paso4Llantas_Activity,
-                        "✅ Vehículo encontrado. ${datosExistentes.size} llantas registradas",
+                        "✅ Vehículo encontrado. ${verificadas} llantas verificadas",
                         Toast.LENGTH_SHORT
                     ).show()
 
@@ -225,7 +240,24 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         }
     }
 
-    private fun mostrarInformacionVehiculo(vehiculo: Vehiculo) {
+    private fun configurarBotonGuardar() {
+        when {
+            vehiculoActual  !=null-> {
+                btnGuardarPaso4.text = "⬅️ ATRÁS"
+                btnGuardarPaso4.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    android.graphics.Color.parseColor("#FF9800")
+                )
+            }
+            else -> {
+                btnGuardarPaso4.text = "💾 GUARDAR"
+                btnGuardarPaso4.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    android.graphics.Color.parseColor("#4CAF50")
+                )
+            }
+        }
+    }
+
+    private fun mostrarInformacionVehiculo(vehiculo: VehiculoPaso4) {
         tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
         tvMarcaModeloAnnio.text = "${vehiculo.Marca} - ${vehiculo.Modelo}, ${vehiculo.Anio}"
         tvColorExterior.text = "Color Ext.: ${vehiculo.ColorExterior}"
@@ -249,21 +281,34 @@ class Paso4Llantas_Activity : AppCompatActivity() {
 
     private fun cargarDatosExistentes() {
         // Cargar checkboxes según datos existentes
-        cbLlanta1.isChecked = datosExistentes[1]?.first ?: false
-        cbLlanta2.isChecked = datosExistentes[2]?.first ?: false
-        cbLlanta3.isChecked = datosExistentes[3]?.first ?: false
-        cbLlanta4.isChecked = datosExistentes[4]?.first ?: false
+        cbLlanta1.isChecked = vehiculoActual?.Verificada1==true
+        cbLlanta2.isChecked = vehiculoActual?.Verificada2==true
+        cbLlanta3.isChecked = vehiculoActual?.Verificada3==true
+        cbLlanta4.isChecked = vehiculoActual?.Verificada4==true
 
         // Actualizar mensaje informativo
-        val totalLlantas = datosExistentes.size
-        val totalFotos = datosExistentes.values.count { it.second }
-        val totalCapturadas = estadoCaptura.values.count { it }
-        tvMensajeInfo.text = "ℹ️ $totalLlantas llantas registradas, $totalFotos con foto guardada, $totalCapturadas nuevas capturadas."
+        var totalVerificadas = 0
+        var totalFotos = 0
+        if(vehiculoActual?.Verificada1==true)totalVerificadas++
+        if(vehiculoActual?.Verificada2==true)totalVerificadas++
+        if(vehiculoActual?.Verificada3==true)totalVerificadas++
+        if(vehiculoActual?.Verificada4==true)totalVerificadas++
+
+        if(vehiculoActual?.TieneFoto1==true)totalFotos++
+        if(vehiculoActual?.TieneFoto2==true)totalFotos++
+        if(vehiculoActual?.TieneFoto3==true)totalFotos++
+        if(vehiculoActual?.TieneFoto4==true)totalFotos++
+        tvMensajeInfo.text = "ℹ️ $totalVerificadas llantas verificadas, $totalFotos  fotos capturadas."
     }
 
     private fun manejarClicLlanta(posicion: Int) {
         val posicionByte = posicion.toByte()
-        val tieneFoto = datosExistentes[posicionByte]?.second ?: false
+        var tieneFoto = false
+        if(posicion==1 && vehiculoActual?.TieneFoto1==true)tieneFoto=true
+        else if(posicion==2 && vehiculoActual?.TieneFoto2==true)tieneFoto=true
+        else if(posicion==3 && vehiculoActual?.TieneFoto3==true)tieneFoto=true
+        else if(posicion==4 && vehiculoActual?.TieneFoto4==true)tieneFoto=true
+
         val fotoCapturada = estadoCaptura[posicionByte] ?: false
 
         if (tieneFoto) {
@@ -291,7 +336,10 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         }
 
         // ✅ VALIDAR SI YA EXISTE EN BD
-        if (datosExistentes[posicion]?.second == true) {
+        if ((vehiculoActual?.TieneFoto1 == true && posicion.toInt()==1) ||
+            (vehiculoActual?.TieneFoto2==true && posicion.toInt()==2) ||
+            (vehiculoActual?.TieneFoto3==true && posicion.toInt()==3) ||
+            (vehiculoActual?.TieneFoto4==true && posicion.toInt()==4)) {
             Toast.makeText(this, "Esta llanta ya tiene foto registrada", Toast.LENGTH_LONG).show()
             return
         }
@@ -433,14 +481,20 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         }
 
         mostrarCargaConMensajes()
-
         lifecycleScope.launch {
             try {
+                // ✅ MANEJAR BOTÓN ATRÁS
+                if (vehiculoActual!=null && vehiculoActual?.Id!!.toInt()>0) {
+                    ocultarCarga()
+                    finish() // Cerrar actividad
+                    return@launch
+                }
+
                 Toast.makeText(this@Paso4Llantas_Activity, "Guardando verificación de llantas...", Toast.LENGTH_SHORT).show()
 
                 // Insertar registro principal si no existe
                 var idPaso4LogVehiculo = -1
-                if (datosExistentes.isEmpty()) {
+                if (vehiculoActual!=null) {
                     idPaso4LogVehiculo = dalVehiculo.insertarPaso4LogVehiculo(
                         idVehiculo = vehiculo.Id.toInt(),
                         idUsuarioNubeAlta = idUsuarioNubeAlta
@@ -448,24 +502,26 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                 }
 
                 var exitoso = true
-
                 // Guardar estado de cada llanta CON FOTOS
-                if (idPaso4LogVehiculo > 0 || datosExistentes.isNotEmpty()) {
+                if (idPaso4LogVehiculo > 0 || vehiculoActual!=null) {
                     val checkboxes = mapOf(
                         1.toByte() to cbLlanta1.isChecked,
                         2.toByte() to cbLlanta2.isChecked,
                         3.toByte() to cbLlanta3.isChecked,
                         4.toByte() to cbLlanta4.isChecked
                     )
-
                     for ((posicion, verificada) in checkboxes) {
-                        val yaExiste = datosExistentes.containsKey(posicion)
+                        var yaExiste = false
+                        if(vehiculoActual?.TieneFoto1==true && posicion.toInt()==1)yaExiste=true
+                        else if(vehiculoActual?.TieneFoto2==true && posicion.toInt()==2)yaExiste=true
+                        else if(vehiculoActual?.TieneFoto3==true && posicion.toInt()==3)yaExiste=true
+                        else if(vehiculoActual?.TieneFoto4==true && posicion.toInt()==4)yaExiste=true
                         if (!yaExiste) {
                             // Obtener foto si fue capturada
                             var fotoBase64: String? = null
                             val archivoFoto = fotosCapturadas[posicion]
                             if (archivoFoto != null) {
-                                fotoBase64 = convertirImagenABase64(archivoFoto)
+                                fotoBase64 =bllUtil?.convertirImagenABase64(archivoFoto)
                             }
 
                             val resultado = dalVehiculo.insertarFotoPaso4(
@@ -481,20 +537,17 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                 }
 
                 ocultarCarga()
-
                 if (exitoso) {
                     Toast.makeText(this@Paso4Llantas_Activity,
                         "✅ Verificación de llantas guardada exitosamente",
                         Toast.LENGTH_LONG).show()
 
                     // Actualizar datos existentes
-                    datosExistentes = dalVehiculo.consultarPaso4Existente(vehiculo.Id.toInt())
-                    cargarDatosExistentes()
+                    //datosExistentes = dalVehiculo.consultarPaso4Existente(vehiculo.Id.toInt())
+                    //cargarDatosExistentes()
 
                     // Limpiar fotos capturadas después de guardar exitosamente
-                    fotosCapturadas.clear()
-                    estadoCaptura.clear()
-
+                    limpiarControles()
                 } else {
                     Toast.makeText(this@Paso4Llantas_Activity,
                         "❌ Error guardando verificación",
@@ -507,6 +560,18 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                 Toast.makeText(this@Paso4Llantas_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    private fun limpiarControles()
+    {
+        fotosCapturadas.clear()
+        estadoCaptura.clear()
+
+        ocultarSecciones()
+        cbLlanta1.isChecked=false
+        cbLlanta2.isChecked=false
+        cbLlanta3.isChecked=false
+        cbLlanta4.isChecked=false
     }
 
     private fun mostrarCargaConMensajes() {
@@ -558,10 +623,7 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         btnConsultarVehiculo.alpha = 1.0f
     }
 
-
-
     // ✅ MÉTODOS AUXILIARES ADAPTADOS DE PASO3
-
     private fun obtenerArchivoDesdeUri(uri: Uri): File? {
         return try {
             val path = uri.path
@@ -627,16 +689,6 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         }
     }
 
-    private fun convertirImagenABase64(archivo: File): String? {
-        return try {
-            val bytes = archivo.readBytes()
-            android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
-        } catch (e: Exception) {
-            Log.e("Paso4LLANTAS", "Error convirtiendo imagen a Base64: ${e.message}")
-            null
-        }
-    }
-
     private fun actualizarEstadoFotoUI(posicion: Byte, capturada: Boolean) {
         val nombrePosicion = when (posicion) {
             1.toByte() -> "Delantera Izq"
@@ -648,7 +700,11 @@ class Paso4Llantas_Activity : AppCompatActivity() {
 
         // Actualizar mensaje informativo
         val totalCapturadas = estadoCaptura.values.count { it }
-        val totalGuardadas = datosExistentes.values.count { it.second }
+        var totalGuardadas = 0
+        if (vehiculoActual?.TieneFoto1==true)totalGuardadas++
+        if (vehiculoActual?.TieneFoto2==true)totalGuardadas++
+        if (vehiculoActual?.TieneFoto3==true)totalGuardadas++
+        if (vehiculoActual?.TieneFoto4==true)totalGuardadas++
         tvMensajeInfo.text = "ℹ️ $totalGuardadas fotos guardadas, $totalCapturadas nuevas capturadas. Toque imagen para ver/capturar."
     }
 
@@ -706,10 +762,6 @@ class Paso4Llantas_Activity : AppCompatActivity() {
             (resources.displayMetrics.heightPixels * 0.7).toInt()
         )
     }
-
-
-
-
 
     override fun onDestroy() {
         super.onDestroy()

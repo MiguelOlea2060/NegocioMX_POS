@@ -261,14 +261,13 @@ class ConsultaPaso4Llantas_Activity : AppCompatActivity() {
         mensaje.append("Marca: ${registro.Marca}\n")
         mensaje.append("Modelo: ${registro.Modelo}\n")
         mensaje.append("Año: ${registro.Anio}\n")
-        mensaje.append("Motor: ${registro.NumeroMotor}\n")
         mensaje.append("Color Exterior: ${registro.ColorExterior}\n")
         mensaje.append("Color Interior: ${registro.ColorInterior}\n\n")
 
         mensaje.append("🛞 INFORMACIÓN DE LLANTAS\n\n")
         mensaje.append("Total de llantas: ${registro.CantidadLlantas}\n")
         mensaje.append("Llantas verificadas: ${registro.LlantasVerificadas}\n")
-        mensaje.append("Llantas con foto: ${registro.LlantasConFoto}\n\n")
+//        mensaje.append("Llantas con foto: ${registro.LlantasConFoto}\n\n")
 
         mensaje.append("📍 DETALLE POR POSICIÓN:\n")
         mensaje.append("🔸 Delantera Izq: ${if (registro.Llanta1Verificada) "✅ Verificada" else "❌ No verificada"} ${if (registro.Llanta1TieneFoto) "📷" else ""}\n")
@@ -277,20 +276,11 @@ class ConsultaPaso4Llantas_Activity : AppCompatActivity() {
         mensaje.append("🔸 Trasera Der: ${if (registro.Llanta4Verificada) "✅ Verificada" else "❌ No verificada"} ${if (registro.Llanta4TieneFoto) "📷" else ""}\n\n")
 
         mensaje.append("📅 Fecha de registro: ${registro.FechaAlta.substring(0, 19)}\n")
-        mensaje.append("👤 Usuario: ${registro.IdUsuarioNube}\n")
 
-        dialog.setTitle("📋 Detalle del Registro Paso 4 - Llantas")
+        dialog.setTitle("📋 Detalle del Registro de Llantas")
         dialog.setMessage(mensaje.toString())
         dialog.setPositiveButton("Cerrar") { dialogInterface, _ ->
             dialogInterface.dismiss()
-        }
-
-        // Opcional: Agregar botón para ver fotos (si implementas visualización de fotos)
-        if (registro.LlantasConFoto > 0) {
-            dialog.setNeutralButton("Ver Fotos") { _, _ ->
-                // Aquí puedes implementar la visualización de fotos si lo deseas
-                Toast.makeText(this, "Función de ver fotos de llantas - Por implementar", Toast.LENGTH_SHORT).show()
-            }
         }
 
         dialog.show()

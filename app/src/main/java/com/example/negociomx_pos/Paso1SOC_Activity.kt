@@ -149,15 +149,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
         binding.btnConsultarVehiculo.setOnClickListener {
             verificaVINSuministrado()
         }
-
-        // ✅ BOTONES DE EVIDENCIAS
-        /*binding.btnEvidencia1.setOnClickListener {
-            capturarEvidencia(1)
-        }
-
-        binding.btnEvidencia2.setOnClickListener {
-            capturarEvidencia(2)
-        }*/
         // ✅ BOTONES DE EVIDENCIAS
         binding.btnEvidencia1.setOnClickListener {
             if (vehiculoPaso1?.FotosPosicion1!! > 0) {
@@ -305,7 +296,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     mostrarSeccionesSOC()
                     // ✅ CONFIGURAR BOTONES DE FOTOS SEGÚN ESTADO
                     configurarBotonesSegunFotos()
-
                     if (vehiculoPaso1 != null) {
                         fotosExistentes = vehiculoPaso1?.FotosPosicion1!! + vehiculoPaso1?.FotosPosicion2!! +
                                 vehiculoPaso1?.FotosPosicion3!! + vehiculoPaso1?.FotosPosicion4!!
@@ -838,7 +828,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
         mostrarCargaConMensajes()
         lifecycleScope.launch {
             try {
-
                 // ✅ MANEJAR BOTÓN ATRÁS
                 if (esTerceraEntradaOMas) {
                     ocultarCarga()

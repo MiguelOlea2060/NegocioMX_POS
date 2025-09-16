@@ -276,12 +276,12 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, alta_vehiculo::class.java)
             startActivity(intent)
         }
-        btnCargaMasivaVins.setOnClickListener {
+/*        btnCargaMasivaVins.setOnClickListener {
             val intent=Intent(Intent.ACTION_GET_CONTENT, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
             intent.putExtra("CargaMasiva",true)
             intent.setType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             startForResult.launch(intent)
-        }
+        }*/
     }
 
     private fun verificarCatalogosDeNubePorActualizarLocalmente() {
