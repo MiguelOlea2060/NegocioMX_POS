@@ -16,6 +16,7 @@ data class VehiculoPaso4(
     var TipoVehiculo:String="",
     var BL:String="",
 
+    var IdPaso4LogVehiculo:Int?=null,
     var Verificada1:Boolean?=null,
     var Verificada2:Boolean?=null,
     var Verificada3:Boolean?=null,

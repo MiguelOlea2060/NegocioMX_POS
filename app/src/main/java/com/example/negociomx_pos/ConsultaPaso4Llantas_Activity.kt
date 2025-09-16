@@ -31,6 +31,7 @@ class ConsultaPaso4Llantas_Activity : AppCompatActivity() {
     private lateinit var tvLoadingText: TextView
     private lateinit var tvLoadingSubtext: TextView
     private lateinit var tvVehiculosUnicos: TextView
+    private lateinit var tvLlantasVerificadas: TextView
     private lateinit var tvTotalFotos: TextView
     private lateinit var tvMensajeSinResultados: TextView
 
@@ -60,6 +61,7 @@ class ConsultaPaso4Llantas_Activity : AppCompatActivity() {
         tvLoadingText = findViewById(R.id.tvLoadingText)
         tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
         tvVehiculosUnicos = findViewById(R.id.tvVehiculosUnicos)
+        tvLlantasVerificadas = findViewById(R.id.tvLlantasVeirifcadas)
         tvTotalFotos = findViewById(R.id.tvTotalFotos)
         tvMensajeSinResultados = findViewById(R.id.tvMensajeSinResultados)
     }
@@ -99,6 +101,7 @@ class ConsultaPaso4Llantas_Activity : AppCompatActivity() {
     }
 
     private fun mostrarSelectorFecha() {
+        tvFechaSeleccionada.isEnabled=false
         val calendario = Calendar.getInstance()
 
         // Si ya hay una fecha seleccionada, usar esa como inicial
@@ -125,6 +128,9 @@ class ConsultaPaso4Llantas_Activity : AppCompatActivity() {
 
                 fechaSeleccionada = formatoFecha.format(fechaSeleccionadaCalendar.time)
                 tvFechaSeleccionada.text = formatoMostrar.format(fechaSeleccionadaCalendar.time)
+                tvFechaSeleccionada.isEnabled=true
+
+                ejecutarConsulta()
             },
             calendario.get(Calendar.YEAR),
             calendario.get(Calendar.MONTH),
@@ -152,10 +158,25 @@ class ConsultaPaso4Llantas_Activity : AppCompatActivity() {
                 val registros = dalConsultaPaso4.consultarPaso4PorFecha(fechaSeleccionada)
 
                 // Consultar estadísticas
-                val estadisticas = dalConsultaPaso4.obtenerEstadisticasPaso4PorFecha(fechaSeleccionada)
+                val estadisticas = mutableMapOf<String,Int>()
+                //dalConsultaPaso4.obtenerEstadisticasPaso4PorFecha(fechaSeleccionada)
+                var totalVehiculos:Int=0
+                var totalFotos:Int=0
+                var totalVerificaciones:Int=0
+                if(registros!=null && registros.count()>0)
+                {
+                    totalVehiculos=registros.count()
+                    registros.forEach {
+                        it->
+                        totalFotos+= it.LlantasConFoto
+                        totalVerificaciones+=it.LlantasVerificadas
+                    }
+                }
+                estadisticas["TotalRegistros"] = totalVerificaciones
+                estadisticas["VehiculosUnicos"] = totalVehiculos
+                estadisticas["TotalFotos"] = totalFotos
 
                 ocultarCarga()
-
                 if (registros.isNotEmpty()) {
                     mostrarResultados(registros, estadisticas)
                     Toast.makeText(this@ConsultaPaso4Llantas_Activity,
@@ -219,6 +240,7 @@ class ConsultaPaso4Llantas_Activity : AppCompatActivity() {
 
         // Mostrar estadísticas
         tvVehiculosUnicos.text = "🚗 ${estadisticas["VehiculosUnicos"] ?: 0} vehículos"
+        tvLlantasVerificadas.text = " ${estadisticas["TotalRegistros"] ?: 0} Verificadas"
         tvTotalFotos.text = "📸 ${estadisticas["TotalFotos"] ?: 0} fotos"
 
         // Mostrar vistas

@@ -28,40 +28,25 @@ class DALPaso4 {
             }
 
             val query = """
-                SELECT DISTINCT
-                    v.IdVehiculo, 
-                    p.IdPaso4LogVehiculo, 
-                    v.Vin, 
-                    ISNULL(b.BL, '') as BL, 
-                    v.IdMarca, 
-                    m.Nombre as Marca, 
-                    v.IdModelo, 
-                    mo.Nombre as Modelo, 
-                    ISNULL(v.Annio, 0) as Anio,
-                    vc.IdColor, 
-                    vc.IdColorInterior, 
-                    ISNULL(c.Nombre, '') as ColorExterior, 
-                    ISNULL(c1.Nombre, '') as ColorInterior, 
-                    ISNULL(v.Motor, '') as NumeroMotor,
-                    CONVERT(varchar, p.FechaAlta, 120) as FechaAlta,
-                    ISNULL(p.IdUsuarioNubeAlta, 0) as IdUsuarioNube,
-                    COUNT(f.IdPaso4LogVehiculoFotos) as CantidadLlantas,
-                    SUM(CASE WHEN f.Verificada = 1 THEN 1 ELSE 0 END) as LlantasVerificadas,
-                    SUM(CASE WHEN f.Foto IS NOT NULL THEN 1 ELSE 0 END) as LlantasConFoto
-                FROM dbo.Paso4LogVehiculo p 
-                INNER JOIN dbo.vehiculo v ON p.IdVehiculo = v.IdVehiculo 
-                INNER JOIN dbo.MarcaAuto m ON v.IdMarca = m.IdMarcaAuto
-                INNER JOIN dbo.Modelo mo ON v.IdMarca = mo.IdMarca AND v.IdModelo = mo.IdModelo
-                LEFT JOIN dbo.VehiculoColor vc ON v.IdVehiculo = vc.IdVehiculo
-                LEFT JOIN dbo.Color c ON vc.IdColor = c.IdColor
-                LEFT JOIN dbo.Color c1 ON vc.IdColorInterior = c1.IdColor
-                LEFT JOIN dbo.bl b ON v.IdBL = b.IdBL
-                LEFT JOIN dbo.Paso4LogVehiculoFotos f ON p.IdPaso4LogVehiculo = f.IdPaso4LogVehiculo
-                WHERE CONVERT(date, p.FechaAlta) = ?
-                GROUP BY v.IdVehiculo, p.IdPaso4LogVehiculo, v.Vin, b.BL, v.IdMarca, m.Nombre, 
-                         v.IdModelo, mo.Nombre, v.Annio, vc.IdColor, vc.IdColorInterior, 
-                         c.Nombre, c1.Nombre, v.Motor, p.FechaAlta, p.IdUsuarioNubeAlta
-                ORDER BY v.Vin
+    SELECT v.IdVehiculo, p.IdPaso4LogVehiculo, v.Vin, b.BL, v.IdMarca, m.Nombre as Marca, v.IdModelo, mo.Nombre as Modelo, v.Annio
+		, vc.IdColor, vc.IdColorInterior, c.Nombre as ColorExterior, c1.Nombre as ColorInterior,  v.Motor as NumeroMotor
+		, CONVERT(varchar, p.FechaAlta, 120) as FechaAlta, p.IdUsuarioNubeAlta as IdUsuarioNube, COUNT(f.IdPaso4LogVehiculoFotos) as CantidadLlantas,
+		SUM(CASE WHEN f.Verificada = 1 THEN 1 ELSE 0 END) as LlantasVerificadas,
+		SUM(CASE WHEN f.Foto IS NOT NULL THEN 1 ELSE 0 END) as LlantasConFoto
+    FROM dbo.Paso4LogVehiculo p 
+    INNER JOIN dbo.vehiculo v ON p.IdVehiculo = v.IdVehiculo 
+    INNER JOIN dbo.MarcaAuto m ON v.IdMarca = m.IdMarcaAuto
+    INNER JOIN dbo.Modelo mo ON v.IdMarca = mo.IdMarca AND v.IdModelo = mo.IdModelo
+    LEFT JOIN dbo.VehiculoColor vc ON v.IdVehiculo = vc.IdVehiculo
+    LEFT JOIN dbo.Color c ON vc.IdColor = c.IdColor
+    LEFT JOIN dbo.Color c1 ON vc.IdColorInterior = c1.IdColor
+    LEFT JOIN dbo.bl b ON v.IdBL = b.IdBL
+    LEFT JOIN dbo.Paso4LogVehiculoFotos f ON p.IdPaso4LogVehiculo = f.IdPaso4LogVehiculo
+    WHERE CONVERT(date, p.FechaAlta) = ?
+    GROUP BY v.IdVehiculo, p.IdPaso4LogVehiculo, v.Vin, b.BL, v.IdMarca, m.Nombre, 
+                v.IdModelo, mo.Nombre, v.Annio, vc.IdColor, vc.IdColorInterior, 
+                c.Nombre, c1.Nombre, v.Motor, p.FechaAlta, p.IdUsuarioNubeAlta
+    ORDER BY p.FechaAlta
             """.trimIndent()
 
             statement = conexion.prepareStatement(query)
@@ -78,7 +63,7 @@ class DALPaso4 {
                     Marca = resultSet.getString("Marca") ?: "",
                     IdModelo = resultSet.getInt("IdModelo"),
                     Modelo = resultSet.getString("Modelo") ?: "",
-                    Anio = resultSet.getInt("Anio"),
+                    Anio = resultSet.getInt("Annio"),
                     ColorExterior = resultSet.getString("ColorExterior") ?: "",
                     ColorInterior = resultSet.getString("ColorInterior") ?: "",
                     NumeroMotor = resultSet.getString("NumeroMotor") ?: "",

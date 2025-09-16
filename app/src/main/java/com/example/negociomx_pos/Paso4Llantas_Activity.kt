@@ -1,6 +1,8 @@
 package com.example.negociomx_pos
 
 import android.Manifest
+import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -11,6 +13,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -160,10 +163,12 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         }
 
         // ✅ EVENTOS DE IMÁGENES DE LLANTAS (DESHABILITADOS INICIALMENTE)
-        ivLlanta1.setOnClickListener { manejarClicLlanta(1) }
-        ivLlanta2.setOnClickListener { manejarClicLlanta(2) }
-        ivLlanta3.setOnClickListener { manejarClicLlanta(3) }
-        ivLlanta4.setOnClickListener { manejarClicLlanta(4) }
+        if(ParametrosSistema.GuardaFotosPaso4) {
+            ivLlanta1.setOnClickListener { manejarClicLlanta(1) }
+            ivLlanta2.setOnClickListener { manejarClicLlanta(2) }
+            ivLlanta3.setOnClickListener { manejarClicLlanta(3) }
+            ivLlanta4.setOnClickListener { manejarClicLlanta(4) }
+        }
 
         // ✅ BOTÓN GUARDAR
         btnGuardarPaso4.setOnClickListener {
@@ -201,14 +206,9 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                     mostrarSeccionLlantas()
                     cargarDatosExistentes()
 
-                    cbLlanta1.isEnabled=false
-                    cbLlanta2.isEnabled=false
-                    cbLlanta3.isEnabled=false
-                    cbLlanta4.isEnabled=false
-                    ivLlanta1.isEnabled=false
-                    ivLlanta2.isEnabled=false
-                    ivLlanta3.isEnabled=false
-                    ivLlanta4.isEnabled=false
+                    activaDesactivaControlesParaEdicion(true)
+                    if(vehiculoActual?.IdPaso4LogVehiculo!!>0)
+                        activaDesactivaControlesParaEdicion(false)
 
                     configurarBotonGuardar()
 
@@ -224,6 +224,7 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                     ).show()
 
                     ocultarCargaConsulta()
+                    hideKeyboard()
                 } else {
                     ocultarSecciones()
                     Toast.makeText(this@Paso4Llantas_Activity, "❌ Vehículo no encontrado", Toast.LENGTH_LONG).show()
@@ -240,9 +241,23 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         }
     }
 
+    private fun activaDesactivaControlesParaEdicion(enabled:Boolean) {
+        cbLlanta1.isEnabled = enabled
+        cbLlanta2.isEnabled = enabled
+        cbLlanta3.isEnabled = enabled
+        cbLlanta4.isEnabled = enabled
+    }
+
+    fun Activity.hideKeyboard() {
+        hideKeyboard(currentFocus ?: View(this))
+    }
+    fun Context.hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
     private fun configurarBotonGuardar() {
         when {
-            vehiculoActual  !=null-> {
+            (vehiculoActual  !=null && vehiculoActual?.IdPaso4LogVehiculo!!>0)-> {
                 btnGuardarPaso4.text = "⬅️ ATRÁS"
                 btnGuardarPaso4.backgroundTintList = android.content.res.ColorStateList.valueOf(
                     android.graphics.Color.parseColor("#FF9800")
@@ -484,14 +499,13 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 // ✅ MANEJAR BOTÓN ATRÁS
-                if (vehiculoActual!=null && vehiculoActual?.Id!!.toInt()>0) {
+                if (vehiculoActual!=null && vehiculoActual?.IdPaso4LogVehiculo!!.toInt()>0) {
                     ocultarCarga()
                     finish() // Cerrar actividad
                     return@launch
                 }
 
                 Toast.makeText(this@Paso4Llantas_Activity, "Guardando verificación de llantas...", Toast.LENGTH_SHORT).show()
-
                 // Insertar registro principal si no existe
                 var idPaso4LogVehiculo = -1
                 if (vehiculoActual!=null) {
@@ -542,10 +556,6 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                         "✅ Verificación de llantas guardada exitosamente",
                         Toast.LENGTH_LONG).show()
 
-                    // Actualizar datos existentes
-                    //datosExistentes = dalVehiculo.consultarPaso4Existente(vehiculo.Id.toInt())
-                    //cargarDatosExistentes()
-
                     // Limpiar fotos capturadas después de guardar exitosamente
                     limpiarControles()
                 } else {
@@ -572,6 +582,9 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         cbLlanta2.isChecked=false
         cbLlanta3.isChecked=false
         cbLlanta4.isChecked=false
+
+        etVIN.setText("")
+        etVIN.requestFocus()
     }
 
     private fun mostrarCargaConMensajes() {

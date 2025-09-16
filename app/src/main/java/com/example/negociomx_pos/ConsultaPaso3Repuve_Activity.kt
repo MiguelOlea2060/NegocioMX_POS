@@ -101,6 +101,7 @@ class ConsultaPaso3Repuve_Activity : AppCompatActivity() {
     private fun mostrarSelectorFecha() {
         val calendario = Calendar.getInstance()
 
+        tvFechaSeleccionada.isEnabled=false
         // Si ya hay una fecha seleccionada, usar esa como inicial
         if (fechaSeleccionada.isNotEmpty()) {
             try {
@@ -125,6 +126,9 @@ class ConsultaPaso3Repuve_Activity : AppCompatActivity() {
 
                 fechaSeleccionada = formatoFecha.format(fechaSeleccionadaCalendar.time)
                 tvFechaSeleccionada.text = formatoMostrar.format(fechaSeleccionadaCalendar.time)
+
+                tvFechaSeleccionada.isEnabled=true
+                ejecutarConsulta()
             },
             calendario.get(Calendar.YEAR),
             calendario.get(Calendar.MONTH),

@@ -25,5 +25,7 @@ class ParametrosSistema {
         lateinit var cfgNV:CfgNVNube
         var cfgNVLocal:CfgNV?=null
         val NombreBD:String="NEGOCIOMX-FB"
+        var GuardaFotosPaso4:Boolean=false
+
     }
 }

@@ -644,7 +644,8 @@ class DALVehiculo {
             val query = """                
                 select v.vin, v.idmarca, v.idmodelo, ma.nombre Marca, m.nombre Modelo, v.Annio, Motor, v.idvehiculo
                         , ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible
-                        , tv.Nombre TipoVehiculo, bl, pd.Posicion, pd.Verificada, pd.Verificada, CASE WHEN pd.Foto IS NOT NULL THEN 1 ELSE 0 END as TieneFoto
+                        , tv.Nombre TipoVehiculo, bl, p.IdPaso4LogVehiculo, pd.Posicion, pd.Verificada
+                        , pd.Verificada, CASE WHEN pd.Foto IS NOT NULL THEN 1 ELSE 0 END as TieneFoto
                 from vehiculo v left join dbo.Paso4LogVehiculo p on p.IdVehiculo=v.IdVehiculo left join dbo.Paso4LogVehiculoFotos pd on p.IdPaso4LogVehiculo=pd.IdPaso4LogVehiculo
                     inner join dbo.MarcaAuto ma with (nolock) on v.IdMarca=ma.IdMarcaAuto
                     inner join dbo.Modelo m with (nolock) on v.IdModelo=m.IdModelo
@@ -678,8 +679,7 @@ class DALVehiculo {
                         NumeroSerie = resultSet.getString("BL") ?: "",
                         TipoVehiculo = resultSet.getString("TipoVehiculo") ?: "",
                         TipoCombustible = resultSet.getString("TipoCombustible") ?: "",
-                        IdEmpresa = "", // No existe en el esquema actual
-                        FechaCreacion = "", // No existe en el esquema actual
+                        IdPaso4LogVehiculo = resultSet.getInt("IdPaso4LogVehiculo")?:0
                     )
                     primera=true
                 }

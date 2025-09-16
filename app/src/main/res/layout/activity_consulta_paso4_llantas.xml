@@ -102,6 +102,16 @@
             android:gravity="center" />
 
         <TextView
+            android:id="@+id/tvLlantasVeirifcadas"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="0 verificadas"
+            android:textSize="12sp"
+            android:textColor="#424242"
+            android:gravity="center" />
+
+        <TextView
             android:id="@+id/tvTotalFotos"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
