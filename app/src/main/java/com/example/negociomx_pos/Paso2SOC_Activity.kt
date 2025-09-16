@@ -21,7 +21,9 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_pos.BE.Paso2LogVehiculo
 import com.example.negociomx_pos.BE.Vehiculo
+import com.example.negociomx_pos.BE.VehiculoPaso2
 import com.example.negociomx_pos.DAL.DALVehiculo
+import com.example.negociomx_pos.Utils.BLLUtils
 import com.example.negociomx_pos.Utils.ParametrosSistema
 import com.example.negociomx_pos.databinding.ActivityPaso2SocBinding
 import kotlinx.coroutines.launch
@@ -34,7 +36,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPaso2SocBinding
     private val dalVehiculo = DALVehiculo()
-    private var vehiculoActual: Vehiculo? = null
+    private var vehiculoActual: VehiculoPaso2? = null
 
     // Variables para manejo de loading
     private lateinit var loadingContainer: LinearLayout
@@ -55,9 +57,11 @@ class Paso2SOC_Activity : AppCompatActivity() {
     private var currentPhotoType: Int = 0
     private var fotoUri: Uri? = null
 
+    var bllUtil: BLLUtils?=null
+
     // Variables para control de datos
     private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.Id?.toInt()!!
-    private var paso2LogVehiculoExistente: Paso2LogVehiculo? = null
+    //private var paso2LogVehiculoExistente: Paso2LogVehiculo? = null
 
     // ✅ LAUNCHER PARA CÁMARA
     private val camaraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
@@ -84,6 +88,8 @@ class Paso2SOC_Activity : AppCompatActivity() {
         binding = ActivityPaso2SocBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        bllUtil=BLLUtils()
+
         configurarEventos()
         verificarPermisos()
     }
@@ -108,7 +114,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
 
         // ✅ BOTONES DE EVIDENCIAS
         binding.btnEvidencia1.setOnClickListener {
-            if (paso2LogVehiculoExistente?.TieneFoto1 == true) {
+            if (vehiculoActual?.TieneFoto1 == true) {
                 verFotoExistente(1)
             } else {
                 capturarEvidencia(1)
@@ -116,7 +122,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
         }
 
         binding.btnEvidencia2.setOnClickListener {
-            if (paso2LogVehiculoExistente?.TieneFoto2 == true) {
+            if (vehiculoActual?.TieneFoto2 == true) {
                 verFotoExistente(2)
             } else {
                 capturarEvidencia(2)
@@ -124,7 +130,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
         }
 
         binding.btnEvidencia3.setOnClickListener {
-            if (paso2LogVehiculoExistente?.TieneFoto3 == true) {
+            if (vehiculoActual?.TieneFoto3 == true) {
                 verFotoExistente(3)
             } else {
                 capturarEvidencia(3)
@@ -132,7 +138,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
         }
 
         binding.btnEvidencia4.setOnClickListener {
-            if (paso2LogVehiculoExistente?.TieneFoto4 == true) {
+            if (vehiculoActual?.TieneFoto4 == true) {
                 verFotoExistente(4)
             } else {
                 capturarEvidencia(4)
@@ -173,12 +179,12 @@ class Paso2SOC_Activity : AppCompatActivity() {
 
                 Toast.makeText(this@Paso2SOC_Activity, "Consultando vehículo...", Toast.LENGTH_SHORT).show()
 
-                val vehiculo = dalVehiculo.consultarVehiculoPorVIN(vin)
+                val vehiculo = dalVehiculo.consultarVehiculoPorVINParaPaso2(vin)
                 if (vehiculo != null) {
                     vehiculoActual = vehiculo
 
                     // ✅ CONSULTAR FOTOS PASO2 EXISTENTES
-                    paso2LogVehiculoExistente = dalVehiculo.consultarFotosPaso2Existentes(vehiculo.Id.toInt())
+                    //paso2LogVehiculoExistente = dalVehiculo.consultarFotosPaso2Existentes(vehiculo.Id.toInt())
 
                     mostrarInformacionVehiculo(vehiculo)
                     mostrarSeccionEvidencias()
@@ -216,7 +222,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
         }
     }
 
-    private fun mostrarInformacionVehiculo(vehiculo: Vehiculo) {
+    private fun mostrarInformacionVehiculo(vehiculo:VehiculoPaso2) {
         binding.apply {
             tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
             tvMarcaModeloAnnio.text = "${vehiculo.Marca} - ${vehiculo.Modelo}, ${vehiculo.Anio}"
@@ -245,9 +251,9 @@ class Paso2SOC_Activity : AppCompatActivity() {
     }
 
     private fun configurarBotonesSegunFotos() {
-        paso2LogVehiculoExistente?.let { paso2 ->
+        vehiculoActual?.let { paso2 ->
             // Configurar botón evidencia 1
-            if (paso2.TieneFoto1) {
+            if (paso2.TieneFoto1!!) {
                 binding.btnEvidencia1.text = "👁️ Ver Foto 1"
                 binding.tvEstadoEvidencia1.text = "📷"
             } else {
@@ -256,7 +262,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
             }
 
             // Configurar botón evidencia 2
-            if (paso2.TieneFoto2) {
+            if (paso2.TieneFoto2!!) {
                 binding.btnEvidencia2.text = "👁️ Ver Foto 2"
                 binding.tvEstadoEvidencia2.text = "📷"
             } else {
@@ -265,7 +271,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
             }
 
             // Configurar botón evidencia 3
-            if (paso2.TieneFoto3) {
+            if (paso2.TieneFoto3!!) {
                 binding.btnEvidencia3.text = "👁️ Ver Foto 3"
                 binding.tvEstadoEvidencia3.text = "📷"
             } else {
@@ -274,7 +280,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
             }
 
             // Configurar botón evidencia 4
-            if (paso2.TieneFoto4) {
+            if (paso2.TieneFoto4!!) {
                 binding.btnEvidencia4.text = "👁️ Ver Foto 4"
                 binding.tvEstadoEvidencia4.text = "📷"
             } else {
@@ -285,12 +291,12 @@ class Paso2SOC_Activity : AppCompatActivity() {
     }
 
     private fun contarFotosExistentes(): Int {
-        return paso2LogVehiculoExistente?.let { paso2 ->
+        return vehiculoActual?.let { paso2 ->
             var count = 0
-            if (paso2.TieneFoto1) count++
-            if (paso2.TieneFoto2) count++
-            if (paso2.TieneFoto3) count++
-            if (paso2.TieneFoto4) count++
+            if (paso2.TieneFoto1!!) count++
+            if (paso2.TieneFoto2!!) count++
+            if (paso2.TieneFoto3!!) count++
+            if (paso2.TieneFoto4!!) count++
             count
         } ?: 0
     }
@@ -492,7 +498,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
                 Toast.makeText(this@Paso2SOC_Activity, "Guardando evidencias del Paso 2...", Toast.LENGTH_SHORT).show()
 
                 // ✅ 1. CREAR O OBTENER REGISTRO PASO2
-                var idPaso2LogVehiculo = paso2LogVehiculoExistente?.IdPaso2LogVehiculo ?: 0
+                var idPaso2LogVehiculo = vehiculoActual?.IdPaso2LogVehiculo ?: 0
 
                 if (idPaso2LogVehiculo == 0) {
                     // Crear nuevo registro
@@ -509,28 +515,28 @@ class Paso2SOC_Activity : AppCompatActivity() {
                     var exitoFotos = true
 
                     if (evidencia1Capturada && evidencia1File != null) {
-                        val fotoBase64 = convertirImagenABase64(evidencia1File!!)
+                        val fotoBase64 = bllUtil?.convertirImagenABase64(evidencia1File!!)
                         if (fotoBase64 != null) {
                             exitoFotos = exitoFotos && dalVehiculo.actualizarFotoPaso2(idPaso2LogVehiculo, 1, fotoBase64)
                         }
                     }
 
                     if (evidencia2Capturada && evidencia2File != null) {
-                        val fotoBase64 = convertirImagenABase64(evidencia2File!!)
+                        val fotoBase64 = bllUtil?.convertirImagenABase64(evidencia2File!!)
                         if (fotoBase64 != null) {
                             exitoFotos = exitoFotos && dalVehiculo.actualizarFotoPaso2(idPaso2LogVehiculo, 2, fotoBase64)
                         }
                     }
 
                     if (evidencia3Capturada && evidencia3File != null) {
-                        val fotoBase64 = convertirImagenABase64(evidencia3File!!)
+                        val fotoBase64 =bllUtil?.convertirImagenABase64(evidencia3File!!)
                         if (fotoBase64 != null) {
                             exitoFotos = exitoFotos && dalVehiculo.actualizarFotoPaso2(idPaso2LogVehiculo, 3, fotoBase64)
                         }
                     }
 
                     if (evidencia4Capturada && evidencia4File != null) {
-                        val fotoBase64 = convertirImagenABase64(evidencia4File!!)
+                        val fotoBase64 =bllUtil?.convertirImagenABase64(evidencia4File!!)
                         if (fotoBase64 != null) {
                             exitoFotos = exitoFotos && dalVehiculo.actualizarFotoPaso2(idPaso2LogVehiculo, 4, fotoBase64)
                         }
@@ -623,16 +629,6 @@ class Paso2SOC_Activity : AppCompatActivity() {
         }
     }
 
-    private fun convertirImagenABase64(archivo: File): String? {
-        return try {
-            val bytes = archivo.readBytes()
-            android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
-        } catch (e: Exception) {
-            Log.e("Paso2SOC", "Error convirtiendo imagen a Base64: ${e.message}")
-            null
-        }
-    }
-
     private fun mostrarCargaConMensajes() {
         loadingContainer.visibility = View.VISIBLE
         binding.btnGuardarPaso2.isEnabled = false
@@ -701,7 +697,6 @@ class Paso2SOC_Activity : AppCompatActivity() {
         evidencia2Capturada = false
         evidencia3Capturada = false
         evidencia4Capturada = false
-        paso2LogVehiculoExistente = null
         ocultarSecciones()
     }
 

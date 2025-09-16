@@ -21,7 +21,9 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_pos.BE.Paso3LogVehiculo
 import com.example.negociomx_pos.BE.Vehiculo
+import com.example.negociomx_pos.BE.VehiculoPaso3
 import com.example.negociomx_pos.DAL.DALVehiculo
+import com.example.negociomx_pos.Utils.BLLUtils
 import com.example.negociomx_pos.Utils.ParametrosSistema
 import com.example.negociomx_pos.databinding.ActivityPaso3RepuveBinding
 import kotlinx.coroutines.launch
@@ -34,7 +36,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPaso3RepuveBinding
     private val dalVehiculo = DALVehiculo()
-    private var vehiculoActual: Vehiculo? = null
+    private var vehiculoActual: VehiculoPaso3? = null
 
     // Variables para manejo de loading
     private lateinit var loadingContainer: LinearLayout
@@ -51,6 +53,8 @@ class Paso3Repuve_Activity : AppCompatActivity() {
     // Variables para control de datos
     private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.Id?.toInt()!!
     private var paso3LogVehiculoExistente: Paso3LogVehiculo? = null
+
+    var bllUtil:BLLUtils?=null
 
     // ✅ LAUNCHER PARA CÁMARA
     private val camaraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
@@ -76,6 +80,8 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityPaso3RepuveBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        bllUtil=BLLUtils()
 
         configurarEventos()
         verificarPermisos()
@@ -142,12 +148,9 @@ class Paso3Repuve_Activity : AppCompatActivity() {
 
                 Toast.makeText(this@Paso3Repuve_Activity, "Consultando vehículo...", Toast.LENGTH_SHORT).show()
 
-                val vehiculo = dalVehiculo.consultarVehiculoPorVIN(vin)
+                val vehiculo = dalVehiculo.consultarVehiculoPorVINParaPaso3(vin)
                 if (vehiculo != null) {
                     vehiculoActual = vehiculo
-
-                    // ✅ CONSULTAR FOTO PASO3 EXISTENTE
-                    paso3LogVehiculoExistente = dalVehiculo.consultarFotoPaso3Existente(vehiculo.Id.toInt())
 
                     mostrarInformacionVehiculo(vehiculo)
                     mostrarSeccionEvidencia()
@@ -185,7 +188,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         }
     }
 
-    private fun mostrarInformacionVehiculo(vehiculo: Vehiculo) {
+    private fun mostrarInformacionVehiculo(vehiculo: VehiculoPaso3) {
         binding.apply {
             tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
             tvMarcaModeloAnnio.text = "${vehiculo.Marca} - ${vehiculo.Modelo}, ${vehiculo.Anio}"
@@ -213,22 +216,6 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         }
     }
 
-   /* private fun configurarBotonSegunFoto() {
-        paso3LogVehiculoExistente?.let { paso3 ->
-            if (paso3.TieneFoto) {
-                binding.btnEvidencia.text = "👁️ Ver Foto REPUVE"
-                binding.btnEvidencia.backgroundTintList = ContextCompat.getColorStateList(this, android.R.color.holo_blue_dark)
-                binding.tvEstadoEvidencia.text = "📷"
-                binding.btnGuardarPaso3.isEnabled = false
-                binding.btnGuardarPaso3.alpha = 0.5f
-                binding.tvMensajeInfo.text = "✅ Foto REPUVE ya registrada - No se puede modificar"
-            } else {
-                binding.btnEvidencia.text = "📷 Tomar Foto REPUVE"
-                binding.btnEvidencia.backgroundTintList = ContextCompat.getColorStateList(this, android.R.color.holo_orange_dark)
-                binding.tvEstadoEvidencia.text = "❌"
-            }
-        }
-    }*/
    private fun configurarBotonSegunFoto() {
        paso3LogVehiculoExistente?.let { paso3 ->
            if (paso3.TieneFoto) {
@@ -250,8 +237,6 @@ class Paso3Repuve_Activity : AppCompatActivity() {
            binding.tvEstadoEvidencia.text = "❌"
        }
    }
-
-
 
     private fun capturarEvidencia() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -417,12 +402,11 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         }
 
         mostrarCargaConMensajes()
-
         lifecycleScope.launch {
             try {
                 Toast.makeText(this@Paso3Repuve_Activity, "Guardando foto REPUVE...", Toast.LENGTH_SHORT).show()
 
-                val fotoBase64 = convertirImagenABase64(evidenciaFile!!)
+                val fotoBase64 =bllUtil?.convertirImagenABase64(evidenciaFile!!)
                 if (fotoBase64 != null) {
                     val idPaso3LogVehiculo = dalVehiculo.insertarPaso3LogVehiculo(
                         idVehiculo = vehiculo.Id.toInt(),
@@ -446,7 +430,6 @@ class Paso3Repuve_Activity : AppCompatActivity() {
 
                         // ✅ RECONFIGURAR BOTÓN PARA MODO VER
                         binding.btnEvidencia.text = "👁️ Ver Foto REPUVE"
-          //              binding.btnEvidencia.backgroundTintList = ContextCompat.getColorStateList(this, android.R.color.holo_blue_dark)
                         binding.tvEstadoEvidencia.text = "📷"
                         binding.btnGuardarPaso3.isEnabled = false
                         binding.btnGuardarPaso3.alpha = 0.5f
@@ -538,16 +521,6 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("Paso3REPUVE", "Error comprimiendo imagen: ${e.message}")
             archivoOriginal
-        }
-    }
-
-    private fun convertirImagenABase64(archivo: File): String? {
-        return try {
-            val bytes = archivo.readBytes()
-            android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
-        } catch (e: Exception) {
-            Log.e("Paso3REPUVE", "Error convirtiendo imagen a Base64: ${e.message}")
-            null
         }
     }
 

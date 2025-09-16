@@ -1,6 +1,6 @@
 package com.example.negociomx_pos.BE
 
-data class Vehiculo(
+data class VehiculoPaso2(
     var Id: String = "",
     var VIN: String = "",
     var Marca: String = "",
@@ -11,20 +11,19 @@ data class Vehiculo(
     var Placa: String = "",
     var NumeroSerie: String = "",
     var IdEmpresa: String = "",
-    var Activo: Boolean = true,
     var FechaCreacion: String = "",
     var FechaModificacion: String = "",
     var TipoCombustible:String="",
     var TipoVehiculo:String="",
     var BL:String="",
 
-    // ✅ CAMPOS SOC (State of Charge)
-    var Odometro: Int = 0,
-    var Bateria: Int = 0,
-    var ModoTransporte: Boolean = false,
-    var RequiereRecarga: Boolean = false,
-    var Evidencia1: String = "",
-    var Evidencia2: String = "",
-    var FechaActualizacion: String = ""
-
+    var IdPaso2LogVehiculo:Int?=null,
+    var TieneFoto1:Boolean?=null,
+    var TieneFoto2:Boolean?=null,
+    var TieneFoto3:Boolean?=null,
+    var TieneFoto4:Boolean?=null,
+    var NombreArchivoFoto1:String="",
+    var NombreArchivoFoto2:String="",
+    var NombreArchivoFoto3:String="",
+    var NombreArchivoFoto4:String=""
 )

@@ -155,7 +155,6 @@ class ConsultaPaso3Repuve_Activity : AppCompatActivity() {
                 val estadisticas = dalConsultaPaso3.obtenerEstadisticasPaso3PorFecha(fechaSeleccionada)
 
                 ocultarCarga()
-
                 if (registros.isNotEmpty()) {
                     mostrarResultados(registros, estadisticas)
                     Toast.makeText(this@ConsultaPaso3Repuve_Activity,
@@ -238,7 +237,6 @@ class ConsultaPaso3Repuve_Activity : AppCompatActivity() {
         }
 
         tvMensajeSinResultados.text = "para la fecha $fechaMostrar"
-
         recyclerViewRegistros.visibility = View.GONE
         layoutEstadisticas.visibility = View.GONE
         layoutSinResultados.visibility = View.VISIBLE
@@ -267,22 +265,12 @@ class ConsultaPaso3Repuve_Activity : AppCompatActivity() {
 
         mensaje.append("📸 INFORMACIÓN REPUVE\n\n")
         mensaje.append("Tiene foto: ${if (registro.TieneFoto) "✅ Sí" else "❌ No"}\n")
-        mensaje.append("Archivo: ${registro.NombreArchivoFoto}\n")
-        mensaje.append("Fecha de registro: ${registro.FechaAlta.substring(0, 19)}\n")
-        mensaje.append("Usuario: ${registro.IdUsuarioNube}\n")
+        mensaje.append("Fecha -> ${registro.FechaAlta.substring(0, 19)}\n")
 
-        dialog.setTitle("📋 Detalle del Registro Paso 3 REPUVE")
+        dialog.setTitle("📋 Detalle del Registro REPUVE")
         dialog.setMessage(mensaje.toString())
         dialog.setPositiveButton("Cerrar") { dialogInterface, _ ->
             dialogInterface.dismiss()
-        }
-
-        // Opcional: Agregar botón para ver foto (si implementas visualización de fotos)
-        if (registro.TieneFoto) {
-            dialog.setNeutralButton("Ver Foto") { _, _ ->
-                // Aquí puedes implementar la visualización de la foto si lo deseas
-                Toast.makeText(this, "Función de ver foto REPUVE - Por implementar", Toast.LENGTH_SHORT).show()
-            }
         }
 
         dialog.show()

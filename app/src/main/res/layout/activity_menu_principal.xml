@@ -157,6 +157,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:gravity="center_vertical"
         android:layout_marginTop="10dp"
         android:layout_marginLeft="10dp"
         android:orientation="horizontal"
@@ -182,6 +183,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Vehículo" />
+
+        <Button
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp"
+            android:id="@+id/btnCargaMasivaXls"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Carga de VINs" />
     </LinearLayout>
 
     <TextView

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.Window
 import android.widget.Button
 import android.widget.ImageView
@@ -45,6 +46,7 @@ import com.example.negociomx_pos.room.entities.UnidadMedida
 import com.example.negociomx_pos.room.enums.TipoUsoSistemaEnum
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+
 
 class menu_principal_activity : AppCompatActivity() {
 
@@ -130,6 +132,7 @@ class menu_principal_activity : AppCompatActivity() {
         val btnConsultaPaso3 =findViewById<Button>(R.id.btnConsultaPaso3)
         val btnPaso4Fotos=findViewById<Button>(R.id.btnPaso4Fotos)
         val btnConsultaPaso4 =findViewById<Button>(R.id.btnConsultaPaso4)
+        val btnCargaMasivaVins =findViewById<Button>(R.id.btnCargaMasivaXls)
 
 
         getEmpresaNubeCfgNubeCfgNVNube()
@@ -150,7 +153,7 @@ class menu_principal_activity : AppCompatActivity() {
         btnRadmin.isVisible=visibleBtns
         btnEmpresas.isVisible=visibleBtns
         btnVehiculo.isVisible=visibleBtns
-
+        btnCargaMasivaVins.isVisible=visibleBtns
 
         btnUm.setOnClickListener {
             val intent = Intent(this, unidadmedida_activity::class.java)
@@ -273,6 +276,12 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, alta_vehiculo::class.java)
             startActivity(intent)
         }
+        btnCargaMasivaVins.setOnClickListener {
+            val intent=Intent(Intent.ACTION_GET_CONTENT, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
+            intent.putExtra("CargaMasiva",true)
+            intent.setType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            startForResult.launch(intent)
+        }
     }
 
     private fun verificarCatalogosDeNubePorActualizarLocalmente() {
@@ -311,8 +320,10 @@ class menu_principal_activity : AppCompatActivity() {
     }
 
     private fun ejecutaSeleccionSistemaOnlineUOffline() {
-        bllUtil.MessageShow(this,"Aceptar","",
-            "Desea seguir trabajando con el sistema OFFLINE","Pregunta",){
+        bllUtil.MessageShow(
+            this, "Aceptar", "",
+            "Desea seguir trabajando con el sistema OFFLINE", "Pregunta",
+        ){
                 res->
             if(res==1)
             {
@@ -1075,11 +1086,18 @@ class menu_principal_activity : AppCompatActivity() {
             result: ActivityResult ->
         if(result.resultCode== Activity.RESULT_OK)
         {
-            val intent=result.data
+            var intent = result.data
+            var cargaMasiva:Boolean?=intent?.getBooleanExtra("CargaMasiva",false)
+            cargaMasiva=true
+            if(cargaMasiva==true)
+            {
 
-            idDocumentoPendiente=intent?.extras?.getInt("idDocumentoPendiente")!!
+            }
+            else {
+                idDocumentoPendiente = intent?.extras?.getInt("idDocumentoPendiente")!!
 
-            if(idDocumentoPendiente!=null && idDocumentoPendiente!!>0) {
+                if (idDocumentoPendiente != null && idDocumentoPendiente!! > 0) {
+                }
             }
         }
     }

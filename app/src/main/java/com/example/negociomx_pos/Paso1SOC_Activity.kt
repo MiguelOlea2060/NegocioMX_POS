@@ -37,6 +37,7 @@ import android.widget.Button
 import androidx.core.util.rangeTo
 import com.example.negociomx_pos.BE.VehiculoPaso1
 import com.example.negociomx_pos.BLL.BLLVehiculo
+import com.example.negociomx_pos.Utils.BLLUtils
 
 
 class Paso1SOC_Activity : AppCompatActivity() {
@@ -77,6 +78,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
     private var puedeCapturarFotos12: Boolean = true
     private var puedeCapturarFotos34: Boolean = false
     private var idPaso1LogVehiculoExistente: Int = -1
+    var bllUtil: BLLUtils?=null
 
 
     // ✅ LAUNCHER PARA ESCÁNER DE CÓDIGOS
@@ -115,6 +117,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityPaso1SocBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        bllUtil= BLLUtils()
 
         configurarEventos()
         verificarPermisos()
@@ -241,21 +245,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
                 if (vehiculo != null) {
                     vehiculoActual = vehiculo
 
-                    // ✅ CONSULTAR DATOS SOC EXISTENTES Y DETERMINAR ESTADO
-                    // Miguelon esta consulta es innecesario, modifique el script anterior para que traiga esots
-                    // datos
-                    //val datosSOCExistentes = dalVehiculo.consultarDatosSOCExistentes(vehiculo?.Id?.toInt()!!)
                     var datosSOCExistentes:Vehiculo?=null
                     if(vehiculoPaso1!=null && vehiculoPaso1?.IdPaso1LogVehiculo!!>0)
                         datosSOCExistentes=vehiculo
-
-                    //Miguelon, esta consulta es innecesaria porque tambien lo agrege a la primera consulta de la linea 238
-                    //solo era agregarla a la consulta
-                    //idPaso1LogVehiculoExistente = dalVehiculo.obtenerIdPaso1LogVehiculoExistente(vehiculo?.Id?.toInt()!!)
-
-// ✅ CONSULTAR FOTOS EXISTENTES
-                    // Moguelon esta consulta es innecesaria porque tambien la agreue a la primera consulta
-                    //status = dalVehiculo.consultarFotosExistentes(vehiculo?.Id?.toInt()!!)
 
 // ✅ DETERMINAR EN QUÉ ENTRADA ESTAMOS
                     if (datosSOCExistentes != null) {
@@ -294,7 +286,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     }
 
                     mostrarInformacionVehiculo(vehiculo!!)
-
                     // ✅ MOSTRAR DATOS SOC SI EXISTEN
                     if (datosSOCExistentes != null && vehiculoPaso1?.IdPaso1LogVehiculo!!>0) {
                         tieneRegistroSOC = true
@@ -661,16 +652,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
     }
 
-    private fun convertirImagenABase64(archivo: File): String? {
-        return try {
-            val bytes = archivo.readBytes()
-            android.util.Base64.encodeToString(bytes, android.util.Base64.DEFAULT)
-        } catch (e: Exception) {
-            Log.e("Paso1SOC", "Error convirtiendo imagen a Base64: ${e.message}")
-            null
-        }
-    }
-
     private fun procesarFoto(uri: Uri) {
         try {
             Log.d("Paso1SOC", "📸 Procesando foto para evidencia $currentPhotoType")
@@ -912,7 +893,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     // Solo permitir guardar nuevas fotos si no tiene registro SOC previo
                     if (!tieneRegistroSOC) {
                         if (evidencia1Capturada && evidencia1File != null) {
-                            val fotoBase64 = convertirImagenABase64(evidencia1File!!)
+                            val fotoBase64 =bllUtil?.convertirImagenABase64(evidencia1File!!)
                             exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
                                 idPaso1LogVehiculo = idPaso1LogVehiculo,
                                 idEntidadArchivoFoto = null,
@@ -925,7 +906,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                         }
 
                         if (evidencia2Capturada && evidencia2File != null) {
-                            val fotoBase64 = convertirImagenABase64(evidencia2File!!)
+                            val fotoBase64 = bllUtil?.convertirImagenABase64(evidencia2File!!)
                             exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
                                 idPaso1LogVehiculo = idPaso1LogVehiculo,
                                 idEntidadArchivoFoto = null,
@@ -939,7 +920,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     } else {
                         // Si ya tiene registro SOC, solo permitir fotos 3 y 4
                         if (evidencia3Capturada && evidencia3File != null) {
-                            val fotoBase64 = convertirImagenABase64(evidencia3File!!)
+                            val fotoBase64 = bllUtil?.convertirImagenABase64(evidencia3File!!)
                             exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
                                 idPaso1LogVehiculo = idPaso1LogVehiculo,
                                 idEntidadArchivoFoto = null,
@@ -952,7 +933,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                         }
 
                         if (evidencia4Capturada && evidencia4File != null) {
-                            val fotoBase64 = convertirImagenABase64(evidencia4File!!)
+                            val fotoBase64 = bllUtil?.convertirImagenABase64(evidencia4File!!)
                             exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
                                 idPaso1LogVehiculo = idPaso1LogVehiculo,
                                 idEntidadArchivoFoto = null,
@@ -997,7 +978,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun validarFotosMinimas(): Pair<Boolean, String> {
         return when {
@@ -1073,7 +1053,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
         ocultarSeccionesSOC()
     }
 
-
     private fun configurarBotonesSegunFotos() {
         if (vehiculoPaso1 == null) return
 
@@ -1134,7 +1113,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun mostrarBotonesEvidenciasAdicionales() {
         // Mostrar layouts de evidencias 3 y 4

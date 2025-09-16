@@ -10,6 +10,8 @@ import com.example.negociomx_pos.BE.StatusFotoVehiculo
 import com.example.negociomx_pos.BE.Transmision
 import com.example.negociomx_pos.BE.Vehiculo
 import com.example.negociomx_pos.BE.VehiculoPaso1
+import com.example.negociomx_pos.BE.VehiculoPaso2
+import com.example.negociomx_pos.BE.VehiculoPaso3
 import com.example.negociomx_pos.Utils.ConexionSQLServer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -463,6 +465,169 @@ class DALVehiculo {
         return@withContext vehiculo
     }
 
+    suspend fun consultarVehiculoPorVINParaPaso2(vin: String): VehiculoPaso2? = withContext(Dispatchers.IO) {
+        var vehiculo: VehiculoPaso2? = null
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try  {
+            //Log.d("DALVehiculo", "🔍 Consultando vehículo con VIN: $vin")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext null
+            }
+
+            // ✅ QUERY CORREGIDO PARA EL ESQUEMA REAL DE LA BASE DE DATOS
+            val query = """                
+                select v.vin, v.idmarca, v.idmodelo, ma.nombre Marca, m.nombre Modelo, v.Annio, Motor, v.idvehiculo
+                        , ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, tv.Nombre TipoVehiculo
+                        , bl ,p.Idpaso2logvehiculo, p.Tienefoto1, p.Tienefoto2, p.Tienefoto3, p.Tienefoto4,
+        p.Nombrearchivofoto1, p.Nombrearchivofoto2, p.Nombrearchivofoto3, p.Nombrearchivofoto4
+                from vehiculo v  left join dbo.paso2logvehiculo p with (nolock) on v.IdVehiculo=p.Idvehiculo 
+                        inner join dbo.MarcaAuto ma with (nolock) on v.IdMarca=ma.IdMarcaAuto
+                        inner join dbo.Modelo m with (nolock) on v.IdModelo=m.IdModelo
+                        left join dbo.VehiculoColor vc with (nolock) on v.IdVehiculo=vc.IdVehiculo
+                        left join dbo.Color ce with (nolock) on vc.IdColor=ce.IdColor
+                        left join dbo.Color ci with (nolock) on vc.IdColorInterior=ci.IdColor
+                        left join dbo.TipoCombustible tc with (nolock) on v.idtipocombustible=tc.idtipocombustible
+                        left join dbo.tipovehiculo tv with (nolock) on v.idtipovehiculo=tv.idtipovehiculo
+                        left join dbo.bl b with (nolock) on v.idbl=b.idbl
+                where v.vin = ?
+              
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setString(1, vin)
+
+            resultSet = statement.executeQuery()
+
+            if (resultSet.next()) {
+                vehiculo = VehiculoPaso2(
+                    Id = resultSet.getInt("IdVehiculo").toString(),
+                    VIN = resultSet.getString("Vin") ?: "",
+                    Marca = resultSet.getString("Marca") ?: "",
+                    Modelo = resultSet.getString("Modelo") ?: "",
+                    Anio = resultSet.getInt("Annio"),
+                    ColorExterior = resultSet.getString("ColorExterior") ?: "",
+                    ColorInterior = resultSet.getString("ColorInterior") ?: "",
+                    BL = resultSet.getString("ColorInterior") ?: "",
+                    NumeroSerie = resultSet.getString("BL") ?: "",
+                    TipoVehiculo = resultSet.getString("TipoVehiculo") ?: "",
+                    TipoCombustible = resultSet.getString("TipoCombustible") ?: "",
+                    IdEmpresa = "", // No existe en el esquema actual
+                    FechaCreacion = "", // No existe en el esquema actual
+                    IdPaso2LogVehiculo=resultSet.getInt("IdPaso2LogVehiculo")?:0,
+                    TieneFoto1=resultSet.getBoolean("TieneFoto1")?:false,
+                    TieneFoto2=resultSet.getBoolean("TieneFoto2")?:false,
+                    TieneFoto3=resultSet.getBoolean("TieneFoto3")?:false,
+                    TieneFoto4=resultSet.getBoolean("TieneFoto4")?:false,
+                    NombreArchivoFoto1=resultSet.getString("NombreArchivoFoto1")?:"",
+                     NombreArchivoFoto2=resultSet.getString("NombreArchivoFoto2")?:"",
+                     NombreArchivoFoto3=resultSet.getString("NombreArchivoFoto3")?:"",
+                     NombreArchivoFoto4=resultSet.getString("NombreArchivoFoto4")?:""
+                )
+                //Log.d("DALVehiculo", "✅ Vehículo encontrado: ${vehiculo.Marca} ${vehiculo.Modelo} ${vehiculo.Anio}")
+            } else {
+                //Log.d("DALVehiculo", "❌ No se encontró vehículo con VIN: $vin")
+            }
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error consultando vehículo: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+        return@withContext vehiculo
+    }
+
+    suspend fun consultarVehiculoPorVINParaPaso3(vin: String): VehiculoPaso3? = withContext(Dispatchers.IO) {
+        var vehiculo: VehiculoPaso3? = null
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try  {
+            //Log.d("DALVehiculo", "🔍 Consultando vehículo con VIN: $vin")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext null
+            }
+
+            // ✅ QUERY CORREGIDO PARA EL ESQUEMA REAL DE LA BASE DE DATOS
+            val query = """                
+                select v.vin, v.idmarca, v.idmodelo, ma.nombre Marca, m.nombre Modelo, v.Annio, Motor, v.idvehiculo
+                       ,ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, tv.Nombre TipoVehiculo
+                       , bl, p.IdPaso3LogVehiculo, p.Tienefoto, p.NombreArchivoFoto, p.FechaAlta FechaAltaFoto                        
+                from vehiculo v left join dbo.paso3logvehiculo p with (nolock) on v.IdVehiculo=p.Idvehiculo 
+                        inner join dbo.MarcaAuto ma with (nolock) on v.IdMarca=ma.IdMarcaAuto
+                        inner join dbo.Modelo m with (nolock) on v.IdModelo=m.IdModelo
+                        left join dbo.VehiculoColor vc with (nolock) on v.IdVehiculo=vc.IdVehiculo
+                        left join dbo.Color ce with (nolock) on vc.IdColor=ce.IdColor
+                        left join dbo.Color ci with (nolock) on vc.IdColorInterior=ci.IdColor
+                        left join dbo.TipoCombustible tc with (nolock) on v.idtipocombustible=tc.idtipocombustible
+                        left join dbo.tipovehiculo tv with (nolock) on v.idtipovehiculo=tv.idtipovehiculo
+                        left join dbo.bl b with (nolock) on v.idbl=b.idbl
+                where v.vin = ?
+              
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setString(1, vin)
+
+            resultSet = statement.executeQuery()
+
+            if (resultSet.next()) {
+                vehiculo = VehiculoPaso3(
+                    Id = resultSet.getInt("IdVehiculo").toString(),
+                    VIN = resultSet.getString("Vin") ?: "",
+                    Marca = resultSet.getString("Marca") ?: "",
+                    Modelo = resultSet.getString("Modelo") ?: "",
+                    Anio = resultSet.getInt("Annio"),
+                    ColorExterior = resultSet.getString("ColorExterior") ?: "",
+                    ColorInterior = resultSet.getString("ColorInterior") ?: "",
+                    BL = resultSet.getString("ColorInterior") ?: "",
+                    NumeroSerie = resultSet.getString("BL") ?: "",
+                    TipoVehiculo = resultSet.getString("TipoVehiculo") ?: "",
+                    TipoCombustible = resultSet.getString("TipoCombustible") ?: "",
+                    IdEmpresa = "", // No existe en el esquema actual
+                    FechaCreacion = "", // No existe en el esquema actual
+                    IdPaso3LogVehiculo=resultSet.getInt("IdPaso3LogVehiculo")?:0,
+                     TieneFoto=resultSet.getBoolean("TieneFoto")?:false,
+                    NombreArchivoFoto=resultSet.getString("NombreArchivoFoto")?:"",
+                    FechaAltaFoto=resultSet.getString("FechaAltaFoto")?:""
+                )
+                //Log.d("DALVehiculo", "✅ Vehículo encontrado: ${vehiculo.Marca} ${vehiculo.Modelo} ${vehiculo.Anio}")
+            } else {
+                //Log.d("DALVehiculo", "❌ No se encontró vehículo con VIN: $vin")
+            }
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error consultando vehículo: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+        return@withContext vehiculo
+    }
+
+
     // ✅ ACTUALIZAR DATOS SOC DEL VEHÍCULO - NECESITARÁS AGREGAR ESTAS COLUMNAS A TU TABLA
     suspend fun actualizarSOC(
         vin: String,
@@ -846,7 +1011,7 @@ class DALVehiculo {
     }
 
     // ✅ CONSULTAR FOTOS EXISTENTES PASO2
-    suspend fun consultarFotosPaso2Existentes(idVehiculo: Int): Paso2LogVehiculo? = withContext(Dispatchers.IO) {
+/*    suspend fun consultarFotosPaso2Existentes(idVehiculo: Int): Paso2LogVehiculo? = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
         var resultSet: ResultSet? = null
@@ -904,7 +1069,7 @@ class DALVehiculo {
         }
 
         return@withContext paso2LogVehiculo
-    }
+    }*/
 
     // ✅ OBTENER FOTO BASE64 PASO2
     suspend fun obtenerFotoBase64Paso2(idVehiculo: Int, numeroFoto: Int): String? = withContext(Dispatchers.IO) {
@@ -1009,61 +1174,6 @@ class DALVehiculo {
         }
     }
 
-    // ✅ CONSULTAR FOTO PASO3 EXISTENTE
-    suspend fun consultarFotoPaso3Existente(idVehiculo: Int): Paso3LogVehiculo? = withContext(Dispatchers.IO) {
-        var conexion: Connection? = null
-        var statement: PreparedStatement? = null
-        var resultSet: ResultSet? = null
-        var paso3LogVehiculo: Paso3LogVehiculo? = null
-
-        try {
-            Log.d("DALVehiculo", "🔍 Consultando foto Paso3 existente para IdVehiculo: $idVehiculo")
-
-            conexion = ConexionSQLServer.obtenerConexion()
-            if (conexion == null) {
-                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
-                return@withContext null
-            }
-
-            val query = """
-                SELECT TOP 1 IdPaso3LogVehiculo, Tienefoto, NombreArchivoFoto, FechaAlta
-                FROM Paso3LogVehiculo 
-                WHERE IdVehiculo = ?
-                ORDER BY IdPaso3LogVehiculo DESC
-            """.trimIndent()
-
-            statement = conexion.prepareStatement(query)
-            statement.setInt(1, idVehiculo)
-            resultSet = statement.executeQuery()
-
-            if (resultSet.next()) {
-                paso3LogVehiculo = Paso3LogVehiculo(
-                    IdPaso3LogVehiculo = resultSet.getInt("IdPaso3LogVehiculo"),
-                    IdVehiculo = idVehiculo,
-                    TieneFoto = resultSet.getBoolean("Tienefoto"),
-                    NombreArchivoFoto = resultSet.getString("NombreArchivoFoto") ?: "",
-                    FechaAlta = resultSet.getString("FechaAlta") ?: ""
-                )
-            }
-
-            Log.d("DALVehiculo", "✅ Consulta Paso3 completada")
-
-        } catch (e: Exception) {
-            Log.e("DALVehiculo", "💥 Error consultando foto Paso3: ${e.message}")
-            e.printStackTrace()
-        } finally {
-            try {
-                resultSet?.close()
-                statement?.close()
-                conexion?.close()
-            } catch (e: Exception) {
-                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
-            }
-        }
-
-        return@withContext paso3LogVehiculo
-    }
-
     // ✅ OBTENER FOTO BASE64 PASO3
     suspend fun obtenerFotoBase64Paso3(idVehiculo: Int): String? = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
@@ -1098,8 +1208,6 @@ class DALVehiculo {
 
         return@withContext null
     }
-
-
 
 
     // ✅ MÉTODOS PARA PASO 4 - LLANTAS
