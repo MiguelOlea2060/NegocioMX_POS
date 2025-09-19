@@ -32,14 +32,32 @@
         android:padding="10dp"
         android:layout_marginBottom="8dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="📅 Seleccionar Fecha"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#1976D2"
-            android:layout_marginBottom="8dp" />
+        <LinearLayout
+            android:layout_marginBottom="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_weight="1"
+                android:layout_gravity="right|center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📅 Seleccionar Fecha"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1976D2"/>
+
+            <CheckBox
+                android:layout_marginLeft="20dp"
+                android:text="Todos los Usuarios"
+                android:id="@+id/chkTodosUsuarioPaso1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </CheckBox>
+
+        </LinearLayout>
 
         <!-- Sección compacta de fecha -->
         <LinearLayout

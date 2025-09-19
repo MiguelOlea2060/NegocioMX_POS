@@ -1,6 +1,8 @@
 package com.example.negociomx_pos
 
 import android.Manifest
+import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -11,6 +13,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -51,8 +54,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
     private var fotoUri: Uri? = null
 
     // Variables para control de datos
-    private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.Id?.toInt()!!
-    private var paso3LogVehiculoExistente: Paso3LogVehiculo? = null
+    private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.IdUsuario
 
     var bllUtil:BLLUtils?=null
 
@@ -107,7 +109,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
 
         // ✅ BOTÓN DE EVIDENCIA
         binding.btnEvidencia.setOnClickListener {
-            if (paso3LogVehiculoExistente?.TieneFoto == true) {
+            if (vehiculoActual?.TieneFoto == true) {
                 verFotoExistente()
             } else {
                 capturarEvidencia()
@@ -140,6 +142,23 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         }
     }
 
+    private fun configurarBotonGuardar() {
+        when {
+            vehiculoActual!=null && vehiculoActual?.IdPaso3LogVehiculo!!>0 -> {
+                binding.btnGuardarPaso3.text = "⬅️ ATRÁS"
+                binding.btnGuardarPaso3.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    android.graphics.Color.parseColor("#FF9800")
+                )
+            }
+            else -> {
+                binding.btnGuardarPaso3.text = "💾 GUARDAR"
+                binding.btnGuardarPaso3.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                    android.graphics.Color.parseColor("#4CAF50")
+                )
+            }
+        }
+    }
+
     private fun consultarVehiculo(vin: String) {
         lifecycleScope.launch {
             try {
@@ -155,8 +174,9 @@ class Paso3Repuve_Activity : AppCompatActivity() {
                     mostrarInformacionVehiculo(vehiculo)
                     mostrarSeccionEvidencia()
                     configurarBotonSegunFoto()
+                    configurarBotonGuardar()
 
-                    if (paso3LogVehiculoExistente?.TieneFoto == true) {
+                    if (vehiculoActual?.TieneFoto == true) {
                         Toast.makeText(
                             this@Paso3Repuve_Activity,
                             "✅ Vehículo encontrado. Ya tiene foto REPUVE registrada",
@@ -172,6 +192,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
                     }
 
                     ocultarCargaConsulta()
+                    hideKeyboard()
                 } else {
                     ocultarSecciones()
                     Toast.makeText(this@Paso3Repuve_Activity, "❌ Vehículo no encontrado", Toast.LENGTH_LONG).show()
@@ -217,12 +238,11 @@ class Paso3Repuve_Activity : AppCompatActivity() {
     }
 
    private fun configurarBotonSegunFoto() {
-       paso3LogVehiculoExistente?.let { paso3 ->
+       vehiculoActual?.let { paso3 ->
            if (paso3.TieneFoto) {
                binding.btnEvidencia.text = "👁️ Ver Foto REPUVE"
                binding.btnEvidencia.backgroundTintList = ContextCompat.getColorStateList(this, android.R.color.holo_blue_dark)
                binding.tvEstadoEvidencia.text = "📷"
-               binding.btnGuardarPaso3.isEnabled = false
                binding.btnGuardarPaso3.alpha = 0.5f
                binding.tvMensajeInfo.text = "✅ Foto REPUVE ya registrada - No se puede modificar"
            } else {
@@ -251,7 +271,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         }
 
         // ✅ VALIDAR SI YA EXISTE EN BD
-        if (paso3LogVehiculoExistente?.TieneFoto == true) {
+        if (vehiculoActual?.TieneFoto == true) {
             Toast.makeText(this, "Este vehículo ya tiene foto REPUVE registrada", Toast.LENGTH_LONG).show()
             return
         }
@@ -390,13 +410,13 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         }
 
         // ✅ VALIDAR QUE TENGA LA FOTO OBLIGATORIA
-        if (!evidenciaCapturada || evidenciaFile == null) {
+        if (vehiculoActual?.IdPaso3LogVehiculo==0 && ( !evidenciaCapturada || evidenciaFile == null)) {
             Toast.makeText(this, "Debe tomar la foto REPUVE obligatoria", Toast.LENGTH_LONG).show()
             return
         }
 
         // ✅ VALIDAR QUE NO EXISTA YA EN BD
-        if (paso3LogVehiculoExistente?.TieneFoto == true) {
+        if (vehiculoActual?.IdPaso3LogVehiculo==0 && vehiculoActual?.TieneFoto == true) {
             Toast.makeText(this, "Este vehículo ya tiene foto REPUVE registrada", Toast.LENGTH_LONG).show()
             return
         }
@@ -404,6 +424,12 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         mostrarCargaConMensajes()
         lifecycleScope.launch {
             try {
+                if (vehiculoActual!=null && vehiculoActual?.IdPaso3LogVehiculo!!.toInt()>0) {
+                    ocultarCarga()
+                    finish() // Cerrar actividad
+                    return@launch
+                }
+
                 Toast.makeText(this@Paso3Repuve_Activity, "Guardando foto REPUVE...", Toast.LENGTH_SHORT).show()
 
                 val fotoBase64 =bllUtil?.convertirImagenABase64(evidenciaFile!!)
@@ -422,16 +448,13 @@ class Paso3Repuve_Activity : AppCompatActivity() {
                             Toast.LENGTH_LONG).show()
 
                         // ✅ ACTUALIZAR ESTADO DESPUÉS DE GUARDAR
-                        paso3LogVehiculoExistente = Paso3LogVehiculo(
-                            IdPaso3LogVehiculo = idPaso3LogVehiculo,
-                            IdVehiculo = vehiculoActual!!.Id.toInt(),
-                            TieneFoto = true
-                        )
+                        vehiculoActual?.IdPaso3LogVehiculo = idPaso3LogVehiculo
+                        vehiculoActual?.IdVehiculo = vehiculoActual!!.Id.toInt()
+                        vehiculoActual?.TieneFoto = true
 
                         // ✅ RECONFIGURAR BOTÓN PARA MODO VER
                         binding.btnEvidencia.text = "👁️ Ver Foto REPUVE"
                         binding.tvEstadoEvidencia.text = "📷"
-                        binding.btnGuardarPaso3.isEnabled = false
                         binding.btnGuardarPaso3.alpha = 0.5f
                         binding.tvMensajeInfo.text = "✅ Foto REPUVE guardada - No se puede modificar"
 
@@ -456,6 +479,14 @@ class Paso3Repuve_Activity : AppCompatActivity() {
                 Toast.makeText(this@Paso3Repuve_Activity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    fun Activity.hideKeyboard() {
+        hideKeyboard(currentFocus ?: View(this))
+    }
+    fun Context.hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     // ✅ MÉTODOS AUXILIARES (REUTILIZADOS DE PASOS ANTERIORES)
@@ -586,7 +617,6 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         vehiculoActual = null
         evidenciaFile = null
         evidenciaCapturada = false
-        paso3LogVehiculoExistente = null
         ocultarSecciones()
     }
 

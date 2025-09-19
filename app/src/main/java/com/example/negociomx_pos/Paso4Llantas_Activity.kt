@@ -69,7 +69,7 @@ class Paso4Llantas_Activity : AppCompatActivity() {
     private var loadingRunnable: Runnable? = null
 
     // Variables para control de datos
-    private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.Id?.toInt()!!
+    private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.IdUsuario!!
 
     // ✅ VARIABLES PARA CAPTURA DE FOTOS (ADAPTADAS DE PASO3)
     private var fotoHabilitada: Boolean = true // HABILITADA AHORA

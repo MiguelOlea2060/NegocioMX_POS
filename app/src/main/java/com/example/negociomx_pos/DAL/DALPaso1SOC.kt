@@ -14,7 +14,7 @@ import java.util.*
 class DALPaso1SOC {
 
     // ✅ CONSULTAR REGISTROS PASO1 SOC POR FECHA
-    suspend fun consultarPaso1SOCPorFecha(fecha: String): List<Paso1SOCItem> = withContext(Dispatchers.IO) {
+    suspend fun consultarPaso1SOCPorFecha(fecha: String, idUsuario:Int?): List<Paso1SOCItem> = withContext(Dispatchers.IO) {
         val registros = mutableListOf<Paso1SOCItem>()
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
@@ -39,27 +39,11 @@ class DALPaso1SOC {
             val mes = calendar.get(Calendar.MONTH) + 1 // Calendar.MONTH es 0-based
             val dia = calendar.get(Calendar.DAY_OF_MONTH)
 
-            val query = """
-                SELECT v.IdVehiculo,
-                       p.IdPaso1LogVehiculo,
-                       v.Vin,
-                       b.BL,
-                       v.IdMarca,
-                       m.Nombre AS Marca,
-                       v.IdModelo,
-                       mo.Nombre AS Modelo,
-                       v.Annio,
-                       v.NumeroMotor,
-                       vc.IdColor,
-                       vc.IdColorInterior,
-                       c.Nombre AS ColorExterior,
-                       c1.Nombre AS ColorInterior,
-                       p.Odometro,
-                       p.Bateria,
-                       p.ModoTransporte,
-                       p.RequiereRecarga,
-                       p.FechaAlta,
-                       p.IdUsuarioNubeAlta,
+            var query = """
+                SELECT v.IdVehiculo, p.IdPaso1LogVehiculo, v.Vin, b.BL, v.IdMarca, m.Nombre AS Marca, v.IdModelo, 
+                       mo.Nombre AS Modelo, v.Annio, v.NumeroMotor, vc.IdColor, vc.IdColorInterior, c.Nombre 
+                       AS ColorExterior, c1.Nombre AS ColorInterior, p.Odometro, p.Bateria, p.ModoTransporte,
+                       p.RequiereRecarga, p.FechaAlta, p.IdUsuarioNubeAlta,
                        (SELECT COUNT(*) FROM Paso1LogVehiculoFotos pf WHERE pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo) AS CantidadFotos
                     ,Format((SELECT top 1 pf.FechaAlta FROM Paso1LogVehiculoFotos pf WHERE pf.Posicion=1 and pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo), 'dd/MMM/yyyy HH:mm:ss') FechaAltaFoto1
                     ,Format((SELECT top 1 pf.FechaAlta FROM Paso1LogVehiculoFotos pf WHERE pf.Posicion=2 and pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo), 'dd/MMM/yyyy HH:mm:ss') FechaAltaFoto2
@@ -72,18 +56,21 @@ class DALPaso1SOC {
                 LEFT JOIN dbo.VehiculoColor vc ON v.IdVehiculo = vc.IdVehiculo
                 LEFT JOIN dbo.Color c ON vc.IdColor = c.IdColor
                 LEFT JOIN dbo.Color c1 ON vc.IdColorInterior = c1.IdColor
-                LEFT JOIN dbo.bl b ON v.IdBL = b.IdBL
-                WHERE DATEPART(YEAR, p.FechaAlta) = ?
-                  AND DATEPART(MONTH, p.FechaAlta) = ?
-                  AND DATEPART(DAY, p.FechaAlta) = ?
-                ORDER BY v.Vin, p.FechaAlta DESC
+                LEFT JOIN dbo.bl b ON v.IdBL = b.IdBL                                
             """.trimIndent()
+            var where="WHERE DATEPART(YEAR, p.FechaAlta) = ?  AND DATEPART(MONTH, p.FechaAlta) = ?\n" +
+                    " AND DATEPART(DAY, p.FechaAlta) = ? "
+            if(idUsuario!=null)
+                where+=" AND p.IdUsuarioNubeAlta = ? "
+            var orderBy=" ORDER BY p.FechaAlta DESC"
+            query+=where+orderBy
 
             statement = conexion.prepareStatement(query)
             statement.setInt(1, anio)
             statement.setInt(2, mes)
             statement.setInt(3, dia)
-
+            if (idUsuario!=null)
+                statement.setInt(3, idUsuario)
             resultSet = statement.executeQuery()
 
             while (resultSet.next()) {

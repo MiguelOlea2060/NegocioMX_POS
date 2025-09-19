@@ -3,6 +3,7 @@ package com.example.negociomx_pos.Utils
 import com.example.negociomx_pos.BE.CfgNVNube
 import com.example.negociomx_pos.BE.CfgNube
 import com.example.negociomx_pos.BE.EmpresaNube
+import com.example.negociomx_pos.BE.Usuario
 import com.example.negociomx_pos.BE.UsuarioNube
 import com.example.negociomx_pos.room.entities.Admins.CfgNV
 import com.example.negociomx_pos.room.entities.Admins.Config
@@ -16,7 +17,7 @@ class ParametrosSistema {
     companion object{
         var firebaseAuth:FirebaseAuth= FirebaseAuth.getInstance()
         lateinit var firebaseUser:FirebaseUser
-        lateinit var usuarioLogueado:UsuarioNube
+        lateinit var usuarioLogueado: Usuario
         lateinit var empresaNube:EmpresaNube
         var empresaLocal:Empresa?=null
         lateinit var cfg:CfgNube

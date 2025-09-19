@@ -10,6 +10,7 @@ import android.widget.Button
 //import android.widget.CalendarView
 import android.app.DatePickerDialog
 import android.util.Log
+import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.negociomx_pos.BE.Paso1SOCItem
 import com.example.negociomx_pos.DAL.DALPaso1SOC
+import com.example.negociomx_pos.Utils.ParametrosSistema
 import com.example.negociomx_pos.adapters.Paso1SOCAdapter
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -37,6 +39,7 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
     private lateinit var loadingContainer: LinearLayout
     private lateinit var tvLoadingText: TextView
     private lateinit var tvLoadingSubtext: TextView
+    private lateinit var chkTodosLosUsuario:CheckBox
 
     // Estadísticas
     private lateinit var tvVehiculosUnicos: TextView
@@ -69,6 +72,7 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         loadingContainer = findViewById(R.id.loadingContainer)
         tvLoadingText = findViewById(R.id.tvLoadingText)
         tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
+        chkTodosLosUsuario=findViewById(R.id.chkTodosUsuarioPaso1)
 
         // Estadísticas
         tvVehiculosUnicos = findViewById(R.id.tvVehiculosUnicos)
@@ -81,6 +85,14 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         // CAMBIAR esta línea:
         tvFechaSeleccionada.setOnClickListener {
             mostrarSelectorFecha()  // Cambiar de mostrarCalendario() a mostrarSelectorFecha()
+        }
+
+        chkTodosLosUsuario.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked)
+                Toast.makeText(this, "Consultando todos los usuarios", Toast.LENGTH_SHORT).show()
+            else
+                Toast.makeText(this, "Consultando usuario actual", Toast.LENGTH_SHORT).show()
+            consultarRegistrosPorFecha(fechaSeleccionada)
         }
 
         // Botón consultar (SIN CAMBIOS)
@@ -164,7 +176,11 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
             try {
                 mostrarCargando()
                 // Consultar registros
-                val registros = dalConsultaSOC.consultarPaso1SOCPorFecha(fecha)
+                var idUsuario:Int?=ParametrosSistema.usuarioLogueado.IdUsuario
+                if(chkTodosLosUsuario.isChecked)
+                    idUsuario=null
+
+                val registros = dalConsultaSOC.consultarPaso1SOCPorFecha(fecha, idUsuario)
 
                 // Calculas estadísticas
                 val estadisticas= mutableMapOf<String,Int>()

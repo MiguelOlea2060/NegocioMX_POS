@@ -203,7 +203,7 @@ class posa_activity : AppCompatActivity() {
             idDocumentoPendiente= intent.extras?.getInt("idDocumentoPendiente")
 
             if(idDocumentoPendiente!=null && idDocumentoPendiente!!>0) {
-                var idUsuario:Int=ParametrosSistema.usuarioLogueado.Id!!.toInt()
+                var idUsuario:Int=ParametrosSistema.usuarioLogueado.IdUsuario
 
                 val  scope1= MainScope()
                 fun asyncFunc()= scope1.launch {
@@ -253,7 +253,7 @@ class posa_activity : AppCompatActivity() {
     {
         if(idDocumentoPendiente==null || idDocumentoPendiente!!<=0)
         {
-            var idUsuario:Int=ParametrosSistema.usuarioLogueado.Id!!.toInt()
+            var idUsuario:Int=ParametrosSistema.usuarioLogueado.IdUsuario
             var idStatus:Int=TipoStatusNotaVentaEnum.Creada.value.toInt()
             val  scope1= MainScope()
             fun asyncFuncion()= scope1.launch {
@@ -297,7 +297,7 @@ class posa_activity : AppCompatActivity() {
             var prefijoFolio = ParametrosSistema.cfgNV.PrefijoFolioNV
             var folioDocumento = prefijoFolio + consecutivoFolio.toString()
             var idTipoDocumento: Int = TipoDocumentoEnum.NotaVenta.value.toInt()
-            var idUsuario: Int = ParametrosSistema.usuarioLogueado.Id!!.toInt()
+            var idUsuario: Int = ParametrosSistema.usuarioLogueado.IdUsuario
             var idStatus: Int = TipoStatusNotaVentaEnum.Creada.value.toInt()
             try {
                 lblFolioVentaPOS.setText(folioDocumento)

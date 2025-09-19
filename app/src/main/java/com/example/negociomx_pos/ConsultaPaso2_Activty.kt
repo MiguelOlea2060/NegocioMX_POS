@@ -8,6 +8,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.negociomx_pos.BE.ConsultaPaso2Item
 import com.example.negociomx_pos.DAL.DALPaso2
+import com.example.negociomx_pos.Utils.ParametrosSistema
 import com.example.negociomx_pos.adapters.Paso2Adapter
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -35,6 +37,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
     private lateinit var tvTotalFotos: TextView
     private lateinit var tvMensajeSinResultados: TextView
     private lateinit var btnConsultar:Button
+    private lateinit var chkTodosLosUsuarios:CheckBox
 
     private lateinit var adapter: Paso2Adapter
     private val dalConsultaPaso2 = DALPaso2()
@@ -64,6 +67,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         tvVehiculosUnicos = findViewById(R.id.tvVehiculosUnicos)
         tvTotalFotos = findViewById(R.id.tvTotalFotos)
         tvMensajeSinResultados = findViewById(R.id.tvMensajeSinResultados)
+        chkTodosLosUsuarios=findViewById(R.id.chkTodosUsuarioPaso2)
 
         btnConsultar=findViewById(R.id.btnConsultarPaso2)
     }
@@ -83,6 +87,13 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
             mostrarSelectorFecha()
         }
 
+        chkTodosLosUsuarios.setOnCheckedChangeListener { buttonView, isChecked ->
+            if(isChecked)
+                Toast.makeText(this, "Consultando todos los usuarios", Toast.LENGTH_SHORT).show()
+            else
+                Toast.makeText(this, "Consultando usuario actual", Toast.LENGTH_SHORT).show()
+            ejecutarConsulta()
+        }
         // Botón consultar
         findViewById<android.widget.Button>(R.id.btnConsultarPaso2).setOnClickListener {
             if (fechaSeleccionada.isNotEmpty()) {
@@ -158,9 +169,10 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
                 ocultarResultados()
 
                 Log.d("ConsultaPaso2", "🔍 Ejecutando consulta para fecha: $fechaSeleccionada")
-
-                // Consultar registros
-                val registros = dalConsultaPaso2.consultarPaso2PorFecha(fechaSeleccionada)
+                var  idUsuario:Int?=ParametrosSistema.usuarioLogueado.IdUsuario
+                if(chkTodosLosUsuarios.isChecked)
+                    idUsuario=null
+                val registros = dalConsultaPaso2.consultarPaso2PorFecha(fechaSeleccionada,idUsuario)
 
                 // Consultar estadísticas
                 val estadisticas= mutableMapOf<String,Int>()
@@ -292,7 +304,6 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         mensaje.append("Color Exterior: ${registro.ColorExterior}\n")
         mensaje.append("Color Interior: ${registro.ColorInterior}\n\n")
         mensaje.append("Color Interior: ${registro.ColorInterior}\n\n")
-
 
         mensaje.append("📸 INFORMACIÓN DE FOTOS\n\n")
         mensaje.append("Total de fotos: ${registro.CantidadFotos}\n\n")

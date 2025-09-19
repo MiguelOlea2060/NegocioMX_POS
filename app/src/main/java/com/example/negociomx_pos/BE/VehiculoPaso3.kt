@@ -17,6 +17,7 @@ data class VehiculoPaso3(
     var TipoVehiculo:String="",
     var BL:String="",
 
+    var IdVehiculo:Int?=null,
     var IdPaso3LogVehiculo:Int=0,
     var TieneFoto:Boolean=false,
     var NombreArchivoFoto:String="",

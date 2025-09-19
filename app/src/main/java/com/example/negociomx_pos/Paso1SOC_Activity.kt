@@ -63,7 +63,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
     private var vehiculoPaso1: VehiculoPaso1? = null
 
     private var idUsuarioNubeAlta: Int =
-        ParametrosSistema.usuarioLogueado.Id?.toInt()!!// Reemplaza con el ID del usuario actual
+        ParametrosSistema.usuarioLogueado.IdUsuario!!// Reemplaza con el ID del usuario actual
     private var fotosExistentes: Int = 0 // Para controlar cuántas fotos ya existen
 
     //Control de consulta de foto

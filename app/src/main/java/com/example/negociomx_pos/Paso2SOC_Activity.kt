@@ -1,16 +1,24 @@
 package com.example.negociomx_pos
 
 import android.Manifest
+import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.icu.text.Normalizer2.Mode
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
+import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -19,18 +27,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.negociomx_pos.BE.Paso2LogVehiculo
-import com.example.negociomx_pos.BE.Vehiculo
 import com.example.negociomx_pos.BE.VehiculoPaso2
 import com.example.negociomx_pos.DAL.DALVehiculo
 import com.example.negociomx_pos.Utils.BLLUtils
 import com.example.negociomx_pos.Utils.ParametrosSistema
 import com.example.negociomx_pos.databinding.ActivityPaso2SocBinding
 import kotlinx.coroutines.launch
+import org.jetbrains.annotations.ApiStatus.NonExtendable
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 class Paso2SOC_Activity : AppCompatActivity() {
 
@@ -57,10 +66,14 @@ class Paso2SOC_Activity : AppCompatActivity() {
     private var currentPhotoType: Int = 0
     private var fotoUri: Uri? = null
 
+    lateinit var ivFotoDialogo :ImageView
+    private lateinit var mScaleGestureDetector:ScaleGestureDetector
+    private var mScaleFactor = 1.0f
+
     var bllUtil: BLLUtils?=null
 
     // Variables para control de datos
-    private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.Id?.toInt()!!
+    private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.IdUsuario
     //private var paso2LogVehiculoExistente: Paso2LogVehiculo? = null
 
     // ✅ LAUNCHER PARA CÁMARA
@@ -183,9 +196,6 @@ class Paso2SOC_Activity : AppCompatActivity() {
                 if (vehiculo != null) {
                     vehiculoActual = vehiculo
 
-                    // ✅ CONSULTAR FOTOS PASO2 EXISTENTES
-                    //paso2LogVehiculoExistente = dalVehiculo.consultarFotosPaso2Existentes(vehiculo.Id.toInt())
-
                     mostrarInformacionVehiculo(vehiculo)
                     mostrarSeccionEvidencias()
                     configurarBotonesSegunFotos()
@@ -206,6 +216,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
                     }
 
                     ocultarCargaConsulta()
+                    hideKeyboard()
                 } else {
                     ocultarSecciones()
                     Toast.makeText(this@Paso2SOC_Activity, "❌ Vehículo no encontrado", Toast.LENGTH_LONG).show()
@@ -220,6 +231,14 @@ class Paso2SOC_Activity : AppCompatActivity() {
                 binding.etVIN.selectAll()
             }
         }
+    }
+
+    fun Activity.hideKeyboard() {
+        hideKeyboard(currentFocus ?: View(this))
+    }
+    fun Context.hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     private fun mostrarInformacionVehiculo(vehiculo:VehiculoPaso2) {
@@ -434,6 +453,22 @@ class Paso2SOC_Activity : AppCompatActivity() {
         }
     }
 
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        mScaleGestureDetector.onTouchEvent(event!!)
+        return true
+    }
+
+    private inner class ScaleListener:ScaleGestureDetector.SimpleOnScaleGestureListener(){
+        override fun onScale(detector: ScaleGestureDetector): Boolean {
+            mScaleFactor*=mScaleGestureDetector.scaleFactor
+            mScaleFactor= max(0.1f, min(mScaleFactor,10.0f))
+
+            ivFotoDialogo.scaleX=mScaleFactor
+            ivFotoDialogo.scaleY=mScaleFactor
+            return true
+        }
+    }
+
     private fun mostrarDialogoFoto(fotoBase64: String, numeroFoto: Int) {
         try {
             // Convertir Base64 a Bitmap
@@ -443,16 +478,47 @@ class Paso2SOC_Activity : AppCompatActivity() {
             if (bitmap != null) {
                 // Crear diálogo personalizado
                 val dialog = android.app.AlertDialog.Builder(this)
-                val imageView = android.widget.ImageView(this)
+                ivFotoDialogo = android.widget.ImageView(this)
 
                 // Configurar ImageView
-                imageView.setImageBitmap(bitmap)
-                imageView.scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
-                imageView.adjustViewBounds = true
+                ivFotoDialogo.setImageBitmap(bitmap)
+                ivFotoDialogo.scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+                ivFotoDialogo.adjustViewBounds = true
+
+                var scaleFactor = 1f
+                val scaleGestureDetector = ScaleGestureDetector(
+                    this,
+                    object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                        override fun onScale(detector: ScaleGestureDetector): Boolean {
+                            scaleFactor *= detector.scaleFactor
+                            scaleFactor= max(0.1f, min(scaleFactor,10.0f))
+//                            scaleFactor = scaleFactor.coerceIn(0.1f, 10.0f)
+
+                            ivFotoDialogo.scaleX = scaleFactor
+                            ivFotoDialogo.scaleY = scaleFactor
+
+                            return true
+                            //return super.onScale(detector)
+                        }
+                    }
+                )
+                var mode:Int=0
+
+                ivFotoDialogo.setOnTouchListener{ _, event->
+                    if(event.action==MotionEvent.ACTION_MOVE)
+                    {
+                        val cadena=event.action.toString()
+                    }
+                    else if(event.action==MotionEvent.ACTION_MOVE)
+                    {
+                        val cadena=event.action.toString()
+                    }
+                    scaleGestureDetector.onTouchEvent(event)
+                }
 
                 // Configurar diálogo
                 dialog.setTitle("Paso 2 - Evidencia $numeroFoto")
-                dialog.setView(imageView)
+                dialog.setView(ivFotoDialogo)
                 dialog.setPositiveButton("Cerrar") { dialogInterface, _ ->
                     dialogInterface.dismiss()
                 }
@@ -462,11 +528,9 @@ class Paso2SOC_Activity : AppCompatActivity() {
 
                 // Ajustar tamaño del diálogo
                 val window = alertDialog.window
-                window?.setLayout(
-                    (resources.displayMetrics.widthPixels * 0.9).toInt(),
-                    (resources.displayMetrics.heightPixels * 0.7).toInt()
+                window?.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.MATCH_PARENT
                 )
-
             } else {
                 Toast.makeText(this, "Error decodificando la imagen", Toast.LENGTH_SHORT).show()
             }

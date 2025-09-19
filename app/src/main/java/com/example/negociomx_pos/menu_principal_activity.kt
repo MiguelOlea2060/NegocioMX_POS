@@ -135,10 +135,9 @@ class menu_principal_activity : AppCompatActivity() {
         val btnCargaMasivaVins =findViewById<Button>(R.id.btnCargaMasivaXls)
         val btnAdminUsuarios =findViewById<Button>(R.id.btnAdminUsuarios)
 
+        //getEmpresaNubeCfgNubeCfgNVNube()
 
-        getEmpresaNubeCfgNubeCfgNVNube()
-
-        var visibleBtns=!ParametrosSistema.usuarioLogueado.IdRol.equals("5")
+        var visibleBtns=ParametrosSistema.usuarioLogueado.IdRol!=5
         btnPOS.isVisible=visibleBtns
         btnCategoria.isVisible=visibleBtns
         btnUsuarios.isVisible=visibleBtns
@@ -156,6 +155,10 @@ class menu_principal_activity : AppCompatActivity() {
         btnVehiculo.isVisible=visibleBtns
         btnCargaMasivaVins.isVisible=visibleBtns
         btnCargaMasivaVins.isVisible=visibleBtns
+
+        btnPaso4Fotos.isVisible=false
+        btnConsultaPaso4.isVisible=false
+        btnAdminUsuarios.isVisible=false
 
         btnUm.setOnClickListener {
             val intent = Intent(this, unidadmedida_activity::class.java)
@@ -282,21 +285,15 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, alta_vehiculo::class.java)
             startActivity(intent)
         }
-/*        btnCargaMasivaVins.setOnClickListener {
-            val intent=Intent(Intent.ACTION_GET_CONTENT, MediaStore.Downloads.EXTERNAL_CONTENT_URI)
-            intent.putExtra("CargaMasiva",true)
-            intent.setType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            startForResult.launch(intent)
-        }*/
     }
 
     private fun verificarCatalogosDeNubePorActualizarLocalmente() {
         validaArtsNubeConLocal (){
             val idEmpresa = ParametrosSistema.cfg.IdEmpresa
-            val idUsuario = ParametrosSistema.usuarioLogueado.Id
+            val idUsuario = ParametrosSistema.usuarioLogueado.IdUsuario
 
             try {
-                dalArt.getArticuloActByFilter(idEmpresa, idUsuario, false) { res ->
+                dalArt.getArticuloActByFilter(idEmpresa, idUsuario.toString(), false) { res ->
                     listaArtsAct = arrayListOf()
                     if (res != null && res.count() > 0) {
                         listaArtsAct = res
@@ -1031,7 +1028,7 @@ class menu_principal_activity : AppCompatActivity() {
     private fun getEmpresaNubeCfgNubeCfgNVNube() {
         var idEmpresa=ParametrosSistema.usuarioLogueado.IdEmpresa
 
-        dalEmp.getByFilters(idEmpresa){
+        dalEmp.getByFilters(idEmpresa.toString()){
                 res->
             empresaNube=null
             if(res!=null && res.count()>0) {
@@ -1039,7 +1036,7 @@ class menu_principal_activity : AppCompatActivity() {
             }
             if(empresaNube!=null) ParametrosSistema.empresaNube=empresaNube!!
 
-            dalCfg.getAll(idEmpresa){
+            dalCfg.getAll(idEmpresa.toString()){
                     res->
                 if(res!=null && res.count()>0)
                 {

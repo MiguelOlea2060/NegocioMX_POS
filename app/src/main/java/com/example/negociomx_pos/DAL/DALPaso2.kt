@@ -12,7 +12,7 @@ import java.sql.ResultSet
 class DALPaso2 {
 
     // ✅ CONSULTAR REGISTROS PASO2 POR FECHA
-    suspend fun consultarPaso2PorFecha(fecha: String): List<ConsultaPaso2Item> = withContext(Dispatchers.IO) {
+    suspend fun consultarPaso2PorFecha(fecha: String,idUsuario:Int?): List<ConsultaPaso2Item> = withContext(Dispatchers.IO) {
         val registros = mutableListOf<ConsultaPaso2Item>()
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
@@ -27,29 +27,14 @@ class DALPaso2 {
                 return@withContext registros
             }
 
-            val query = """
-                SELECT v.IdVehiculo, 
-                    p.IdPaso2LogVehiculo, 
-                    v.Vin, 
-                    ISNULL(b.BL, '') as BL, 
-                    v.IdMarca, 
-                    m.Nombre as Marca, 
-                    v.IdModelo, 
-                    mo.Nombre as Modelo, 
-                    ISNULL(v.Annio, 0) as Anio,
-                    vc.IdColor, 
-                    vc.IdColorInterior, 
-                    ISNULL(c.Nombre, '') as ColorExterior, 
-                    ISNULL(c1.Nombre, '') as ColorInterior, 
-                    ISNULL(v.Motor, '') as NumeroMotor,
-                    CONVERT(varchar, p.Fechaaltafoto1, 120) as FechaAltaFoto1,
+            var query = """
+                SELECT v.IdVehiculo, p.IdPaso2LogVehiculo, v.Vin, b.BL, v.IdMarca, m.Nombre as Marca, v.IdModelo, 
+                    mo.Nombre as Modelo, v.Annio, as Anio, vc.IdColor, vc.IdColorInterior, c.Nombre as ColorExterior, 
+                    c1.Nombre as ColorInterior, v.Motor as NumeroMotor, CONVERT(varchar, p.Fechaaltafoto1, 120) as FechaAltaFoto1,
                     CONVERT(varchar, p.Fechaaltafoto2, 120) as FechaAltaFoto2,
                     CONVERT(varchar, p.Fechaaltafoto3, 120) as FechaAltaFoto3,
                     CONVERT(varchar, p.Fechaaltafoto4, 120) as FechaAltaFoto4,
-                    TieneFoto1,
-                    TieneFoto2,
-                    TieneFoto3,
-                    TieneFoto4
+                    TieneFoto1, TieneFoto2, TieneFoto3, TieneFoto4
                 FROM dbo.Paso2LogVehiculo p 
                 INNER JOIN dbo.vehiculo v with (nolock) ON p.IdVehiculo = v.IdVehiculo 
                 INNER JOIN dbo.MarcaAuto m with (nolock) ON v.IdMarca = m.IdMarcaAuto
@@ -57,19 +42,24 @@ class DALPaso2 {
                 LEFT JOIN dbo.VehiculoColor vc with (nolock) ON v.IdVehiculo = vc.IdVehiculo
                 LEFT JOIN dbo.Color c with (nolock) ON vc.IdColor = c.IdColor
                 LEFT JOIN dbo.Color c1 with (nolock) ON vc.IdColorInterior = c1.IdColor
-                LEFT JOIN dbo.bl b with (nolock) ON v.IdBL = b.IdBL
-                WHERE (CONVERT(date, p.Fechaaltafoto1) = ?)
-                   OR (CONVERT(date, p.Fechaaltafoto2) = ?)
-                   OR (CONVERT(date, p.Fechaaltafoto3) = ?)
-                   OR (CONVERT(date, p.Fechaaltafoto4) = ?)
-                ORDER BY v.Vin
+                LEFT JOIN dbo.bl b with (nolock) ON v.IdBL = b.IdBL                                
             """.trimIndent()
+            var where=" WHERE ((CONVERT(date, p.Fechaaltafoto1) = ?) OR (CONVERT(date, p.Fechaaltafoto2) = ?)\n" +
+                    " OR (CONVERT(date, p.Fechaaltafoto3) = ?)\n" +
+                    " OR (CONVERT(date, p.Fechltafoto4) = ?)) "
+            if(idUsuario!=null)
+                where+=" p.IdUsuarioNube = ? "
+            var orderBy=" ORDER BY p.fechaaltafoto1 desc"
+            query+=where+orderBy
 
             statement = conexion.prepareStatement(query)
             statement.setString(1, fecha)
             statement.setString(2, fecha)
             statement.setString(3, fecha)
             statement.setString(4, fecha)
+            if(idUsuario!=null)
+                statement.setInt(5, idUsuario)
+
             resultSet = statement.executeQuery()
 
             while (resultSet.next()) {

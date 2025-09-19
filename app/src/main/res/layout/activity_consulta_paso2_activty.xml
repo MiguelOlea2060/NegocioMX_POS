@@ -10,7 +10,7 @@
     android:padding="4dp"
     tools:context=".ConsultaPaso2_Activity">
 
-    Título
+    <!--Título -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,7 +23,7 @@
         android:padding="6dp"
         android:layout_marginBottom="16dp" />
 
-    Sección de Filtros
+    <!--Sección de Filtros -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,16 +32,32 @@
         android:padding="10dp"
         android:layout_marginBottom="8dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="📅 Seleccionar Fecha"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#1976D2"
-            android:layout_marginBottom="8dp" />
+        <LinearLayout
+            android:layout_marginBottom="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        Sección compacta de fecha
+            <TextView
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📅 Seleccionar Fecha"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#1976D2"/>
+            <CheckBox
+                android:layout_marginLeft="20dp"
+                android:text="Todos los Usuarios"
+                android:id="@+id/chkTodosUsuarioPaso2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            </CheckBox>
+
+        </LinearLayout>
+
+        <!--Sección compacta de fecha -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -80,7 +96,7 @@
 
     </LinearLayout>
 
-    Estadísticas
+    <!--Estadísticas -->
     <LinearLayout
         android:id="@+id/layoutEstadisticas"
         android:layout_width="match_parent"
@@ -113,7 +129,7 @@
 
     </LinearLayout>
 
-    Loading
+    <!--Loading -->
     <LinearLayout
         android:id="@+id/loadingContainer"
         android:layout_width="match_parent"
@@ -149,7 +165,7 @@
 
     </LinearLayout>
 
-    Lista de Resultados
+    <!--Lista de Resultados -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewRegistros"
         android:layout_width="match_parent"
@@ -159,7 +175,7 @@
         android:padding="5dp"
         tools:listitem="@layout/item_consulta_paso2" />
 
-    Mensaje Sin Resultados
+    <!--Mensaje Sin Resultados -->
     <LinearLayout
         android:id="@+id/layoutSinResultados"
         android:layout_width="match_parent"
