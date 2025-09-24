@@ -29,8 +29,9 @@ class DALPaso2 {
 
             var query = """
                 SELECT v.IdVehiculo, p.IdPaso2LogVehiculo, v.Vin, b.BL, v.IdMarca, m.Nombre as Marca, v.IdModelo, 
-                    mo.Nombre as Modelo, v.Annio, as Anio, vc.IdColor, vc.IdColorInterior, c.Nombre as ColorExterior, 
-                    c1.Nombre as ColorInterior, v.Motor as NumeroMotor, CONVERT(varchar, p.Fechaaltafoto1, 120) as FechaAltaFoto1,
+                    mo.Nombre as Modelo, v.Annio as Anio, vc.IdColor, vc.IdColorInterior, c.Nombre as ColorExterior, 
+                    c1.Nombre as ColorInterior, v.Motor as NumeroMotor, CONVERT(varchar, p.Fechaaltafoto1, 120) 
+                    as FechaAltaFoto1,
                     CONVERT(varchar, p.Fechaaltafoto2, 120) as FechaAltaFoto2,
                     CONVERT(varchar, p.Fechaaltafoto3, 120) as FechaAltaFoto3,
                     CONVERT(varchar, p.Fechaaltafoto4, 120) as FechaAltaFoto4,
@@ -44,11 +45,11 @@ class DALPaso2 {
                 LEFT JOIN dbo.Color c1 with (nolock) ON vc.IdColorInterior = c1.IdColor
                 LEFT JOIN dbo.bl b with (nolock) ON v.IdBL = b.IdBL                                
             """.trimIndent()
-            var where=" WHERE ((CONVERT(date, p.Fechaaltafoto1) = ?) OR (CONVERT(date, p.Fechaaltafoto2) = ?)\n" +
-                    " OR (CONVERT(date, p.Fechaaltafoto3) = ?)\n" +
-                    " OR (CONVERT(date, p.Fechltafoto4) = ?)) "
+            var where=" WHERE ((CONVERT(date, p.Fechaaltafoto1) = ?) OR (CONVERT(date, p.Fechaaltafoto2) = ?) " +
+                    " OR (CONVERT(date, p.Fechaaltafoto3) = ?) " +
+                    " OR (CONVERT(date, p.Fechaaltafoto4) = ?)) "
             if(idUsuario!=null)
-                where+=" p.IdUsuarioNube = ? "
+                where+=" AND  p.IdUsuarioNube = ? "
             var orderBy=" ORDER BY p.fechaaltafoto1 desc"
             query+=where+orderBy
 
