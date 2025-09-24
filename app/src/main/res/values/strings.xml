@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NegocioMX POS</string>
+    <string name="app_name">Transvisión</string>
     <string name="title_activity_login">login_activity</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>

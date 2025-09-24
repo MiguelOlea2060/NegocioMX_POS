@@ -2,9 +2,17 @@ package com.example.negociomx_pos
 
 import android.app.DatePickerDialog
 import android.app.AlertDialog
+import android.content.ContentValues
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
+import android.provider.MediaStore.Audio.Media
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -18,6 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.negociomx_pos.BE.ConsultaPaso2Item
 import com.example.negociomx_pos.DAL.DALPaso2
+import com.example.negociomx_pos.DAL.DALVehiculo
 import com.example.negociomx_pos.Utils.ParametrosSistema
 import com.example.negociomx_pos.adapters.Paso2Adapter
 import kotlinx.coroutines.launch
@@ -41,6 +50,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
 
     private lateinit var adapter: Paso2Adapter
     private val dalConsultaPaso2 = DALPaso2()
+    private var dalVehiculo:DALVehiculo?=null
     private var fechaSeleccionada: String = ""
     private var loadingHandler: Handler? = null
     private var loadingRunnable: Runnable? = null
@@ -70,6 +80,8 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         chkTodosLosUsuarios=findViewById(R.id.chkTodosUsuarioPaso2)
 
         btnConsultar=findViewById(R.id.btnConsultarPaso2)
+
+        dalVehiculo=DALVehiculo()
     }
 
     private fun configurarRecyclerView() {
@@ -332,15 +344,117 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         }
 
         // Opcional: Agregar botón para ver fotos (si implementas visualización de fotos)
-/*        if (registro.CantidadFotos > 0) {
+        if (registro.CantidadFotos > 0) {
             dialog.setNeutralButton("Ver Fotos") { _, _ ->
-                // Aquí puedes implementar la visualización de fotos si lo deseas
-                Toast.makeText(this, "Función de ver fotos - Por implementar", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Descargando fotos del Paso 2", Toast.LENGTH_SHORT).show()
+
+                lifecycleScope.launch {
+                    var imgUri:Uri
+
+                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q) {
+                        imgUri = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                    }
+                    else {
+                        imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                    }
+
+                    var bitmap:Bitmap
+                    val contentValues=ContentValues()
+                    var nombreArchivo="${registro.VIN}_Paso_2_Foto_1"
+                    contentValues.put(MediaStore.Images.Media.DISPLAY_NAME,nombreArchivo)
+                    contentValues.put(MediaStore.Images.Media.MIME_TYPE,"image/jpg")
+                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q)
+                    {
+                        contentValues.put(MediaStore.Images.Media.RELATIVE_PATH,"Pictures/VINS")
+                        contentValues.put(MediaStore.Images.Media.IS_PENDING,1)
+                    }
+                    else
+                    {
+
+                    }
+                    if (registro.TieneFoto1 == true) {
+                        Toast.makeText(this@ConsultaPaso2_Activity, "Descargando foto 1", Toast.LENGTH_SHORT).show()
+                        val fotoBase64 = dalVehiculo?.obtenerFotoBase64Paso2(registro.IdVehiculo, 1)
+
+                        imgUri=contentResolver.insert(imgUri,contentValues)!!
+                        if(imgUri!=null)
+                        {
+                            val outputStream=contentResolver.openOutputStream(imgUri)
+                            if(outputStream!=null)
+                            {
+                                //bitmap=getImageBitmap(uri = imgUri)
+                                //saveBitmapToFile(bitmap,nombreArchivo)
+                            }
+
+                        }
+                    }
+                    if (registro.TieneFoto2 == true) {
+                        Toast.makeText(this@ConsultaPaso2_Activity, "Descargando foto 2", Toast.LENGTH_SHORT).show()
+                        val fotoBase64 = dalVehiculo?.obtenerFotoBase64Paso2(registro.IdVehiculo, 2)
+                    }
+                    if (registro.TieneFoto3 == true) {
+                        Toast.makeText(this@ConsultaPaso2_Activity, "Descargando foto 3", Toast.LENGTH_SHORT).show()
+                        val fotoBase64 = dalVehiculo?.obtenerFotoBase64Paso2(registro.IdVehiculo, 3)
+                    }
+                    if (registro.TieneFoto4 == true) {
+                        Toast.makeText(this@ConsultaPaso2_Activity, "Descargando foto 4", Toast.LENGTH_SHORT).show()
+                        val fotoBase64 = dalVehiculo?.obtenerFotoBase64Paso2(registro.IdVehiculo, 4)
+                    }
+                }
             }
-        }*/
+        }
 
         dialog.show()
     }
+
+    private fun saveBitmapToFile(bitmap: Bitmap,nombreArchivo:String):Uri {
+        var imgUri: Uri
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        {
+            imgUri=MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        }
+        else
+        {
+            imgUri=MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        }
+        val contentValues=ContentValues()
+        contentValues.put(MediaStore.Images.Media.DISPLAY_NAME,nombreArchivo)
+        contentValues.put(MediaStore.Images.Media.MIME_TYPE,"image/jpg")
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q)
+        {
+            contentValues.put(MediaStore.Images.Media.RELATIVE_PATH,"Pictures/VINS")
+            contentValues.put(MediaStore.Images.Media.IS_PENDING,1)
+        }
+
+        imgUri=contentResolver.insert(imgUri,contentValues)!!
+
+        if(imgUri!=null)
+        {
+           val outputStream=contentResolver.openOutputStream(imgUri)
+            if(outputStream!=null)
+            {
+                bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream)
+
+            }
+
+            outputStream?.close()
+        }
+
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q)
+        {
+            contentValues.clear()
+            contentValues.put(MediaStore.Images.Media.IS_PENDING,0)
+            contentResolver.update(imgUri!!,contentValues,null,null)
+        }
+
+        return imgUri
+    }
+
+/*    private fun getImageBitmap(uri:Uri): Bitmap {
+        val source=ImageDecoder.createSource(contentResolver,uri)!!
+        return ImageDecoder.decodeBitmap(source)
+    }*/
 
     override fun onDestroy() {
         super.onDestroy()
