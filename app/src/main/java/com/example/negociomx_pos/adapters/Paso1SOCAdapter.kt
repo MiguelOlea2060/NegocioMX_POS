@@ -7,10 +7,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.negociomx_pos.BE.Paso1SOCItem
 import com.example.negociomx_pos.R
+import android.widget.Button
 
 class Paso1SOCAdapter(
     private var registros: List<Paso1SOCItem>,
-    private val onItemClick: (Paso1SOCItem) -> Unit
+    private val onItemClick: (Paso1SOCItem) -> Unit,
+    private val onDescargarFotosClick: (Paso1SOCItem) -> Unit
 ) : RecyclerView.Adapter<Paso1SOCAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -22,7 +24,7 @@ class Paso1SOCAdapter(
         val tvNumeroMotor: TextView = view.findViewById(R.id.tvNumeroMotor)
         val tvDatosSOC: TextView = view.findViewById(R.id.tvDatosSOC)
         val tvFotos: TextView = view.findViewById(R.id.tvFotos)
-
+        val btnDescargarFotos: Button = view.findViewById(R.id.btnDescargarFotos)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -51,6 +53,21 @@ class Paso1SOCAdapter(
         holder.itemView.setOnClickListener {
             onItemClick(registro)
         }
+
+
+        // Habilitar/deshabilitar botón según cantidad de fotos
+        holder.btnDescargarFotos.isEnabled = registro.CantidadFotos > 0
+        holder.btnDescargarFotos.alpha = if (registro.CantidadFotos > 0) 1.0f else 0.5f
+
+        holder.btnDescargarFotos.setOnClickListener {
+            if (registro.CantidadFotos > 0) {
+                onDescargarFotosClick(registro)
+            }
+        }
+
+
+
+
     }
 
     override fun getItemCount() = registros.size

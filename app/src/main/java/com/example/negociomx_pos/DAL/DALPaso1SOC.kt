@@ -70,7 +70,7 @@ class DALPaso1SOC {
             statement.setInt(2, mes)
             statement.setInt(3, dia)
             if (idUsuario!=null)
-                statement.setInt(3, idUsuario)
+                statement.setInt(4, idUsuario) //aqui era 3
             resultSet = statement.executeQuery()
 
             while (resultSet.next()) {
@@ -121,4 +121,63 @@ class DALPaso1SOC {
 
         return@withContext registros
     }
+
+
+    // ✅ NUEVO MÉTtodo: OBTENER URLs DE FOTOS PARA DESCARGA
+    suspend fun obtenerURLsFotosPaso1(idPaso1LogVehiculo: Int): List<String> = withContext(Dispatchers.IO) {
+        val urls = mutableListOf<String>()
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            Log.d("DALPaso1SOC", "🔍 Obteniendo URLs de fotos para IdPaso1LogVehiculo: $idPaso1LogVehiculo")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALPaso1SOC", "❌ No se pudo obtener conexión")
+                return@withContext urls
+            }
+
+            val query = """
+                SELECT Posicion, URLFoto, NombreArchivo
+                FROM dbo.Paso1LogVehiculoFotos 
+                WHERE IdPaso1LogVehiculo = ?
+                ORDER BY Posicion
+            """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setInt(1, idPaso1LogVehiculo)
+            resultSet = statement.executeQuery()
+
+            while (resultSet.next()) {
+                val urlFoto = resultSet.getString("URLFoto")
+                if (!urlFoto.isNullOrEmpty()) {
+                    urls.add(urlFoto)
+                    Log.d("DALPaso1SOC", "📸 URL encontrada para posición ${resultSet.getInt("Posicion")}: $urlFoto")
+                }
+            }
+
+            Log.d("DALPaso1SOC", "✅ Se obtuvieron ${urls.size} URLs de fotos")
+
+        } catch (e: Exception) {
+            Log.e("DALPaso1SOC", "💥 Error obteniendo URLs de fotos: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALPaso1SOC", "Error cerrando recursos: ${e.message}")
+            }
+        }
+
+        return@withContext urls
+    }
+
+
+
+
+
 }

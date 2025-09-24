@@ -105,7 +105,7 @@
             android:padding="6dp"
             android:layout_marginBottom="8dp" />
 
-        <!-- Footer con fotos y fecha -->
+        <!-- Footer con fotos y botón de descarga -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -114,17 +114,28 @@
 
             <TextView
                 android:id="@+id/tvFotos"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="📸 0 foto(s)"
                 android:textSize="12sp"
                 android:textColor="#9C27B0"
                 android:background="#F3E5F5"
                 android:padding="4dp" />
 
-
-
-
+            <Button
+                android:id="@+id/btnDescargarFotos"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:text="📥 Descargar"
+                android:textSize="10sp"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#4CAF50"
+                android:layout_marginStart="8dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp" />
 
         </LinearLayout>
 

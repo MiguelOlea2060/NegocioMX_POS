@@ -27,7 +27,14 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import android.Manifest
+import android.os.Build
 
+import android.content.pm.PackageManager
+
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.example.negociomx_pos.Utils.DescargadorFotos
 
 class ConsultaPaso1Soc_Activity : AppCompatActivity() {
 
@@ -51,6 +58,13 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
     private var loadingHandler: Handler? = null
     private var loadingRunnable: Runnable? = null
 
+    private lateinit var descargadorFotos: DescargadorFotos
+    private var dialogoProgreso: Dialog? = null
+
+   /* companion object {
+        private const val REQUEST_WRITE_STORAGE = 112
+    }*/
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_consulta_paso1_soc)
@@ -60,6 +74,7 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         configurarRecyclerView()
 
         establecerFechaActual()
+      //  verificarPermisos()
         realizarConsultaInicial()
     }
 
@@ -79,7 +94,55 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
         tvTotalFotos = findViewById(R.id.tvTotalFotos)
 
         dalConsultaSOC = DALPaso1SOC()
+        descargadorFotos = DescargadorFotos(this)
     }
+   /* private fun verificarPermisos() {
+       /* val permisos = mutableListOf<String>()
+
+        // Para Android 10 y anteriores
+        if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                permisos.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+        }
+
+        // Para todas las versiones
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            permisos.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        }
+
+        if (permisos.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, permisos.toTypedArray(), REQUEST_WRITE_STORAGE)
+        }*/
+    }*/
+
+   /* override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            REQUEST_WRITE_STORAGE -> {
+                var todosPermisosOtorgados = true
+                for (resultado in grantResults) {
+                    if (resultado != PackageManager.PERMISSION_GRANTED) {
+                        todosPermisosOtorgados = false
+                        break
+                    }
+                }
+
+                if (todosPermisosOtorgados) {
+                    Toast.makeText(this, "Permisos concedidos para descargar fotos", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Permisos denegados. No se podrán descargar fotos", Toast.LENGTH_LONG).show()
+
+                    // ✅ MOSTRAR DIÁLOGO EXPLICATIVO
+                    android.app.AlertDialog.Builder(this)
+                        .setTitle("Permisos Requeridos")
+                        .setMessage("Para descargar fotos necesitamos acceso al almacenamiento. Puedes otorgar los permisos desde Configuración > Aplicaciones > NegocioMX_POS > Permisos")
+                        .setPositiveButton("Entendido") { dialog, _ -> dialog.dismiss() }
+                        .show()
+                }
+            }
+        }
+    }*/
 
     private fun configurarEventos() {
         // CAMBIAR esta línea:
@@ -145,10 +208,17 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
     }
 
     private fun configurarRecyclerView() {
-        adapter = Paso1SOCAdapter(emptyList()) { registro ->
-            // Manejar clic en item
-            mostrarDetalleRegistro(registro)
-        }
+        adapter = Paso1SOCAdapter(
+            emptyList(),
+            { registro ->
+                // Manejar clic en item
+                mostrarDetalleRegistro(registro)
+            },
+            { registro ->
+                // Manejar clic en descargar fotos
+                iniciarDescargaFotos(registro)
+            }
+        )
 
         recyclerViewRegistros.layoutManager = LinearLayoutManager(this)
         recyclerViewRegistros.adapter = adapter
@@ -336,8 +406,108 @@ class ConsultaPaso1Soc_Activity : AppCompatActivity() {
             .show()
     }
 
+    private fun iniciarDescargaFotos(registro: Paso1SOCItem) {
+        // ✅ VERIFICACIÓN MEJORADA DE PERMISOS
+     /*   val tienePermisos = if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.Q) {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        }
+
+        if (!tienePermisos) {
+            Toast.makeText(this, "Se requieren permisos de almacenamiento para descargar fotos", Toast.LENGTH_LONG).show()
+            verificarPermisos()
+            return
+        }*/
+
+        if (registro.CantidadFotos == 0) {
+            Toast.makeText(this, "Este vehículo no tiene fotos para descargar", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        Log.d("ConsultaPaso1SOC", "🚀 Iniciando descarga de fotos para VIN: ${registro.VIN}")
+
+        lifecycleScope.launch {
+            mostrarDialogoProgreso("Preparando descarga...", "Iniciando proceso")
+
+            descargadorFotos.descargarFotosVehiculo(
+                registro,
+                onProgress = { titulo, subtitulo ->
+                    runOnUiThread {
+                        actualizarDialogoProgreso(titulo, subtitulo)
+                    }
+                },
+                onComplete = { exito, mensaje ->
+                    runOnUiThread {
+                        ocultarDialogoProgreso()
+
+                        if (exito) {
+                            Toast.makeText(this@ConsultaPaso1Soc_Activity, "✅ Descarga completada", Toast.LENGTH_SHORT).show()
+                            mostrarResultadoDescarga(mensaje)
+                        } else {
+                            Toast.makeText(this@ConsultaPaso1Soc_Activity, "❌ Error en descarga", Toast.LENGTH_SHORT).show()
+                            mostrarErrorDescarga(mensaje)
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    private fun mostrarDialogoProgreso(titulo: String, subtitulo: String) {
+        if (dialogoProgreso?.isShowing == true) {
+            dialogoProgreso?.dismiss()
+        }
+
+        dialogoProgreso = Dialog(this).apply {
+            requestWindowFeature(Window.FEATURE_NO_TITLE)
+            setContentView(R.layout.dialog_progreso_descarga)
+            setCancelable(false)
+
+            findViewById<TextView>(R.id.tvTituloProgreso).text = titulo
+            findViewById<TextView>(R.id.tvSubtituloProgreso).text = subtitulo
+
+            show()
+        }
+    }
+
+    private fun actualizarDialogoProgreso(titulo: String, subtitulo: String) {
+        dialogoProgreso?.let { dialogo ->
+            if (dialogo.isShowing) {
+                dialogo.findViewById<TextView>(R.id.tvTituloProgreso)?.text = titulo
+                dialogo.findViewById<TextView>(R.id.tvSubtituloProgreso)?.text = subtitulo
+            }
+        }
+    }
+
+    private fun ocultarDialogoProgreso() {
+        dialogoProgreso?.let { dialogo ->
+            if (dialogo.isShowing) {
+                dialogo.dismiss()
+            }
+        }
+        dialogoProgreso = null
+    }
+
+    private fun mostrarResultadoDescarga(mensaje: String) {
+        android.app.AlertDialog.Builder(this)
+            .setTitle("✅ Descarga Completada")
+            .setMessage(mensaje)
+            .setPositiveButton("Aceptar") { dialog, _ -> dialog.dismiss() }
+            .show()
+    }
+
+    private fun mostrarErrorDescarga(mensaje: String) {
+        android.app.AlertDialog.Builder(this)
+            .setTitle("❌ Error en Descarga")
+            .setMessage(mensaje)
+            .setPositiveButton("Aceptar") { dialog, _ -> dialog.dismiss() }
+            .show()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         loadingHandler?.removeCallbacks(loadingRunnable!!)
+        ocultarDialogoProgreso()
     }
 }
