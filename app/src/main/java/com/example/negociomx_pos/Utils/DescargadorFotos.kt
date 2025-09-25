@@ -4,8 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Environment
 import android.util.Log
-import com.example.negociomx_pos.BE.Paso1SOCItem
-import com.example.negociomx_pos.DAL.DALPaso1SOC
+import com.example.negociomx_pos.BE.PasoNumLogVehiculo
 import com.example.negociomx_pos.DAL.DALVehiculo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -31,7 +30,7 @@ class DescargadorFotos(private val context: Context) {
     private var opcionGlobal: OpcionArchivo = OpcionArchivo.PREGUNTAR
 
     suspend fun descargarFotosVehiculo(
-        registro: Paso1SOCItem,
+        registro: PasoNumLogVehiculo,
         onProgress: (String, String) -> Unit,
         onComplete: (Boolean, String) -> Unit
     ) = withContext(Dispatchers.IO) {
@@ -46,62 +45,80 @@ class DescargadorFotos(private val context: Context) {
             val dalVeh=DALVehiculo()
 
             var fotosDescargadas = 0
-            var errores = 0
 
             var existeFoto= true
-            var contadorFotos=1
+            var contador=1
+            var contadorFotos=0
             var salir=false
-            var paso=1
             var totalFotos=registro.CantidadFotos
             do {
                 existeFoto=false
-                if(contadorFotos==1 && registro.FechaAltaFoto1.trim().isNotEmpty())
-                    existeFoto=true
-                else if (contadorFotos==2 && registro.FechaAltaFoto2.trim().isNotEmpty())
-                    existeFoto=true
-                else if (contadorFotos==3 && registro.FechaAltaFoto3.trim().isNotEmpty())
-                    existeFoto=true
-                else if(contadorFotos==4 && registro.FechaAltaFoto4.trim().isNotEmpty())
-                    existeFoto=true
+                if(registro.Paso==1) {
+                    if (contador == 1 && registro.FechaAltaFoto1.trim().isNotEmpty())
+                        existeFoto = true
+                    else if (contador == 2 && registro.FechaAltaFoto2.trim().isNotEmpty())
+                        existeFoto = true
+                    else if (contador == 3 && registro.FechaAltaFoto3.trim().isNotEmpty())
+                        existeFoto = true
+                    else if (contador == 4 && registro.FechaAltaFoto4.trim().isNotEmpty())
+                        existeFoto = true
+                }
+                else if (registro.Paso==2)
+                {
+                    if (contador == 1 && registro.TieneFoto1==true)
+                        existeFoto = true
+                    else if (contador == 2 && registro.TieneFoto2==true)
+                        existeFoto = true
+                    else if (contador == 3 && registro.TieneFoto3==true)
+                        existeFoto = true
+                    else if (contador == 4 && registro.TieneFoto4==true)
+                        existeFoto = true
+                }
 
                 if(existeFoto) {
-                    val nombreArchivo = "${registro.VIN}_Paso_${paso}_${contadorFotos}.jpg"
+                    val nombreArchivo = "${registro.VIN}_Paso_${registro.Paso}_${contador}.jpg"
                     withContext(Dispatchers.Main) {
                         onProgress(
-                            "Descargando foto $contadorFotos de ${totalFotos}",
+                            "Descargando foto $contador de ${totalFotos}",
                             "Procesando: $nombreArchivo"
                         )
                     }
 
                     val nombreAux=Environment.DIRECTORY_PICTURES+"/"+ nombreCarpeta+"/"
                     val carpetaVIN = File(nombreAux,nombreArchivo)
-                    if (carpetaVIN.isFile || carpetaVIN.exists()) {
+                    /*if (carpetaVIN.isFile || carpetaVIN.exists()) {
                         val lista = carpetaVIN.listFiles()
                         if(lista!=null)
                         {
 
                         }
-                    }
-                    val fotoBase64 = dalVeh.obtenerFotoBase64Paso1(registro.IdVehiculo,contadorFotos)
+                    }*/
+                    var fotoBase64:String =""
+                    if(registro.Paso==1)
+                        fotoBase64=dalVeh.obtenerFotoBase64Paso1(registro.IdVehiculo,contador)!!
+                    else if(registro.Paso==2)
+                        fotoBase64=dalVeh.obtenerFotoBase64Paso2(registro.IdVehiculo,contador)!!
+                    else if(registro.Paso==3)
+                        fotoBase64=dalVeh.obtenerFotoBase64Paso3(registro.IdVehiculo)!!
+                    else if(registro.Paso==4)
+                        fotoBase64=dalVeh.obtenerFotoBase64Paso4(registro.IdVehiculo,contador.toByte())!!
                     try {
                         var uri = bllUtil.saveBitmapToFile(context, fotoBase64!!,nombreCarpeta,nombreArchivo)
                         if (uri!=null) {
                             fotosDescargadas++
-                            Log.d(TAG, "✅ Foto $contadorFotos descargada exitosamente")
+                            Log.d(TAG, "✅ Foto $contador descargada exitosamente")
                         } else {
-                            errores++
-                            Log.e(TAG, "❌ Error descargando foto $contadorFotos")
+                            Log.e(TAG, "❌ Error descargando foto $contador")
                         }
 
                     } catch (e: Exception) {
-                        errores++
-                        Log.e(TAG, "💥 Excepción descargando foto $contadorFotos: ${e.message}")
+                        Log.e(TAG, "💥 Excepción descargando foto $contador: ${e.message}")
                     }
+                    contadorFotos++
                 }
-                else
-                    salir=true
 
-                contadorFotos++
+                contador++
+                if(contadorFotos>=totalFotos) salir=true
             }while(!salir)
 
             val mensaje = buildString {

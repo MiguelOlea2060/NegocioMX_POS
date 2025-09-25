@@ -1,5 +1,8 @@
 package com.example.negociomx_pos.BLL
 
+import com.example.negociomx_pos.BE.ConsultaPaso2Item
+import com.example.negociomx_pos.BE.Paso1SOCItem
+import com.example.negociomx_pos.BE.PasoNumLogVehiculo
 import com.example.negociomx_pos.BE.Vehiculo
 import com.example.negociomx_pos.BE.VehiculoPaso1
 
@@ -26,5 +29,69 @@ class BLLVehiculo {
         )
 
         return v
+    }
+
+    fun asignaPasoNumLogVehiculo(a:Paso1SOCItem):PasoNumLogVehiculo
+    {
+        var b=PasoNumLogVehiculo(
+            Paso = 1,
+            VIN = a.VIN,
+            IdVehiculo = a.IdVehiculo,
+            IdModelo = a.IdModelo,
+            IdMarca = a.IdMarca,
+            IdPasoNumLogVehiculo = a.IdPaso1LogVehiculo,
+            IdColor = a.IdColor,
+            IdColorInterior = a.IdColorInterior,
+            Anio = a.Anio,
+            Modelo = a.Modelo,
+            Marca = a.Marca,
+            CantidadFotos = a.CantidadFotos,
+            ColorExterior = a.ColorExterior,
+            ColorInterior = a.ColorInterior,
+            FechaAltaFoto1 = a.FechaAltaFoto1,
+            FechaAltaFoto2 = a.FechaAltaFoto2,
+            FechaAltaFoto3 = a.FechaAltaFoto3,
+            FechaAltaFoto4 = a.FechaAltaFoto4,
+            TieneFoto1 = true,
+            TieneFoto2 = true,
+            TieneFoto3 = true,
+            TieneFoto4 = true
+        )
+        return b
+    }
+
+    fun asignaPasoNumLogVehiculo(a:List<ConsultaPaso2Item>):MutableList<PasoNumLogVehiculo>
+    {
+        var lista:MutableList<PasoNumLogVehiculo>
+
+        lista= mutableListOf()
+        a.forEach { a ->
+            var b = PasoNumLogVehiculo(
+                Paso = 2,
+                VIN = a.VIN,
+                IdVehiculo = a.IdVehiculo,
+                IdModelo = a.IdModelo,
+                IdMarca = a.IdMarca,
+                IdPasoNumLogVehiculo = a.IdPaso2LogVehiculo,
+                IdColor = a.IdColor,
+                IdColorInterior = a.IdColorInterior,
+                Anio = a.Anio,
+                Modelo = a.Modelo,
+                Marca = a.Marca,
+                CantidadFotos = a.CantidadFotos,
+                ColorExterior = a.ColorExterior,
+                ColorInterior = a.ColorInterior,
+                FechaAltaFoto1 = a.FechaAltaFoto1,
+                FechaAltaFoto2 = a.FechaAltaFoto2,
+                FechaAltaFoto3 = a.FechaAltaFoto3,
+                FechaAltaFoto4 = a.FechaAltaFoto4,
+                TieneFoto1 = a.TieneFoto1,
+                TieneFoto2 = a.TieneFoto2,
+                TieneFoto3 = a.TieneFoto3,
+                TieneFoto4 = a.TieneFoto4,
+            )
+            lista.add(b)
+        }
+        return lista
     }
 }

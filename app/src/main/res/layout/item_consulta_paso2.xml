@@ -12,14 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="8dp">
 
-        Header con VIN y BL
+        <!-- Header con VIN y BL -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="4dp">
+            android:layout_marginBottom="2dp">
 
             <TextView
                 android:id="@+id/tvVIN"
@@ -44,12 +44,12 @@
 
         </LinearLayout>
 
-        Información del Vehículo
+        <!--Información del Vehículo-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="5dp">
+            android:layout_marginBottom="3dp">
 
             <TextView
                 android:id="@+id/tvMarcaModelo"
@@ -72,7 +72,7 @@
 
         </LinearLayout>
 
-        Colores
+        <!-- Colores -->
         <TextView
             android:id="@+id/tvColores"
             android:layout_width="match_parent"
@@ -82,7 +82,7 @@
             android:textColor="#666666"
             android:layout_marginBottom="4dp" />
 
-        Número de Motor
+        <!-- Número de Motor -->
         <TextView
             android:id="@+id/tvNumeroMotor"
             android:layout_width="match_parent"
@@ -90,21 +90,21 @@
             android:text="Numero de Motor: XXXXXXXXX"
             android:textSize="12sp"
             android:textColor="#666666"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="4dp" />
 
-        Datos de Fechas de Fotos
+        <!-- Datos de Fechas de Fotos -->
         <TextView
             android:id="@+id/tvDatosSOC"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Fechas de fotos: Foto1: 2024-01-01 | Foto2: 2024-01-01"
-            android:textSize="11sp"
+            android:textSize="14sp"
             android:textColor="#FF6F00"
             android:background="#FFF3E0"
             android:padding="6dp"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="4dp" />
 
-        Footer con fotos y fecha
+        <!-- Footer con fotos y fecha-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -112,16 +112,30 @@
             android:gravity="center_vertical">
 
             <TextView
+                android:textStyle="bold"
+                android:layout_weight="1"
                 android:id="@+id/tvFotos"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="📸 0 foto(s)"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:textColor="#9C27B0"
                 android:background="#F3E5F5"
                 android:padding="4dp" />
 
-
+            <Button
+                android:id="@+id/btnDescargarFotos"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:text="📥 Descargar"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#4CAF50"
+                android:layout_marginStart="8dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="12dp"
+                android:minWidth="0dp"
+                android:minHeight="0dp" />
 
         </LinearLayout>
 

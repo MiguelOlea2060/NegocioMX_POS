@@ -2,22 +2,20 @@ package com.example.negociomx_pos
 
 import android.app.DatePickerDialog
 import android.app.AlertDialog
-import android.content.ContentValues
+import android.app.Dialog
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
-import android.provider.MediaStore
-import android.provider.MediaStore.Audio.Media
 import android.util.Log
 import android.view.View
+import android.view.Window
 import android.widget.Button
 import android.widget.CheckBox
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -25,14 +23,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.negociomx_pos.BE.ConsultaPaso2Item
+import com.example.negociomx_pos.BE.PasoNumLogVehiculo
+import com.example.negociomx_pos.BLL.BLLVehiculo
 import com.example.negociomx_pos.DAL.DALPaso2
 import com.example.negociomx_pos.DAL.DALVehiculo
 import com.example.negociomx_pos.Utils.BLLUtils
+import com.example.negociomx_pos.Utils.DescargadorFotos
 import com.example.negociomx_pos.Utils.ParametrosSistema
-import com.example.negociomx_pos.adapters.Paso2Adapter
+import com.example.negociomx_pos.adapters.PasoNumVehiculoAdapter
 import kotlinx.coroutines.launch
-import org.apache.xmlbeans.impl.xb.ltgfmt.TestCase.Files
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -51,15 +50,20 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
     private lateinit var tvMensajeSinResultados: TextView
     private lateinit var btnConsultar: Button
     private lateinit var chkTodosLosUsuarios: CheckBox
+    private lateinit var btnRegresar:ImageView
 
-    private lateinit var adapter: Paso2Adapter
+    private lateinit var adapter: PasoNumVehiculoAdapter
     private val dalConsultaPaso2 = DALPaso2()
     private var dalVehiculo: DALVehiculo? = null
     private var fechaSeleccionada: String = ""
     private var loadingHandler: Handler? = null
     private var loadingRunnable: Runnable? = null
 
+    private lateinit var descargadorFotos: DescargadorFotos
+    private var dialogoProgreso: Dialog? = null
+
     private var bllUtil:BLLUtils?=null
+    private lateinit var bllVeh:BLLVehiculo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,18 +88,29 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         tvTotalFotos = findViewById(R.id.tvTotalFotos)
         tvMensajeSinResultados = findViewById(R.id.tvMensajeSinResultados)
         chkTodosLosUsuarios = findViewById(R.id.chkTodosUsuarioPaso2)
+        btnRegresar=findViewById(R.id.btnRegresarConsultaPaso2)
 
         btnConsultar = findViewById(R.id.btnConsultarPaso2)
 
-        bllUtil=BLLUtils()
+        bllUtil= BLLUtils()
         dalVehiculo = DALVehiculo()
+        bllVeh= BLLVehiculo()
+        descargadorFotos = DescargadorFotos(this)
     }
 
     private fun configurarRecyclerView() {
-        adapter = Paso2Adapter(emptyList()) { registro ->
-            // Manejar clic en item
-            mostrarDetalleRegistro(registro)
-        }
+        adapter = PasoNumVehiculoAdapter(
+            emptyList(),
+            { registro ->
+                    // Manejar clic en item
+                    mostrarDetalleRegistro(registro)
+                },
+                { registro ->
+                    // Manejar clic en descargar fotos
+                    iniciarDescargaFotos(registro)
+
+                }
+                )
         recyclerViewRegistros.layoutManager = LinearLayoutManager(this)
         recyclerViewRegistros.adapter = adapter
     }
@@ -104,6 +119,10 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         // Selector de fecha
         tvFechaSeleccionada.setOnClickListener {
             mostrarSelectorFecha()
+        }
+
+        btnRegresar.setOnClickListener {
+            finish()
         }
 
         chkTodosLosUsuarios.setOnCheckedChangeListener { buttonView, isChecked ->
@@ -194,6 +213,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
                 val registros =
                     dalConsultaPaso2.consultarPaso2PorFecha(fechaSeleccionada, idUsuario)
 
+                val registros1=bllVeh.asignaPasoNumLogVehiculo(registros)
                 // Consultar estadísticas
                 val estadisticas = mutableMapOf<String, Int>()
                 var totalVehiculos = 0
@@ -212,7 +232,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
                 ocultarCarga()
 
                 if (registros.isNotEmpty()) {
-                    mostrarResultados(registros, estadisticas)
+                    mostrarResultados(registros1, estadisticas)
                     Toast.makeText(
                         this@ConsultaPaso2_Activity,
                         "✅ Se encontraron ${registros.size} registros",
@@ -278,7 +298,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
     }
 
     private fun mostrarResultados(
-        registros: List<ConsultaPaso2Item>,
+        registros: List<PasoNumLogVehiculo>,
         estadisticas: Map<String, Int>
     ) {
         // Actualizar adapter
@@ -317,7 +337,74 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         layoutSinResultados.visibility = View.GONE
     }
 
-    private fun mostrarDetalleRegistro(registro: ConsultaPaso2Item) {
+    private fun iniciarDescargaFotos(registro: PasoNumLogVehiculo) {
+        if (registro.CantidadFotos == 0) {
+            Toast.makeText(this, "Este vehículo no tiene fotos para descargar", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        Log.d("ConsultaPaso2", "🚀 Iniciando descarga de fotos para VIN: ${registro.VIN}")
+
+        lifecycleScope.launch {
+            mostrarDialogoProgreso("Preparando descarga...", "Iniciando proceso")
+
+            descargadorFotos.descargarFotosVehiculo(registro,
+                onProgress = { titulo, subtitulo ->
+                    runOnUiThread {
+                        actualizarDialogoProgreso(titulo, subtitulo)
+                    }
+                },
+                onComplete = { exito, mensaje ->
+                    runOnUiThread {
+                        ocultarDialogoProgreso()
+
+                        if (exito) {
+                            Toast.makeText(this@ConsultaPaso2_Activity, "✅ Descarga completada", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this@ConsultaPaso2_Activity, "❌ Error en descarga", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            )
+        }
+    }
+
+    private fun ocultarDialogoProgreso() {
+        dialogoProgreso?.let { dialogo ->
+            if (dialogo.isShowing) {
+                dialogo.dismiss()
+            }
+        }
+        dialogoProgreso = null
+    }
+
+    private fun actualizarDialogoProgreso(titulo: String, subtitulo: String) {
+        dialogoProgreso?.let { dialogo ->
+            if (dialogo.isShowing) {
+                dialogo.findViewById<TextView>(R.id.tvTituloProgreso)?.text = titulo
+                dialogo.findViewById<TextView>(R.id.tvSubtituloProgreso)?.text = subtitulo
+            }
+        }
+    }
+
+    private fun mostrarDialogoProgreso(titulo: String, subtitulo: String) {
+        if (dialogoProgreso?.isShowing == true) {
+            dialogoProgreso?.dismiss()
+        }
+
+        dialogoProgreso = Dialog(this).apply {
+            requestWindowFeature(Window.FEATURE_NO_TITLE)
+            setContentView(R.layout.dialog_progreso_descarga)
+            setCancelable(false)
+
+            findViewById<TextView>(R.id.tvTituloProgreso).text = titulo
+            findViewById<TextView>(R.id.tvSubtituloProgreso).text = subtitulo
+
+            show()
+        }
+    }
+
+    private fun mostrarDetalleRegistro(registro: PasoNumLogVehiculo) {
         val dialog = AlertDialog.Builder(this)
 
         // Crear el contenido del diálogo
@@ -328,7 +415,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         mensaje.append("Marca: ${registro.Marca}\n")
         mensaje.append("Modelo: ${registro.Modelo}\n")
         mensaje.append("Año: ${registro.Anio}\n")
-        mensaje.append("Motor: ${registro.NumeroMotor}\n")
+        //mensaje.append("Motor: ${registro.NumeroMotor}\n")
         mensaje.append("Color Exterior: ${registro.ColorExterior}\n")
         mensaje.append("Color Interior: ${registro.ColorInterior}\n\n")
         mensaje.append("Color Interior: ${registro.ColorInterior}\n\n")
@@ -357,75 +444,6 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         dialog.setMessage(mensaje.toString())
         dialog.setPositiveButton("Cerrar") { dialogInterface, _ ->
             dialogInterface.dismiss()
-        }
-
-        // Opcional: Agregar botón para ver fotos (si implementas visualización de fotos)
-        if (registro.CantidadFotos > 0) {
-            dialog.setNeutralButton("Ver Fotos") { _, _ ->
-                Toast.makeText(this, "Descargando fotos de BD del Paso 2", Toast.LENGTH_SHORT).show()
-
-                lifecycleScope.launch {
-                    var nombreCarpeta=registro.VIN.toString()
-
-                    val directory = File(Environment.DIRECTORY_PICTURES +"/"+nombreCarpeta)
-                    if (directory.exists()) {
-                        /*val esDirectorio=directory.isDirectory
-                        val lista= directory.listFiles()
-                            lista.forEach {
-                            if(it.isFile)
-                                it.delete()
-                        }*/
-                    }
-
-                    if (registro.TieneFoto1 == true) {
-                        Toast.makeText(
-                            this@ConsultaPaso2_Activity,
-                            "Descargando foto 1",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        val fotoBase64 = dalVehiculo?.obtenerFotoBase64Paso2(registro.IdVehiculo, 1)
-
-                        var nombreArchivo = "${registro.VIN}_Paso_2_Foto_1"
-                        bllUtil?.saveBitmapToFile(this@ConsultaPaso2_Activity, fotoBase64!!,nombreCarpeta, nombreArchivo)
-                        Toast.makeText(this@ConsultaPaso2_Activity, "Foto 1 de Paso 2 guardada en el dispositivo", Toast.LENGTH_SHORT).show()
-                    }
-                    if (registro.TieneFoto2 == true) {
-                        Toast.makeText(
-                            this@ConsultaPaso2_Activity,
-                            "Descargando foto 2",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        val fotoBase64 = dalVehiculo?.obtenerFotoBase64Paso2(registro.IdVehiculo, 2)
-                        var nombreArchivo = "${registro.VIN}_Paso_2_Foto_2"
-                        bllUtil?.saveBitmapToFile(this@ConsultaPaso2_Activity, fotoBase64!!,nombreCarpeta, nombreArchivo)
-                        Toast.makeText(this@ConsultaPaso2_Activity, "Foto 2 guardada en el dispositivo", Toast.LENGTH_SHORT).show()
-                    }
-                    if (registro.TieneFoto3 == true) {
-                        Toast.makeText(
-                            this@ConsultaPaso2_Activity,
-                            "Descargando foto 3",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        val fotoBase64 = dalVehiculo?.obtenerFotoBase64Paso2(registro.IdVehiculo, 3)
-                        var nombreArchivo = "${registro.VIN}_Paso_2_Foto_3"
-                        bllUtil?.saveBitmapToFile(this@ConsultaPaso2_Activity, fotoBase64!!,nombreCarpeta, nombreArchivo)
-                        Toast.makeText(this@ConsultaPaso2_Activity, "Foto 3 guardada en el dispositivo", Toast.LENGTH_SHORT).show()
-                    }
-                    if (registro.TieneFoto4 == true) {
-                        Toast.makeText(
-                            this@ConsultaPaso2_Activity,
-                            "Descargando foto 4",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        val fotoBase64 = dalVehiculo?.obtenerFotoBase64Paso2(registro.IdVehiculo, 4)
-                        var nombreArchivo = "${registro.VIN}_Paso_2_Foto_4"
-                        bllUtil?.saveBitmapToFile(this@ConsultaPaso2_Activity, fotoBase64!!,nombreCarpeta,
-                           nombreArchivo)
-                        Toast.makeText(this@ConsultaPaso2_Activity, "Foto 4 guardada en el dispositivo", Toast.LENGTH_SHORT).show()
-                    }
-                    Toast.makeText(this@ConsultaPaso2_Activity, "Fotos guardadas en carpeta ${nombreCarpeta}", Toast.LENGTH_LONG).show()
-                }
-            }
         }
 
         dialog.show()

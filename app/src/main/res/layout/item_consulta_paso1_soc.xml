@@ -12,14 +12,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="8dp">
 
         <!-- Header con VIN y BL -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="4dp">
+            android:layout_marginBottom="2dp">
 
             <TextView
                 android:id="@+id/tvVIN"
@@ -81,7 +81,7 @@
             android:text="Colores -> Ext: Color | Int: Color"
             android:textSize="12sp"
             android:textColor="#666666"
-            android:layout_marginBottom="4dp" />
+            android:layout_marginBottom="2dp" />
 
         <!-- Número de Motor -->
         <TextView
@@ -91,7 +91,7 @@
             android:text="Numero de Motor: XXXXXXXXX"
             android:textSize="12sp"
             android:textColor="#666666"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="6dp" />
 
         <!-- Datos SOC -->
         <TextView
@@ -103,7 +103,8 @@
             android:textColor="#FF6F00"
             android:background="#FFF3E0"
             android:padding="6dp"
-            android:layout_marginBottom="8dp" />
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
 
         <!-- Footer con fotos y botón de descarga -->
         <LinearLayout
@@ -126,14 +127,14 @@
             <Button
                 android:id="@+id/btnDescargarFotos"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="38dp"
                 android:text="📥 Descargar"
-                android:textSize="10sp"
+                android:textSize="12sp"
                 android:textColor="@android:color/white"
                 android:backgroundTint="#4CAF50"
                 android:layout_marginStart="8dp"
                 android:paddingStart="8dp"
-                android:paddingEnd="8dp"
+                android:paddingEnd="10dp"
                 android:minWidth="0dp"
                 android:minHeight="0dp" />
 

@@ -49,11 +49,9 @@ class Paso1SOCAdapter(
 
         holder.tvFotos.text = "📸 ${registro.CantidadFotos} foto(s)"
 
-
         holder.itemView.setOnClickListener {
             onItemClick(registro)
         }
-
 
         // Habilitar/deshabilitar botón según cantidad de fotos
         holder.btnDescargarFotos.isEnabled = registro.CantidadFotos > 0
@@ -64,10 +62,6 @@ class Paso1SOCAdapter(
                 onDescargarFotosClick(registro)
             }
         }
-
-
-
-
     }
 
     override fun getItemCount() = registros.size

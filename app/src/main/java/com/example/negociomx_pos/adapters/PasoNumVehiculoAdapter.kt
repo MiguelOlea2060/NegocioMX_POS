@@ -3,15 +3,17 @@ package com.example.negociomx_pos.adapters
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.negociomx_pos.BE.ConsultaPaso2Item
+import com.example.negociomx_pos.BE.PasoNumLogVehiculo
 import com.example.negociomx_pos.R
 
-class Paso2Adapter(
-    private var registros: List<ConsultaPaso2Item>,
-    private val onItemClick: (ConsultaPaso2Item) -> Unit
-) : RecyclerView.Adapter<Paso2Adapter.ViewHolder>() {
+class PasoNumVehiculoAdapter(
+    private var registros: List<PasoNumLogVehiculo>,
+    private val onItemClick: (PasoNumLogVehiculo) -> Unit,
+    private val onDescargarFotosClick: (PasoNumLogVehiculo) -> Unit
+) : RecyclerView.Adapter<PasoNumVehiculoAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tvVIN: TextView = view.findViewById(R.id.tvVIN)
@@ -22,7 +24,7 @@ class Paso2Adapter(
         val tvNumeroMotor: TextView = view.findViewById(R.id.tvNumeroMotor)
         val tvDatosSOC: TextView = view.findViewById(R.id.tvDatosSOC)
         val tvFotos: TextView = view.findViewById(R.id.tvFotos)
-
+        val btnDescargarFotos: Button = view.findViewById(R.id.btnDescargarFotos)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -39,7 +41,7 @@ class Paso2Adapter(
         holder.tvMarcaModelo.text = "${registro.Marca} ${registro.Modelo}"
         holder.tvAnio.text = "Año: ${registro.Anio}"
         holder.tvColores.text = "Colores -> Ext: ${registro.ColorExterior} | Int: ${registro.ColorInterior}"
-        holder.tvNumeroMotor.text = "Numero de Motor: ${registro.NumeroMotor}"
+        //holder.tvNumeroMotor.text = "Numero de Motor: ${registro.NumeroMotor}"
 
         // Mostrar información de fechas de fotos
         val fechasInfo = mutableListOf<String>()
@@ -53,32 +55,26 @@ class Paso2Adapter(
         } else {
             "Sin fechas de fotos registradas"
         }
-
         holder.tvFotos.text = "📸 ${registro.CantidadFotos} foto(s)"
-
-        // Mostrar la fecha más reciente
-       /* val fechaReciente = listOf(
-            registro.FechaAltaFoto1,
-            registro.FechaAltaFoto2,
-            registro.FechaAltaFoto3,
-            registro.FechaAltaFoto4
-        ).filter { it.isNotEmpty() }.maxOrNull() ?: ""
-
-        holder.tvFechaHora.text = if (fechaReciente.isNotEmpty()) {
-            fechaReciente.substring(0, 19) // YYYY-MM-DD HH:mm:ss
-        } else {
-            "Sin fecha"
-        }*/
 
         // ✅ CONFIGURAR EL CLIC EN EL ITEM
         holder.itemView.setOnClickListener {
             onItemClick(registro)
         }
+        // Habilitar/deshabilitar botón según cantidad de fotos
+        holder.btnDescargarFotos.isEnabled = registro.CantidadFotos > 0
+        holder.btnDescargarFotos.alpha = if (registro.CantidadFotos > 0) 1.0f else 0.5f
+
+        holder.btnDescargarFotos.setOnClickListener {
+            if (registro.CantidadFotos > 0) {
+                onDescargarFotosClick(registro)
+            }
+        }
     }
 
     override fun getItemCount() = registros.size
 
-    fun actualizarRegistros(nuevosRegistros: List<ConsultaPaso2Item>) {
+    fun actualizarRegistros(nuevosRegistros: List<PasoNumLogVehiculo>) {
         registros = nuevosRegistros
         notifyDataSetChanged()
     }

@@ -8,7 +8,7 @@
     tools:context=".menu_principal_activity">
 
     <LinearLayout
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="5dp"
         android:layout_gravity="center_vertical"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -21,19 +21,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:layout_marginLeft="10dp"
             android:layout_weight="1"
             app:srcCompat="@drawable/transvision_logo_clean" />
-
-        <ImageView
-            android:layout_gravity="top"
-            android:id="@+id/imgLoginLogoutMenuPrincipal"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="40dp"
-            app:srcCompat="@drawable/logout_icono_64x64" />
 
     </LinearLayout>
 
@@ -201,21 +190,39 @@
             android:text="Carga de VINs" />
     </LinearLayout>
 
-    <TextView
-        android:textColor="@color/black"
-        android:textAlignment="textStart"
+    <LinearLayout
         android:padding="5dp"
-        android:textStyle="bold"
+        android:gravity="center_vertical"
         android:background="@color/naranja"
-        android:layout_marginLeft="10dp"
-        android:text="Opciones"
-        android:textSize="22dp"
-        android:layout_marginRight="10dp"
-        android:paddingLeft="7dp"
+        android:layout_marginTop="40dp"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    </TextView>
+        <TextView
+            android:layout_weight="1"
+            android:textColor="@color/black"
+            android:textAlignment="textStart"
+            android:textStyle="bold"
+            android:layout_marginLeft="10dp"
+            android:text="Opciones"
+            android:textSize="22dp"
+            android:layout_marginRight="10dp"
+            android:paddingLeft="7dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        </TextView>
+        <ImageView
+            android:layout_gravity="top"
+            android:id="@+id/imgLoginLogoutMenuPrincipal"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="5dp"
+            app:srcCompat="@drawable/logout_icono_64x64" />
+
+    </LinearLayout>
     <View
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
