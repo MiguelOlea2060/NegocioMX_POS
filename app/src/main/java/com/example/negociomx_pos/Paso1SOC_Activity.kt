@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.negociomx_pos.BE.StatusFotoVehiculo
 import com.example.negociomx_pos.BE.Vehiculo
 import com.example.negociomx_pos.DAL.DALVehiculo
 //import com.example.negociomx_pos.Utils.FileUploadUtil
@@ -34,7 +33,6 @@ import android.os.Looper
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Button
-import androidx.core.util.rangeTo
 import com.example.negociomx_pos.BE.VehiculoPaso1
 import com.example.negociomx_pos.BLL.BLLVehiculo
 import com.example.negociomx_pos.Utils.BLLUtils
@@ -393,7 +391,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                 Toast.makeText(this@Paso1SOC_Activity, "Cargando foto...", Toast.LENGTH_SHORT)
                     .show()
 
-                val fotoBase64 = dalVehiculo.obtenerFotoBase64(vehiculo.Id.toInt(), posicion)
+                val fotoBase64 = dalVehiculo.obtenerFotoBase64Paso1(vehiculo.Id.toInt(), posicion)
 
                 if (fotoBase64 != null && fotoBase64.isNotEmpty()) {
                     mostrarDialogoFoto(fotoBase64, posicion)

@@ -6,6 +6,7 @@ import android.os.Environment
 import android.util.Log
 import com.example.negociomx_pos.BE.Paso1SOCItem
 import com.example.negociomx_pos.DAL.DALPaso1SOC
+import com.example.negociomx_pos.DAL.DALVehiculo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -39,92 +40,82 @@ class DescargadorFotos(private val context: Context) {
             Log.d(TAG, "🚀 Iniciando descarga de fotos para VIN: ${registro.VIN}")
 
             opcionGlobal = OpcionArchivo.PREGUNTAR
+            var nombreCarpeta=registro.VIN
 
-            val carpetaVIN = crearCarpetaVIN(registro.VIN)
-            if (carpetaVIN == null) {
-                withContext(Dispatchers.Main) {
-                    onComplete(false, "Error creando carpeta para VIN: ${registro.VIN}")
-                }
-                return@withContext
-            }
-
-            val dalPaso1SOC = DALPaso1SOC()
-            val urlsFotos = dalPaso1SOC.obtenerURLsFotosPaso1(registro.IdPaso1LogVehiculo)
-
-            if (urlsFotos.isEmpty()) {
-                withContext(Dispatchers.Main) {
-                    onComplete(false, "No se encontraron URLs de fotos para este vehículo")
-                }
-                return@withContext
-            }
-
-            Log.d(TAG, "📸 Se encontraron ${urlsFotos.size} fotos para descargar")
+            var bllUtil=BLLUtils()
+            val dalVeh=DALVehiculo()
 
             var fotosDescargadas = 0
-            var fotosOmitidas = 0
             var errores = 0
 
-            for (i in urlsFotos.indices) {
-                val urlFoto = urlsFotos[i]
-                val numeroFoto = i + 1
-                val nombreArchivo = "foto$numeroFoto.jpg"
-                val archivoDestino = File(carpetaVIN, nombreArchivo)
+            var existeFoto= true
+            var contadorFotos=1
+            var salir=false
+            var paso=1
+            var totalFotos=registro.CantidadFotos
+            do {
+                existeFoto=false
+                if(contadorFotos==1 && registro.FechaAltaFoto1.trim().isNotEmpty())
+                    existeFoto=true
+                else if (contadorFotos==2 && registro.FechaAltaFoto2.trim().isNotEmpty())
+                    existeFoto=true
+                else if (contadorFotos==3 && registro.FechaAltaFoto3.trim().isNotEmpty())
+                    existeFoto=true
+                else if(contadorFotos==4 && registro.FechaAltaFoto4.trim().isNotEmpty())
+                    existeFoto=true
 
-                withContext(Dispatchers.Main) {
-                    onProgress("Descargando foto $numeroFoto de ${urlsFotos.size}", "Procesando: $nombreArchivo")
-                }
+                if(existeFoto) {
+                    val nombreArchivo = "${registro.VIN}_Paso_${paso}_${contadorFotos}.jpg"
+                    withContext(Dispatchers.Main) {
+                        onProgress(
+                            "Descargando foto $contadorFotos de ${totalFotos}",
+                            "Procesando: $nombreArchivo"
+                        )
+                    }
 
-                try {
-                    if (archivoDestino.exists()) {
-                        val accion = manejarArchivoExistente(nombreArchivo, archivoDestino)
-                        when (accion) {
-                            OpcionArchivo.OMITIR_TODO -> {
-                                Log.d(TAG, "⏭️ Omitiendo foto $numeroFoto (archivo existe)")
-                                fotosOmitidas++
-                                continue
-                            }
-                            OpcionArchivo.PREGUNTAR -> {
-                                fotosOmitidas++
-                                continue
-                            }
-                            OpcionArchivo.REEMPLAZAR_TODO -> {
-                                // Continuar con la descarga
-                            }
+                    val nombreAux=Environment.DIRECTORY_PICTURES+"/"+ nombreCarpeta+"/"
+                    val carpetaVIN = File(nombreAux,nombreArchivo)
+                    if (carpetaVIN.isFile || carpetaVIN.exists()) {
+                        val lista = carpetaVIN.listFiles()
+                        if(lista!=null)
+                        {
+
                         }
                     }
+                    val fotoBase64 = dalVeh.obtenerFotoBase64Paso1(registro.IdVehiculo,contadorFotos)
+                    try {
+                        var uri = bllUtil.saveBitmapToFile(context, fotoBase64!!,nombreCarpeta,nombreArchivo)
+                        if (uri!=null) {
+                            fotosDescargadas++
+                            Log.d(TAG, "✅ Foto $contadorFotos descargada exitosamente")
+                        } else {
+                            errores++
+                            Log.e(TAG, "❌ Error descargando foto $contadorFotos")
+                        }
 
-                    val exito = descargarArchivo(urlFoto, archivoDestino)
-                    if (exito) {
-                        fotosDescargadas++
-                        Log.d(TAG, "✅ Foto $numeroFoto descargada exitosamente")
-                    } else {
+                    } catch (e: Exception) {
                         errores++
-                        Log.e(TAG, "❌ Error descargando foto $numeroFoto")
+                        Log.e(TAG, "💥 Excepción descargando foto $contadorFotos: ${e.message}")
                     }
-
-                } catch (e: Exception) {
-                    errores++
-                    Log.e(TAG, "💥 Excepción descargando foto $numeroFoto: ${e.message}")
                 }
-            }
+                else
+                    salir=true
+
+                contadorFotos++
+            }while(!salir)
 
             val mensaje = buildString {
                 append("✅ Descarga completada para VIN: ${registro.VIN}\n\n")
                 append("📊 RESUMEN:\n")
                 append("📥 Fotos descargadas: $fotosDescargadas\n")
-                if (fotosOmitidas > 0) append("⏭️ Fotos omitidas: $fotosOmitidas\n")
-                if (errores > 0) append("❌ Errores: $errores\n")
                 append("\n📁 UBICACIÓN:\n")
                 append("Almacenamiento interno de la app\n")
-                append("Carpeta: NegocioMX_Fotos/${registro.VIN}\n\n")
+                append("Carpeta: ${registro.VIN}\n\n")
                 append("📱 PARA ACCEDER A LAS FOTOS:\n")
                 append("1. Abre el Administrador de archivos\n")
                 append("2. Ve a 'Almacenamiento interno'\n")
-                append("3. Busca 'Android' > 'data'\n")
-                append("4. Encuentra 'com.example.negociomx_pos'\n")
-                append("5. Ve a 'files' > 'NegocioMX_Fotos' > '${registro.VIN}'\n\n")
-                append("💡 Las fotos están guardadas como:\n")
-                append("foto1.jpg, foto2.jpg, foto3.jpg, etc.")
+                append("5. Ve a 'files' > '${registro.VIN}'\n\n")
+                append("💡 Las fotos están guardadas dentro\n")
             }
 
             withContext(Dispatchers.Main) {

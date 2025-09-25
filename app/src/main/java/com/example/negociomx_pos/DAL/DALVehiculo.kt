@@ -4,8 +4,6 @@ import android.util.Log
 import com.example.negociomx_pos.BE.DireccionVehiculo
 import com.example.negociomx_pos.BE.Marca
 import com.example.negociomx_pos.BE.Modelo
-import com.example.negociomx_pos.BE.Paso2LogVehiculo
-import com.example.negociomx_pos.BE.Paso3LogVehiculo
 import com.example.negociomx_pos.BE.StatusFotoVehiculo
 import com.example.negociomx_pos.BE.Transmision
 import com.example.negociomx_pos.BE.Vehiculo
@@ -1631,7 +1629,7 @@ class DALVehiculo {
     }
 
 
-    suspend fun obtenerFotoBase64(idVehiculo: Int, posicion: Int): String? = withContext(Dispatchers.IO) {
+    suspend fun obtenerFotoBase64Paso1(idVehiculo: Int, posicion: Int): String? = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
         var resultSet: ResultSet? = null

@@ -1,10 +1,14 @@
 package com.example.negociomx_pos.Utils
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -82,6 +86,57 @@ class BLLUtils {
             null
         }
     }*/
+
+    public fun saveBitmapToFile(context: Context, fotoBase64: String,nombreCarpeta:String, nombreArchivo: String): Uri? {
+        var imgUri: Uri?=null
+        val decodedBytes = android.util.Base64.decode(fotoBase64, android.util.Base64.DEFAULT)
+        var bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+
+        try {
+            if (bitmap != null) {
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    imgUri =
+                        MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                } else {
+                    imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                }
+                val contentValues = ContentValues()
+                contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, nombreArchivo)
+                contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES +"/"+nombreCarpeta)
+                    contentValues.put(MediaStore.Images.Media.IS_PENDING, 1)
+                }
+                val mkDir=File(Environment.DIRECTORY_PICTURES+"/"+nombreCarpeta)
+                if(!mkDir.exists())
+                    mkDir.mkdirs()
+
+                imgUri = context. contentResolver.insert(imgUri, contentValues)!!
+
+                if (imgUri != null) {
+                    val outputStream =context. contentResolver.openOutputStream(imgUri,"wt")
+                    if (outputStream != null) {
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                    }
+
+                    outputStream?.close()
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    contentValues.clear()
+                    contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+                    context.contentResolver.update(imgUri!!, contentValues, null, null)
+                }
+            }
+        }
+        catch (ex:Exception)
+        {
+            var cadena=ex.message.toString()
+            cadena+=""
+        }
+        return imgUri
+    }
 
     public fun convertirImagenABase64(archivo: File): String? {
         return try {

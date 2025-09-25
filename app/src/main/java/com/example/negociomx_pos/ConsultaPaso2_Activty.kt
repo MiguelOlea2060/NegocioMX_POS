@@ -9,6 +9,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
@@ -27,9 +28,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.negociomx_pos.BE.ConsultaPaso2Item
 import com.example.negociomx_pos.DAL.DALPaso2
 import com.example.negociomx_pos.DAL.DALVehiculo
+import com.example.negociomx_pos.Utils.BLLUtils
 import com.example.negociomx_pos.Utils.ParametrosSistema
 import com.example.negociomx_pos.adapters.Paso2Adapter
 import kotlinx.coroutines.launch
+import org.apache.xmlbeans.impl.xb.ltgfmt.TestCase.Files
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -45,15 +49,17 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
     private lateinit var tvVehiculosUnicos: TextView
     private lateinit var tvTotalFotos: TextView
     private lateinit var tvMensajeSinResultados: TextView
-    private lateinit var btnConsultar:Button
-    private lateinit var chkTodosLosUsuarios:CheckBox
+    private lateinit var btnConsultar: Button
+    private lateinit var chkTodosLosUsuarios: CheckBox
 
     private lateinit var adapter: Paso2Adapter
     private val dalConsultaPaso2 = DALPaso2()
-    private var dalVehiculo:DALVehiculo?=null
+    private var dalVehiculo: DALVehiculo? = null
     private var fechaSeleccionada: String = ""
     private var loadingHandler: Handler? = null
     private var loadingRunnable: Runnable? = null
+
+    private var bllUtil:BLLUtils?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,11 +83,12 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         tvVehiculosUnicos = findViewById(R.id.tvVehiculosUnicos)
         tvTotalFotos = findViewById(R.id.tvTotalFotos)
         tvMensajeSinResultados = findViewById(R.id.tvMensajeSinResultados)
-        chkTodosLosUsuarios=findViewById(R.id.chkTodosUsuarioPaso2)
+        chkTodosLosUsuarios = findViewById(R.id.chkTodosUsuarioPaso2)
 
-        btnConsultar=findViewById(R.id.btnConsultarPaso2)
+        btnConsultar = findViewById(R.id.btnConsultarPaso2)
 
-        dalVehiculo=DALVehiculo()
+        bllUtil=BLLUtils()
+        dalVehiculo = DALVehiculo()
     }
 
     private fun configurarRecyclerView() {
@@ -100,7 +107,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         }
 
         chkTodosLosUsuarios.setOnCheckedChangeListener { buttonView, isChecked ->
-            if(isChecked)
+            if (isChecked)
                 Toast.makeText(this, "Consultando todos los usuarios", Toast.LENGTH_SHORT).show()
             else
                 Toast.makeText(this, "Consultando usuario actual", Toast.LENGTH_SHORT).show()
@@ -145,7 +152,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
             this,
             { _, year, month, dayOfMonth ->
 
-                val fechaAux=fechaSeleccionada
+                val fechaAux = fechaSeleccionada
 
                 val fechaSeleccionadaCalendar = Calendar.getInstance()
                 fechaSeleccionadaCalendar.set(year, month, dayOfMonth)
@@ -155,7 +162,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
 
                 fechaSeleccionada = formatoFecha.format(fechaSeleccionadaCalendar.time)
                 tvFechaSeleccionada.text = formatoMostrar.format(fechaSeleccionadaCalendar.time)
-                if(!fechaAux.equals(fechaSeleccionada))
+                if (!fechaAux.equals(fechaSeleccionada))
                     ejecutarConsultaAutomatica()
             },
             calendario.get(Calendar.YEAR),
@@ -173,7 +180,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
     }
 
     private fun ejecutarConsulta() {
-        tvFechaSeleccionada.isEnabled=false
+        tvFechaSeleccionada.isEnabled = false
         btnConsultar.isEnabled = false
         lifecycleScope.launch {
             try {
@@ -181,20 +188,20 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
                 ocultarResultados()
 
                 Log.d("ConsultaPaso2", "🔍 Ejecutando consulta para fecha: $fechaSeleccionada")
-                var  idUsuario:Int?=ParametrosSistema.usuarioLogueado.IdUsuario
-                if(chkTodosLosUsuarios.isChecked)
-                    idUsuario=null
-                val registros = dalConsultaPaso2.consultarPaso2PorFecha(fechaSeleccionada,idUsuario)
+                var idUsuario: Int? = ParametrosSistema.usuarioLogueado.IdUsuario
+                if (chkTodosLosUsuarios.isChecked)
+                    idUsuario = null
+                val registros =
+                    dalConsultaPaso2.consultarPaso2PorFecha(fechaSeleccionada, idUsuario)
 
                 // Consultar estadísticas
-                val estadisticas= mutableMapOf<String,Int>()
-                var totalVehiculos=0
-                var totalFotos=0
-                if(registros!=null && registros.count()>0)
-                {
-                    totalVehiculos=registros.count()
-                    registros.forEach { Unit->
-                        totalFotos+= Unit.CantidadFotos
+                val estadisticas = mutableMapOf<String, Int>()
+                var totalVehiculos = 0
+                var totalFotos = 0
+                if (registros != null && registros.count() > 0) {
+                    totalVehiculos = registros.count()
+                    registros.forEach { Unit ->
+                        totalFotos += Unit.CantidadFotos
                     }
                 }
 
@@ -206,27 +213,33 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
 
                 if (registros.isNotEmpty()) {
                     mostrarResultados(registros, estadisticas)
-                    Toast.makeText(this@ConsultaPaso2_Activity,
+                    Toast.makeText(
+                        this@ConsultaPaso2_Activity,
                         "✅ Se encontraron ${registros.size} registros",
-                        Toast.LENGTH_SHORT).show()
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
                     mostrarSinResultados()
-                    Toast.makeText(this@ConsultaPaso2_Activity,
+                    Toast.makeText(
+                        this@ConsultaPaso2_Activity,
                         "No se encontraron registros para la fecha seleccionada",
-                        Toast.LENGTH_LONG).show()
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
 
             } catch (e: Exception) {
                 ocultarCarga()
                 Log.e("ConsultaPaso2", "💥 Error en consulta: ${e.message}")
-                Toast.makeText(this@ConsultaPaso2_Activity,
+                Toast.makeText(
+                    this@ConsultaPaso2_Activity,
                     "Error: ${e.message}",
-                    Toast.LENGTH_LONG).show()
+                    Toast.LENGTH_LONG
+                ).show()
                 mostrarSinResultados()
             }
 
-            btnConsultar.isEnabled=true
-            tvFechaSeleccionada.isEnabled=true
+            btnConsultar.isEnabled = true
+            tvFechaSeleccionada.isEnabled = true
         }
     }
 
@@ -264,7 +277,10 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         loadingRunnable = null
     }
 
-    private fun mostrarResultados(registros: List<ConsultaPaso2Item>, estadisticas: Map<String, Int>) {
+    private fun mostrarResultados(
+        registros: List<ConsultaPaso2Item>,
+        estadisticas: Map<String, Int>
+    ) {
         // Actualizar adapter
         adapter.actualizarRegistros(registros)
 
@@ -346,60 +362,68 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         // Opcional: Agregar botón para ver fotos (si implementas visualización de fotos)
         if (registro.CantidadFotos > 0) {
             dialog.setNeutralButton("Ver Fotos") { _, _ ->
-                Toast.makeText(this, "Descargando fotos del Paso 2", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Descargando fotos de BD del Paso 2", Toast.LENGTH_SHORT).show()
 
                 lifecycleScope.launch {
-                    var imgUri:Uri
+                    var nombreCarpeta=registro.VIN.toString()
 
-                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q) {
-                        imgUri = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-                    }
-                    else {
-                        imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                    val directory = File(Environment.DIRECTORY_PICTURES +"/"+nombreCarpeta)
+                    if (directory.exists()) {
+                        /*val esDirectorio=directory.isDirectory
+                        val lista= directory.listFiles()
+                            lista.forEach {
+                            if(it.isFile)
+                                it.delete()
+                        }*/
                     }
 
-                    var bitmap:Bitmap
-                    val contentValues=ContentValues()
-                    var nombreArchivo="${registro.VIN}_Paso_2_Foto_1"
-                    contentValues.put(MediaStore.Images.Media.DISPLAY_NAME,nombreArchivo)
-                    contentValues.put(MediaStore.Images.Media.MIME_TYPE,"image/jpg")
-                    if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q)
-                    {
-                        contentValues.put(MediaStore.Images.Media.RELATIVE_PATH,"Pictures/VINS")
-                        contentValues.put(MediaStore.Images.Media.IS_PENDING,1)
-                    }
-                    else
-                    {
-
-                    }
                     if (registro.TieneFoto1 == true) {
-                        Toast.makeText(this@ConsultaPaso2_Activity, "Descargando foto 1", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@ConsultaPaso2_Activity,
+                            "Descargando foto 1",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         val fotoBase64 = dalVehiculo?.obtenerFotoBase64Paso2(registro.IdVehiculo, 1)
 
-                        imgUri=contentResolver.insert(imgUri,contentValues)!!
-                        if(imgUri!=null)
-                        {
-                            val outputStream=contentResolver.openOutputStream(imgUri)
-                            if(outputStream!=null)
-                            {
-                                //bitmap=getImageBitmap(uri = imgUri)
-                                //saveBitmapToFile(bitmap,nombreArchivo)
-                            }
-
-                        }
+                        var nombreArchivo = "${registro.VIN}_Paso_2_Foto_1"
+                        bllUtil?.saveBitmapToFile(this@ConsultaPaso2_Activity, fotoBase64!!,nombreCarpeta, nombreArchivo)
+                        Toast.makeText(this@ConsultaPaso2_Activity, "Foto 1 de Paso 2 guardada en el dispositivo", Toast.LENGTH_SHORT).show()
                     }
                     if (registro.TieneFoto2 == true) {
-                        Toast.makeText(this@ConsultaPaso2_Activity, "Descargando foto 2", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@ConsultaPaso2_Activity,
+                            "Descargando foto 2",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         val fotoBase64 = dalVehiculo?.obtenerFotoBase64Paso2(registro.IdVehiculo, 2)
+                        var nombreArchivo = "${registro.VIN}_Paso_2_Foto_2"
+                        bllUtil?.saveBitmapToFile(this@ConsultaPaso2_Activity, fotoBase64!!,nombreCarpeta, nombreArchivo)
+                        Toast.makeText(this@ConsultaPaso2_Activity, "Foto 2 guardada en el dispositivo", Toast.LENGTH_SHORT).show()
                     }
                     if (registro.TieneFoto3 == true) {
-                        Toast.makeText(this@ConsultaPaso2_Activity, "Descargando foto 3", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@ConsultaPaso2_Activity,
+                            "Descargando foto 3",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         val fotoBase64 = dalVehiculo?.obtenerFotoBase64Paso2(registro.IdVehiculo, 3)
+                        var nombreArchivo = "${registro.VIN}_Paso_2_Foto_3"
+                        bllUtil?.saveBitmapToFile(this@ConsultaPaso2_Activity, fotoBase64!!,nombreCarpeta, nombreArchivo)
+                        Toast.makeText(this@ConsultaPaso2_Activity, "Foto 3 guardada en el dispositivo", Toast.LENGTH_SHORT).show()
                     }
                     if (registro.TieneFoto4 == true) {
-                        Toast.makeText(this@ConsultaPaso2_Activity, "Descargando foto 4", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@ConsultaPaso2_Activity,
+                            "Descargando foto 4",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         val fotoBase64 = dalVehiculo?.obtenerFotoBase64Paso2(registro.IdVehiculo, 4)
+                        var nombreArchivo = "${registro.VIN}_Paso_2_Foto_4"
+                        bllUtil?.saveBitmapToFile(this@ConsultaPaso2_Activity, fotoBase64!!,nombreCarpeta,
+                           nombreArchivo)
+                        Toast.makeText(this@ConsultaPaso2_Activity, "Foto 4 guardada en el dispositivo", Toast.LENGTH_SHORT).show()
                     }
+                    Toast.makeText(this@ConsultaPaso2_Activity, "Fotos guardadas en carpeta ${nombreCarpeta}", Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -407,54 +431,10 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
         dialog.show()
     }
 
-    private fun saveBitmapToFile(bitmap: Bitmap,nombreArchivo:String):Uri {
-        var imgUri: Uri
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-        {
-            imgUri=MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-        }
-        else
-        {
-            imgUri=MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        }
-        val contentValues=ContentValues()
-        contentValues.put(MediaStore.Images.Media.DISPLAY_NAME,nombreArchivo)
-        contentValues.put(MediaStore.Images.Media.MIME_TYPE,"image/jpg")
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q)
-        {
-            contentValues.put(MediaStore.Images.Media.RELATIVE_PATH,"Pictures/VINS")
-            contentValues.put(MediaStore.Images.Media.IS_PENDING,1)
-        }
-
-        imgUri=contentResolver.insert(imgUri,contentValues)!!
-
-        if(imgUri!=null)
-        {
-           val outputStream=contentResolver.openOutputStream(imgUri)
-            if(outputStream!=null)
-            {
-                bitmap.compress(Bitmap.CompressFormat.JPEG,100,outputStream)
-
-            }
-
-            outputStream?.close()
-        }
-
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.Q)
-        {
-            contentValues.clear()
-            contentValues.put(MediaStore.Images.Media.IS_PENDING,0)
-            contentResolver.update(imgUri!!,contentValues,null,null)
-        }
-
-        return imgUri
-    }
-
-/*    private fun getImageBitmap(uri:Uri): Bitmap {
-        val source=ImageDecoder.createSource(contentResolver,uri)!!
+    private fun getImageBitmap(uri: Uri): Bitmap {
+        val source = ImageDecoder.createSource(contentResolver, uri)!!
         return ImageDecoder.decodeBitmap(source)
-    }*/
+    }
 
     override fun onDestroy() {
         super.onDestroy()
