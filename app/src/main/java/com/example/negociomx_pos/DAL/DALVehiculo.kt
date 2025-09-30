@@ -11,6 +11,7 @@ import com.example.negociomx_pos.BE.VehiculoPaso1
 import com.example.negociomx_pos.BE.VehiculoPaso2
 import com.example.negociomx_pos.BE.VehiculoPaso3
 import com.example.negociomx_pos.BE.VehiculoPaso4
+import com.example.negociomx_pos.BE.VehiculoResumen
 import com.example.negociomx_pos.Utils.ConexionSQLServer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -296,6 +297,10 @@ class DALVehiculo {
                 return@withContext null
             }
 
+
+
+
+
             // ✅ QUERY CORREGIDO PARA EL ESQUEMA REAL DE LA BASE DE DATOS
             val query = """                
                 select v.vin, v.idmarca, v.idmodelo, ma.nombre Marca, m.nombre Modelo, v.Annio, Motor, 
@@ -399,6 +404,7 @@ class DALVehiculo {
                         left join dbo.bl b with (nolock) on v.idbl=b.idbl
 						left join dbo.Paso1LogVehiculo p on p.IdVehiculo=v.IdVehiculo
                 where v.vin = ?
+       
               
             """.trimIndent()
 
@@ -576,6 +582,8 @@ class DALVehiculo {
                         left join dbo.tipovehiculo tv with (nolock) on v.idtipovehiculo=tv.idtipovehiculo
                         left join dbo.bl b with (nolock) on v.idbl=b.idbl
                 where v.vin = ?
+                
+                
               
             """.trimIndent()
 
@@ -653,8 +661,7 @@ class DALVehiculo {
                     left join dbo.TipoCombustible tc with (nolock) on v.idtipocombustible=tc.idtipocombustible
                     left join dbo.tipovehiculo tv with (nolock) on v.idtipovehiculo=tv.idtipovehiculo
                     left join dbo.bl b with (nolock) on v.idbl=b.idbl
-                where v.vin = ?
-              
+                where v.vin = ?   
             """.trimIndent()
 
             statement = conexion.prepareStatement(query)
@@ -1666,6 +1673,111 @@ class DALVehiculo {
     }
 
 
+
+
+    // ✅ metodo PARA CONSULTAR RESUMEN COMPLETO DEL VEHÍCULO
+    suspend fun consultarResumenVehiculo(vin: String): VehiculoResumen? = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+        var resumen: VehiculoResumen? = null
+
+        try {
+            Log.d("DALVehiculo", "🔍 Consultando resumen para VIN: $vin")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext null
+            }
+
+            val query = """
+            select  v.IdVehiculo, v.VIN, bl, v.idmarca, ma.nombre Marca, v.idmodelo, m.nombre Modelo, v.Annio, ce.Nombre ColorExterior, ci.Nombre ColorInterior,
+                            tc.Nombre TipoCombustible, v.NumeroMotor, p1.FechaAlta as FechaPrimerRegistro, DATEDIFF(DAY, p1.FechaAlta, GETDATE()) as DiasEstadia,
+                 
+                            -- Datos SOC (Paso 1)
+                            p1.IdPaso1LogVehiculo, p1.Bateria SOC, p1.Odometro as Odometro, p1.FechaAlta as FechaPrimerSOC,
+                            
+                            -- Datos Accesorios (Paso 2)
+                            p2.Idpaso2logvehiculo, p2.Tienefoto1 as TieneAccesorios, p2.Fechaaltafoto1 as FechaAccesorios,
+                            
+            				-- Datos REPUVE (Paso 3)
+                            p3.IdPaso3LogVehiculo, p3.Tienefoto as Repuve, p3.FechaAlta as FechaRepuve 
+            from dbo.vehiculo v 
+            			inner join dbo.MarcaAuto ma with (nolock) on v.IdMarca=ma.IdMarcaAuto
+                        inner join dbo.Modelo m with (nolock) on v.IdModelo=m.IdModelo 
+                        left join dbo.VehiculoColor vc with (nolock) on v.IdVehiculo=vc.IdVehiculo
+                        left join dbo.Color ce with (nolock) on vc.IdColor=ce.IdColor
+                        left join dbo.Color ci with (nolock) on vc.IdColorInterior=ci.IdColor
+                        left join dbo.TipoCombustible tc with (nolock) on v.idtipocombustible=tc.idtipocombustible
+                        left join dbo.bl b with (nolock) on v.idbl=b.idbl
+
+            			left join dbo.Paso1LogVehiculo p1 on v.IdVehiculo=p1.IdVehiculo
+            			left join dbo.paso2logvehiculo p2 on v.IdVehiculo=p2.Idvehiculo
+            			left join dbo.paso3logvehiculo p3 on v.IdVehiculo=p3.IdVehiculo
+            where v.vin=?
+        """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setString(1, vin)
+            resultSet = statement.executeQuery()
+
+            if (resultSet.next()) {
+                val diasRegistrado = resultSet.getInt("DiasEstadia")
+                val anios = diasRegistrado / 365
+                val mesesRestantes = (diasRegistrado % 365) / 30
+                val semanasRestantes = ((diasRegistrado % 365) % 30) / 7
+                val diasRestantes = ((diasRegistrado % 365) % 30) % 7
+
+                resumen = VehiculoResumen(
+                    IdVehiculo = resultSet.getInt("IdVehiculo"),
+                    VIN = resultSet.getString("VIN") ?: "",
+                    BL = resultSet.getString("bl") ?: "",
+                    Marca = resultSet.getString("Marca") ?: "",
+                    Modelo = resultSet.getString("Modelo") ?: "",
+                    Anio = resultSet.getString("Annio") ?: "",
+                    ColorExterior = resultSet.getString("ColorExterior") ?: "",
+                    ColorInterior = resultSet.getString("ColorInterior") ?: "",
+                    TipoCombustible = resultSet.getString("TipoCombustible") ?: "",
+                    NumeroMotor = resultSet.getString("NumeroMotor") ?: "",
+
+                    FechaPrimerRegistro = resultSet.getString("FechaPrimerRegistro") ?: "",
+                    DiasRegistrado = diasRegistrado,
+                    AniosRegistrado = anios,
+                    MesesRegistrado = mesesRestantes,
+                    SemanasRegistrado = semanasRestantes,
+                    DiasRestantes = diasRestantes,
+
+
+                    Odometro = resultSet.getInt("Odometro"),
+                    Bateria = resultSet.getInt("SOC"),
+                    FechaPrimerSOC = resultSet.getString("FechaPrimerSOC") ?: "",
+
+                    TieneAccesorios = resultSet.getInt("TieneAccesorios") == 1,
+                    FechaPrimerAccesorio = resultSet.getString("FechaAccesorios") ?: "",
+
+                    TieneRepuve = resultSet.getInt("Repuve") == 1,
+                    FechaPrimerRepuve = resultSet.getString("FechaRepuve") ?: ""
+                )
+            }
+
+            Log.d("DALVehiculo", "✅ Resumen consultado exitosamente")
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error consultando resumen: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+
+        return@withContext resumen
+    }
 
 
 }

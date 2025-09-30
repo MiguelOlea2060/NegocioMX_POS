@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Título -->
+        <TextView
+            android:padding="8dp"
+            android:background="@color/naranja_ligero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📊 Resumen"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#2E7D32"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Sección Escaneo -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🚗 Escanea el Codigo QR"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#1976D2"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/etVIN"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:hint="Ingrese VIN del vehículo"
+                    android:background="@drawable/edittext_background"
+                    android:padding="12dp"
+                    android:textSize="16sp"
+                    android:maxLength="19"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnBuscar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="🔍"
+                    android:backgroundTint="#2196F3"
+                    android:textColor="@android:color/white"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Datos del Vehículo -->
+        <LinearLayout
+            android:id="@+id/layoutDatosVehiculo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#C8E6C9"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📋 Datos del Vehículo"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2E7D32"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvMBL"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="MBL: -"
+                android:textSize="16sp"
+                android:textColor="#1B5E20"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvColorExterior"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Color Ext.: -"
+                android:textSize="14sp"
+                android:textColor="#1B5E20"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvColorInterior"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Color Int.: -"
+                android:textSize="14sp"
+                android:textColor="#1B5E20"
+                android:layout_marginBottom="4dp" />
+
+            <TextView
+                android:id="@+id/tvCombustible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Combustible: -"
+                android:textSize="14sp"
+                android:textColor="#1B5E20"
+                android:layout_marginBottom="4dp" />
+            <View
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:background="#1B5E20"
+                android:layout_width="match_parent"
+                android:layout_height="2dp">
+            </View>
+
+            <TextView
+                android:id="@+id/tvTiempoRegistrado"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0 días"
+                android:textSize="16sp"
+                android:textColor="#1B5E20"
+                android:textStyle="bold"
+                android:layout_marginBottom="4dp" />
+
+        </LinearLayout>
+
+        <!-- Datos SOC -->
+        <LinearLayout
+            android:id="@+id/layoutSOC"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚡ Datos del SOC"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#FF6F00"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvSocEstado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✅ Sí"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#4CAF50"
+                android:layout_weight="1" />
+
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🛣️ Odómetro (km):     "
+                    android:textSize="14sp"
+                    android:textColor="#424242"
+                    />
+
+                <TextView
+                    android:id="@+id/tvOdometro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textSize="14sp"
+                    android:layout_gravity="end"
+                    android:textColor="#424242"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔋 SOC (%)     "
+                    android:textSize="14sp"
+                    android:textColor="#424242"
+                     />
+
+                <TextView
+                    android:id="@+id/tvSOC"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:layout_gravity="end"
+                    android:textSize="14sp"
+                    android:textColor="#424242"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvFechaSoc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Fecha: -"
+                android:textSize="14sp"
+                android:textColor="#424242"
+                android:layout_gravity="end"/>
+
+
+
+        </LinearLayout>
+
+        <!-- Accesorios -->
+        <LinearLayout
+            android:id="@+id/layoutAccesorios"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="💺 Accesorios"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#FF6F00"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvAccesoriosEstado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="✅ Sí"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/tvFechaAccesorios"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha: -"
+                    android:textSize="14sp"
+                    android:textColor="#424242" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- REPUVE -->
+        <LinearLayout
+            android:id="@+id/layoutRepuve"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📄 REPUVE"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#FF6F00"
+                android:layout_marginBottom="12dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvRepuveEstado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="✅ Sí"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/tvFechaRepuve"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fecha: -"
+                    android:textSize="14sp"
+                    android:textColor="#424242" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Loading -->
+        <LinearLayout
+            android:id="@+id/loadingContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="24dp"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                style="?android:attr/progressBarStyleLarge"
+                android:indeterminateTint="#2196F3" />
+
+            <TextView
+                android:id="@+id/tvLoadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Consultando vehículo..."
+                android:textSize="16sp"
+                android:textColor="#2196F3" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

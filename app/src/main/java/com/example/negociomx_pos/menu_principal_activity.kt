@@ -84,6 +84,7 @@ class menu_principal_activity : AppCompatActivity() {
     lateinit var listaCategoriasNube:List<CategoriaNube>
     lateinit var listaTipospagoNube:List<TipoPagoNube>
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_menu_principal)
@@ -134,6 +135,7 @@ class menu_principal_activity : AppCompatActivity() {
         val btnConsultaPaso4 =findViewById<Button>(R.id.btnConsultaPaso4)
         val btnCargaMasivaVins =findViewById<Button>(R.id.btnCargaMasivaXls)
         val btnAdminUsuarios =findViewById<Button>(R.id.btnAdminUsuarios)
+        val btnPasoResumen = findViewById<Button>(R.id.btnPasoResumen)
 
         //getEmpresaNubeCfgNubeCfgNVNube()
 
@@ -270,6 +272,10 @@ class menu_principal_activity : AppCompatActivity() {
         }
         btnConsultaPaso4.setOnClickListener{
             val intent = Intent(this, ConsultaPaso4Llantas_Activity::class.java)
+            startActivity(intent)
+        }
+        btnPasoResumen.setOnClickListener{
+            val intent = Intent(this, PasoResumen_Activity::class.java)
             startActivity(intent)
         }
         btnAdminUsuarios.setOnClickListener {
