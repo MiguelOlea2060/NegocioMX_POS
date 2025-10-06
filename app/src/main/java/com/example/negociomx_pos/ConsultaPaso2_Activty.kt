@@ -108,7 +108,6 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
                 { registro ->
                     // Manejar clic en descargar fotos
                     iniciarDescargaFotos(registro)
-
                 }
                 )
         recyclerViewRegistros.layoutManager = LinearLayoutManager(this)
