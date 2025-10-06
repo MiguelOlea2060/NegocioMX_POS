@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.Window
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
@@ -29,6 +30,7 @@ import com.example.negociomx_pos.DAL.DALCfg
 import com.example.negociomx_pos.DAL.DALCfgNV
 import com.example.negociomx_pos.DAL.DALEmpresa
 import com.example.negociomx_pos.DAL.DALMarca
+import com.example.negociomx_pos.DAL.DALNotificaciones
 import com.example.negociomx_pos.DAL.DALTipoPago
 import com.example.negociomx_pos.DAL.DALUnidadMedida
 import com.example.negociomx_pos.DAL.DALUsuario
@@ -46,6 +48,7 @@ import com.example.negociomx_pos.room.entities.UnidadMedida
 import com.example.negociomx_pos.room.enums.TipoUsoSistemaEnum
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import android.util.Log
 
 
 class menu_principal_activity : AppCompatActivity() {
@@ -84,6 +87,12 @@ class menu_principal_activity : AppCompatActivity() {
     lateinit var listaCategoriasNube:List<CategoriaNube>
     lateinit var listaTipospagoNube:List<TipoPagoNube>
 
+    // AGREGAR DESPUÉS DE: lateinit var dalUsu:DALUsuario
+    lateinit var dalNotificaciones: DALNotificaciones
+    private lateinit var frameNotificaciones: FrameLayout
+    private lateinit var tvBadgeNotificaciones: TextView
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,6 +109,7 @@ class menu_principal_activity : AppCompatActivity() {
         dalTP=DALTipoPago()
         dalEmp=DALEmpresa()
         dalUsu=DALUsuario()
+        dalNotificaciones = DALNotificaciones()
 
         idDocumentoPendiente=null
         empresaNube=null
@@ -136,6 +146,8 @@ class menu_principal_activity : AppCompatActivity() {
         val btnCargaMasivaVins =findViewById<Button>(R.id.btnCargaMasivaXls)
         val btnAdminUsuarios =findViewById<Button>(R.id.btnAdminUsuarios)
         val btnPasoResumen = findViewById<Button>(R.id.btnPasoResumen)
+        frameNotificaciones = findViewById(R.id.frameNotificaciones)
+        tvBadgeNotificaciones = findViewById(R.id.tvBadgeNotificaciones)
 
         //getEmpresaNubeCfgNubeCfgNVNube()
 
@@ -291,6 +303,13 @@ class menu_principal_activity : AppCompatActivity() {
             val intent = Intent(this, alta_vehiculo::class.java)
             startActivity(intent)
         }
+
+
+        frameNotificaciones.setOnClickListener {
+            val intent = Intent(this, Notificaciones_Activity::class.java)
+            startActivity(intent)
+        }
+
     }
 
     private fun verificarCatalogosDeNubePorActualizarLocalmente() {
@@ -1110,4 +1129,40 @@ class menu_principal_activity : AppCompatActivity() {
             }
         }
     }
+
+
+
+
+
+
+    private fun cargarConteoNotificaciones() {
+        val scope = MainScope()
+        fun asyncFun() = scope.launch {
+            try {
+                val cantidad = dalNotificaciones.obtenerCantidadNotificaciones()
+
+                runOnUiThread {
+                    if (cantidad > 0) {
+                        tvBadgeNotificaciones.text = if (cantidad > 99) "99+" else cantidad.toString()
+                        tvBadgeNotificaciones.isVisible = true
+                    } else {
+                        tvBadgeNotificaciones.isVisible = false
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("menu_principal_activity", "Error cargando notificaciones: ${e.message}")
+            }
+        }
+        asyncFun()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Recargar notificaciones cada vez que se vuelve al menú
+        cargarConteoNotificaciones()
+    }
+
+
+
+
 }

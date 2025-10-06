@@ -35,6 +35,12 @@
         android:theme="@style/Theme.NegocioMX_POS"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+
+        <activity
+            android:name=".Notificaciones_Activity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".PasoResumen_Activity"
             android:exported="false" />
