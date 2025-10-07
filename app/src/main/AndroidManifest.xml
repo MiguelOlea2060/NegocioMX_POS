@@ -35,8 +35,9 @@
         android:theme="@style/Theme.NegocioMX_POS"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
-
+        <activity
+            android:name=".Paso1SOCPrueba_Activity"
+            android:exported="false" />
         <activity
             android:name=".Notificaciones_Activity"
             android:screenOrientation="portrait"

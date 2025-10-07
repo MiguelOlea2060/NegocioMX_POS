@@ -81,4 +81,7 @@ dependencies {
     //Librerias para leer archivos de xlsx
     implementation ("org.apache.poi:poi:5.2.2")
     implementation ("org.apache.poi:poi-ooxml:5.2.2")
+
+    //web api
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }

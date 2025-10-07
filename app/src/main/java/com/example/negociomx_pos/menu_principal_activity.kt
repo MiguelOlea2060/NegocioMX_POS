@@ -255,7 +255,7 @@ class menu_principal_activity : AppCompatActivity() {
             startActivity(intent)
         }
         btnPaso1SOC.setOnClickListener{
-            val intent = Intent(this, Paso1SOC_Activity::class.java)
+            val intent = Intent(this, Paso1SOCPrueba_Activity::class.java)
             startActivity(intent)
         }
         btnPaso2Accesorios.setOnClickListener{

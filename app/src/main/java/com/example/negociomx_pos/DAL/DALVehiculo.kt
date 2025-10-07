@@ -1494,11 +1494,11 @@ class DALVehiculo {
                 statement.setNull(5, java.sql.Types.TINYINT)
             } else {
                 statement.setByte(5, posicion)
-                if (fotoBase64 == null) {
-                    statement.setNull(6, java.sql.Types.NVARCHAR)
-                } else {
+
+
+
                     statement.setString(6, fotoBase64)
-                }
+
             }
 
             val filasAfectadas = statement.executeUpdate()
