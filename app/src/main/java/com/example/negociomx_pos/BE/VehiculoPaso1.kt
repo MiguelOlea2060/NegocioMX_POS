@@ -33,5 +33,10 @@ data class VehiculoPaso1(
     var FotosPosicion1: Int = 0,
     var FotosPosicion2: Int = 0,
     var FotosPosicion3: Int = 0,
-    var FotosPosicion4: Int = 0
+    var FotosPosicion4: Int = 0,
+
+    var NombreArchivo1:String="",
+    var NombreArchivo2:String="",
+    var NombreArchivo3:String="",
+    var NombreArchivo4:String=""
 )

@@ -139,7 +139,7 @@ class DescargadorFotos(private val context: Context) {
                         else
                         {
                             val urlCompletaImagen=urlVisualArchivos+'/'+nombreArchivo
-                            var bitmap=mLoad(urlCompletaImagen)
+                            var bitmap=bllUtil.mLoad(urlCompletaImagen)
                             bllUtil.saveBitmapToFile(context,bitmap!!,nombreCarpeta,nombreArchivo)
                             guardadoCorrecto=true
                         }
@@ -186,7 +186,7 @@ class DescargadorFotos(private val context: Context) {
         }
     }
 
-    public fun mLoad(string: String): Bitmap? {
+/*    public fun mLoad(string: String): Bitmap? {
         val url: URL = mStringToURL(string)!!
         val connection: HttpURLConnection?
         try {
@@ -210,7 +210,7 @@ class DescargadorFotos(private val context: Context) {
             e.printStackTrace()
         }
         return null
-    }
+    }*/
 
     private fun crearCarpetaVIN(vin: String): File? {
         return try {

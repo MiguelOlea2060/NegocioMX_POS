@@ -391,6 +391,10 @@ class DALVehiculo {
 				        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=2) FotosPosicion2
 				        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pf.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=3) FotosPosicion3
 				        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pf.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=4) FotosPosicion4                        
+				        ,(SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=1) NombreArchivoFoto1
+				        ,(SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=2) NombreArchivoFoto2
+				        ,(SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=3) NombreArchivoFoto3
+				        ,(SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=4) NombreArchivoFoto4
                         ,v.vin, v.idmarca, v.idmodelo, ma.nombre Marca, m.nombre Modelo, v.Annio, Motor, 
                         v.idvehiculo, ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, 
                         tv.Nombre TipoVehiculo, bl
@@ -445,7 +449,12 @@ class DALVehiculo {
                     FotosPosicion4 = resultSet.getInt("FotosPosicion4").toInt(),
 
                     FechaAltaPaso1 = resultSet.getString("FechaAlta")?:"",
-                    IdPaso1LogVehiculo =resultSet.getInt("IdPaso1LogVehiculo") ?:0
+                    IdPaso1LogVehiculo =resultSet.getInt("IdPaso1LogVehiculo") ?:0,
+
+                    NombreArchivo1 = resultSet.getString("NombreArchivoFoto1")?:"",
+                    NombreArchivo2 = resultSet.getString("NombreArchivoFoto2")?:"",
+                    NombreArchivo3 = resultSet.getString("NombreArchivoFoto3")?:"",
+                    NombreArchivo4 = resultSet.getString("NombreArchivoFoto4")?:""
                 )
                 //Log.d("DALVehiculo", "✅ Vehículo encontrado: ${vehiculo.Marca} ${vehiculo.Modelo} ${vehiculo.Anio}")
             } else {
