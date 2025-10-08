@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.example.negociomx_pos.BE.CfgApp
 import com.example.negociomx_pos.BE.DispositivoAcceso
 import com.example.negociomx_pos.BE.Intento
 import com.example.negociomx_pos.BE.Usuario
@@ -140,7 +141,7 @@ class acceso_activity : AppCompatActivity() {
 
             mainHandler.postDelayed(loginTimeoutRunnable, 60000) // 60 segundos
 
-            loguearUsuario(nombreUsuarioEmail, pwd) { usuario, usuarioLogueado ->
+            loguearUsuario(nombreUsuarioEmail, pwd) { usuario,cfg, usuarioLogueado ->
                 mainHandler.removeCallbacks(loginTimeoutRunnable)
 
                 if (usuarioLogueado == true) {
@@ -149,6 +150,7 @@ class acceso_activity : AppCompatActivity() {
                     prefs.saveUsername(nombreUsuarioEmail)
                     prefs.savePassword(pwd)
 
+                    ParametrosSistema.cfgApp=cfg
                     ParametrosSistema.usuarioLogueado=usuario!!
                     ParametrosSistema.usuarioLogueado.IdRol=5
 
@@ -179,12 +181,12 @@ class acceso_activity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun loguearUsuario(email:String, pwd:String,onLoginFinish: (Usuario?, Boolean) -> Unit)
+    fun loguearUsuario(email:String, pwd:String,onLoginFinish: (Usuario?,CfgApp?, Boolean) -> Unit)
     {
         //CoroutineScope(Dispatchers.Main).launch {
         GlobalScope.launch{
             try {
-                val usuario = dalUsuSql.getUsuarioByEmailAndPassword(email, pwd,)
+                val (usuario,cfg) = dalUsuSql.getUsuarioByEmailAndPassword(email, pwd,)
                 Log.d("AccesoActivity", "📊 Resultado búsqueda Database: ${usuario != null}")
 
                 if (usuario != null) {
@@ -192,7 +194,18 @@ class acceso_activity : AppCompatActivity() {
                     val cuentaVerificada = usuario.CuentaVerificada
                     val activo = usuario.Activo
 
-                    if (cuentaVerificada != true) {
+                    if (!usuario.Contrasena.equals(pwd)) {
+                        Log.w("AccesoActivity", "⚠️ Acceso invalido")
+                        mainHandler.post {
+                            bllUtil.MessageShow(
+                                this@acceso_activity,
+                                "El correo o la contraseña son incorrectos. Favor de verificarlo",
+                                "Aviso"
+                            ) { res -> }
+                        }
+                        onLoginFinish(null,null, false)
+                    }
+                    else if (cuentaVerificada != true) {
                         Log.w("AccesoActivity", "⚠️ Cuenta no verificada")
                         mainHandler.post {
                             bllUtil.MessageShow(
@@ -201,10 +214,9 @@ class acceso_activity : AppCompatActivity() {
                                 "Aviso"
                             ) { res -> }
                         }
-                        onLoginFinish(null, false)
+                        onLoginFinish(null,null, false)
                     }
-
-                    if (activo != true) {
+                    else if (activo != true) {
                         Log.w("AccesoActivity", "⚠️ Cuenta no activa")
                         mainHandler.post {
                             bllUtil.MessageShow(
@@ -213,17 +225,17 @@ class acceso_activity : AppCompatActivity() {
                                 "Aviso"
                             ) { res -> }
                         }
-                        onLoginFinish(null, false)
+                        onLoginFinish(null,null, false)
                     }
-                    onLoginFinish(usuario, true)
+                    onLoginFinish(usuario,cfg, true)
                 } else {
-                    onLoginFinish(null, false)
+                    onLoginFinish(null,null, false)
                 }
             } catch (e: Exception) {
                 Log.e("AccesoActivity", "💥 Error en login: ${e.message}")
                 bllUtil.MessageShow(this@acceso_activity, "Error de conexión: ${e.message}",
                     "Error") { res -> }
-                onLoginFinish(null, false)
+                onLoginFinish(null,null, false)
             }
         }
     }

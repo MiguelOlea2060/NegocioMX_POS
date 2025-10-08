@@ -1,5 +1,6 @@
 package com.example.negociomx_pos.Utils
 
+import com.example.negociomx_pos.BE.CfgApp
 import com.example.negociomx_pos.BE.CfgNVNube
 import com.example.negociomx_pos.BE.CfgNube
 import com.example.negociomx_pos.BE.EmpresaNube
@@ -20,6 +21,7 @@ class ParametrosSistema {
         lateinit var usuarioLogueado: Usuario
         lateinit var empresaNube:EmpresaNube
         var empresaLocal:Empresa?=null
+        var cfgApp:CfgApp?=null
         lateinit var cfg:CfgNube
         var cfgLocal:Config?=null
         var TipoUsoSistema=TipoUsoSistemaEnum.OnLine

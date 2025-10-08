@@ -16,6 +16,11 @@ data class PasoNumLogVehiculo(
     var ColorExterior: String = "",
     var ColorInterior: String = "",
 
+    var NombreArchivoFoto1:String="",
+    var NombreArchivoFoto2:String="",
+    var NombreArchivoFoto3:String="",
+    var NombreArchivoFoto4:String="",
+
     var CantidadFotos: Int = 0,
 
     var FechaAltaFoto1:String="",

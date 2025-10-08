@@ -2,16 +2,22 @@ package com.example.negociomx_pos.Utils
 
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Environment
 import android.util.Log
 import com.example.negociomx_pos.BE.PasoNumLogVehiculo
 import com.example.negociomx_pos.DAL.DALVehiculo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
+import java.net.MalformedURLException
 import java.net.URL
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -36,6 +42,17 @@ class DescargadorFotos(private val context: Context) {
     ) = withContext(Dispatchers.IO) {
 
         try {
+            val manejaGuardadoArchivosEnBD=ParametrosSistema.cfgApp!=null &&
+                    ParametrosSistema?.cfgApp!!.ManejaGuardadoArchivosEnBD==true
+
+            var urlVisualArchivos=""
+            if(ParametrosSistema.cfgApp!=null)
+            {
+                urlVisualArchivos=ParametrosSistema?.cfgApp!!.UrlGuardadoArchivos
+                if(ParametrosSistema.cfgApp?.CarpetaGuardadoArchivosNube!!.isNotEmpty())
+                    urlVisualArchivos=ParametrosSistema.cfgApp?.CarpetaGuardadoArchivosNube!!.replace("~/","")
+            }
+
             Log.d(TAG, "🚀 Iniciando descarga de fotos para VIN: ${registro.VIN}")
 
             opcionGlobal = OpcionArchivo.PREGUNTAR
@@ -53,6 +70,7 @@ class DescargadorFotos(private val context: Context) {
             var totalFotos=registro.CantidadFotos
             do {
                 existeFoto=false
+                var nombreArchivo = ""
                 if(registro.Paso==1) {
                     if (contador == 1 && registro.FechaAltaFoto1.trim().isNotEmpty())
                         existeFoto = true
@@ -76,26 +94,30 @@ class DescargadorFotos(private val context: Context) {
                 }
 
                 if(existeFoto) {
-                    val nombreArchivo = "${registro.VIN}_Paso_${registro.Paso}_${contador}.jpg"
+                    if(contador==1) nombreArchivo=registro.NombreArchivoFoto1
+                    else if(contador==2) nombreArchivo=registro.NombreArchivoFoto2
+                    else if(contador==3) nombreArchivo=registro.NombreArchivoFoto3
+                    else if(contador==4) nombreArchivo=registro.NombreArchivoFoto4
+//                    val nombreArchivo = "${registro.VIN}_Paso_${registro.Paso}_${contador}.jpg"
                     withContext(Dispatchers.Main) {
                         onProgress(
                             "Descargando foto $contador de ${totalFotos}",
                             "Procesando: $nombreArchivo"
                         )
                     }
-
                     val nombreAux=Environment.DIRECTORY_PICTURES+"/"+ nombreCarpeta+"/"
                     val carpetaVIN = File(nombreAux,nombreArchivo)
-                    /*if (carpetaVIN.isFile || carpetaVIN.exists()) {
-                        val lista = carpetaVIN.listFiles()
-                        if(lista!=null)
+
+                    var fotoBase64:String =""
+                    if(registro.Paso==1) {
+                        if(manejaGuardadoArchivosEnBD) {
+                            fotoBase64 = dalVeh.obtenerFotoBase64Paso1(registro.IdVehiculo, contador)!!
+                        }
+                        else
                         {
 
                         }
-                    }*/
-                    var fotoBase64:String =""
-                    if(registro.Paso==1)
-                        fotoBase64=dalVeh.obtenerFotoBase64Paso1(registro.IdVehiculo,contador)!!
+                    }
                     else if(registro.Paso==2)
                         fotoBase64=dalVeh.obtenerFotoBase64Paso2(registro.IdVehiculo,contador)!!
                     else if(registro.Paso==3)
@@ -103,8 +125,20 @@ class DescargadorFotos(private val context: Context) {
                     else if(registro.Paso==4)
                         fotoBase64=dalVeh.obtenerFotoBase64Paso4(registro.IdVehiculo,contador.toByte())!!
                     try {
-                        var uri = bllUtil.saveBitmapToFile(context, fotoBase64!!,nombreCarpeta,nombreArchivo)
-                        if (uri!=null) {
+                        var guardadoCorrecto=false
+                        if(manejaGuardadoArchivosEnBD) {
+                            var uri = bllUtil.saveBitmapToFile(context, fotoBase64!!, nombreCarpeta, nombreArchivo
+                            )
+                            guardadoCorrecto=uri!=null
+                        }
+                        else
+                        {
+                            val urlCompletaImagen=urlVisualArchivos+nombreArchivo
+                            var bitmap=mLoad(urlCompletaImagen)
+                            bllUtil.saveBitmapToFile(context,bitmap!!,nombreCarpeta,nombreArchivo)
+                            guardadoCorrecto=true
+                        }
+                        if (guardadoCorrecto) {
                             fotosDescargadas++
                             Log.d(TAG, "✅ Foto $contador descargada exitosamente")
                         } else {
@@ -145,6 +179,32 @@ class DescargadorFotos(private val context: Context) {
                 onComplete(false, "Error general: ${e.message}")
             }
         }
+    }
+
+    public fun mLoad(string: String): Bitmap? {
+        val url: URL = mStringToURL(string)!!
+        val connection: HttpURLConnection?
+        try {
+            connection = url.openConnection() as HttpURLConnection
+            connection.connect()
+            val inputStream: InputStream = connection.inputStream
+            val bufferedInputStream = BufferedInputStream(inputStream)
+            return BitmapFactory.decodeStream(bufferedInputStream)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            //Toast.makeText(applicationContext, "Error", Toast.LENGTH_LONG).show()
+        }
+        return null
+    }
+
+    // Function to convert string to URL
+    public fun mStringToURL(string: String): URL? {
+        try {
+            return URL(string)
+        } catch (e: MalformedURLException) {
+            e.printStackTrace()
+        }
+        return null
     }
 
     private fun crearCarpetaVIN(vin: String): File? {

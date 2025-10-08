@@ -485,11 +485,15 @@ class Paso1SOCPrueba_Activity : AppCompatActivity() {
                     val vin = vehiculo.VIN
                     val paso = 1
 
+                    var urlBase=ParametrosSistema.cfgApp!!.UrlGuardadoArchivos+'/'+
+                            ParametrosSistema.cfgApp!!.UrlAPIControllerGuardadoArchivos
+
                     // Subir foto 1 si fue capturada
                     if (evidencia1Capturada && evidencia1File != null) {
                         Log.d("Paso1SOCPrueba", "📤 Subiendo foto 1 a la API...")
 
                         val resultadoSubida = ApiUploadUtil.subirFoto(
+                            urlBase = urlBase,
                             file = evidencia1File!!,
                             vin = vin,
                             paso = paso,
@@ -519,6 +523,7 @@ class Paso1SOCPrueba_Activity : AppCompatActivity() {
                         Log.d("Paso1SOCPrueba", "📤 Subiendo foto 2 a la API...")
 
                         val resultadoSubida = ApiUploadUtil.subirFoto(
+                            urlBase = urlBase,
                             file = evidencia2File!!,
                             vin = vin,
                             paso = paso,

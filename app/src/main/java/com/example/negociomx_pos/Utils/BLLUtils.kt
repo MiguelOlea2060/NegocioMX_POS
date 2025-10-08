@@ -138,6 +138,54 @@ class BLLUtils {
         return imgUri
     }
 
+    public fun saveBitmapToFile(context: Context,bitmap: Bitmap ,nombreCarpeta:String, nombreArchivo: String): Uri? {
+        var imgUri: Uri?=null
+        try {
+            if (bitmap != null) {
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    imgUri =
+                        MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                } else {
+                    imgUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                }
+                val contentValues = ContentValues()
+                contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, nombreArchivo)
+                contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    contentValues.put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES +"/"+nombreCarpeta)
+                    contentValues.put(MediaStore.Images.Media.IS_PENDING, 1)
+                }
+                val mkDir=File(Environment.DIRECTORY_PICTURES+"/"+nombreCarpeta)
+                if(!mkDir.exists())
+                    mkDir.mkdirs()
+
+                imgUri = context. contentResolver.insert(imgUri, contentValues)!!
+
+                if (imgUri != null) {
+                    val outputStream =context. contentResolver.openOutputStream(imgUri,"wt")
+                    if (outputStream != null) {
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                    }
+
+                    outputStream?.close()
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    contentValues.clear()
+                    contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+                    context.contentResolver.update(imgUri!!, contentValues, null, null)
+                }
+            }
+        }
+        catch (ex:Exception)
+        {
+            var cadena=ex.message.toString()
+            cadena+=""
+        }
+        return imgUri
+    }
+
     public fun convertirImagenABase64(archivo: File): String? {
         return try {
             val bytes = archivo.readBytes()

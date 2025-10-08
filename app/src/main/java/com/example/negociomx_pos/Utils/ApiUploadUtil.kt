@@ -12,7 +12,7 @@ import java.io.IOException
 class ApiUploadUtil {
     companion object {
         // URL de tu API para subir archivos
-        private const val BASE_URL = "https://softsystemmx.com/api/Upload/UploadFile"
+        //private const val BASE_URL = "https://softsystemmx.com/api/Upload/UploadFile"
         private const val TAG = "ApiUploadUtil"
 
         /**
@@ -24,6 +24,7 @@ class ApiUploadUtil {
          * @return Pair<Boolean, String> - (éxito, mensaje/url)
          */
         suspend fun subirFoto(
+            urlBase:String,
             file: File,
             vin: String,
             paso: Int,
@@ -37,7 +38,7 @@ class ApiUploadUtil {
             try {
                 Log.d(TAG, "📤 Iniciando subida de foto: $nombreArchivo")
                 Log.d(TAG, "📦 Tamaño del archivo: ${file.length()} bytes")
-                Log.d(TAG, "🌐 URL destino: $BASE_URL")
+                Log.d(TAG, "🌐 URL destino: $urlBase")
 
                 // Crear cliente HTTP con timeouts configurados
                 val client = OkHttpClient.Builder()
@@ -58,7 +59,7 @@ class ApiUploadUtil {
 
                 // Crear la petición HTTP POST
                 val request = Request.Builder()
-                    .url(BASE_URL)
+                    .url(urlBase)
                     .post(requestBody)
                     .build()
 

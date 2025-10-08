@@ -55,7 +55,12 @@ class BLLVehiculo {
             TieneFoto1 = true,
             TieneFoto2 = true,
             TieneFoto3 = true,
-            TieneFoto4 = true
+            TieneFoto4 = true,
+
+            NombreArchivoFoto1 = a.NombreArchivoFoto1,
+            NombreArchivoFoto2 = a.NombreArchivoFoto2,
+            NombreArchivoFoto3 = a.NombreArchivoFoto3,
+            NombreArchivoFoto4 = a.NombreArchivoFoto4
         )
         return b
     }
@@ -89,6 +94,11 @@ class BLLVehiculo {
                 TieneFoto2 = a.TieneFoto2,
                 TieneFoto3 = a.TieneFoto3,
                 TieneFoto4 = a.TieneFoto4,
+
+                NombreArchivoFoto1 = a.NombreArchivoFoto1,
+                NombreArchivoFoto2 = a.NombreArchivoFoto2,
+                NombreArchivoFoto3 = a.NombreArchivoFoto3,
+                NombreArchivoFoto4 = a.NombreArchivoFoto4
             )
             lista.add(b)
         }
