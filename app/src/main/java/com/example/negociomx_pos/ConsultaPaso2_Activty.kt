@@ -209,8 +209,7 @@ class ConsultaPaso2_Activity : AppCompatActivity() {
                 var idUsuario: Int? = ParametrosSistema.usuarioLogueado.IdUsuario
                 if (chkTodosLosUsuarios.isChecked)
                     idUsuario = null
-                val registros =
-                    dalConsultaPaso2.consultarPaso2PorFecha(fechaSeleccionada, idUsuario)
+                val registros = dalConsultaPaso2.consultarPaso2PorFecha(fechaSeleccionada, idUsuario)
 
                 val registros1=bllVeh.asignaPasoNumLogVehiculo(registros)
                 // Consultar estadísticas

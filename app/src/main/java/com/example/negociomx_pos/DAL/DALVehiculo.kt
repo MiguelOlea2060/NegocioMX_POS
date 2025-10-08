@@ -1041,7 +1041,9 @@ class DALVehiculo {
     suspend fun actualizarFotoPaso2(
         idPaso2LogVehiculo: Int,
         numeroFoto: Int,
-        fotoBase64: String
+        fotoBase64: String?,
+        fechaMovimiento: String,
+        nombreArchivo: String
     ): Boolean = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
@@ -1055,27 +1057,25 @@ class DALVehiculo {
                 return@withContext false
             }
 
-            val nombreArchivo = "Paso2Foto${numeroFoto}_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())}.jpg"
-
             val query = when (numeroFoto) {
                 1 -> """
                     UPDATE paso2logvehiculo 
-                    SET Foto1 = ?, Tienefoto1 = 1, Nombrearchivofoto1 = ?, Fechaaltafoto1 = GETDATE()
+                    SET Foto1 = ?, Tienefoto1 = 1, Nombrearchivofoto1 = ?, Fechaaltafoto1 = ?
                     WHERE Idpaso2logvehiculo = ?
                 """.trimIndent()
                 2 -> """
                     UPDATE paso2logvehiculo 
-                    SET Foto2 = ?, Tienefoto2 = 1, Nombrearchivofoto2 = ?, Fechaaltafoto2 = GETDATE()
+                    SET Foto2 = ?, Tienefoto2 = 1, Nombrearchivofoto2 = ?, Fechaaltafoto2 = ?
                     WHERE Idpaso2logvehiculo = ?
                 """.trimIndent()
                 3 -> """
                     UPDATE paso2logvehiculo 
-                    SET Foto3 = ?, Tienefoto3 = 1, Nombrearchivofoto3 = ?, Fechaaltafoto3 = GETDATE()
+                    SET Foto3 = ?, Tienefoto3 = 1, Nombrearchivofoto3 = ?, Fechaaltafoto3 = ?
                     WHERE Idpaso2logvehiculo = ?
                 """.trimIndent()
                 4 -> """
                     UPDATE paso2logvehiculo 
-                    SET Foto4 = ?, Tienefoto4 = 1, Nombrearchivofoto4 = ?, Fechaaltafoto4 = GETDATE()
+                    SET Foto4 = ?, Tienefoto4 = 1, Nombrearchivofoto4 = ?, Fechaaltafoto4 = ?
                     WHERE Idpaso2logvehiculo = ?
                 """.trimIndent()
                 else -> return@withContext false
@@ -1084,7 +1084,8 @@ class DALVehiculo {
             statement = conexion.prepareStatement(query)
             statement.setString(1, fotoBase64)
             statement.setString(2, nombreArchivo)
-            statement.setInt(3, idPaso2LogVehiculo)
+            statement.setString(3, fechaMovimiento)
+            statement.setInt(4, idPaso2LogVehiculo)
 
             val filasAfectadas = statement.executeUpdate()
 

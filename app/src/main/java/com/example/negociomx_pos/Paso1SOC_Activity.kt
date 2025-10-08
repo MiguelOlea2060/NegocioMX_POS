@@ -880,6 +880,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     // ✅ 2. GUARDAR FOTOS DIRECTAMENTE EN BD
                     var exitoFotos = true
                     var consecutivo: Short = 1
+                    var nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_1.jpg"
 
                     // Solo permitir guardar nuevas fotos si no tiene registro SOC previo
                     if (!tieneRegistroSOC) {
@@ -891,12 +892,15 @@ class Paso1SOC_Activity : AppCompatActivity() {
                                 idUsuarioNubeAlta = idUsuarioNubeAlta,
                                 consecutivo = consecutivo,
                                 posicion = 1,
-                                fotoBase64 = fotoBase64
+                                fotoBase64 = fotoBase64,
+                                fechaMovimiento = fechaActual,
+                                nombreArchivo = nombreArchivo
                             )
                             consecutivo++
                         }
 
                         if (evidencia2Capturada && evidencia2File != null) {
+                            var nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_2.jpg"
                             val fotoBase64 = bllUtil?.convertirImagenABase64(evidencia2File!!)
                             exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
                                 idPaso1LogVehiculo = idPaso1LogVehiculo,
@@ -904,26 +908,39 @@ class Paso1SOC_Activity : AppCompatActivity() {
                                 idUsuarioNubeAlta = idUsuarioNubeAlta,
                                 consecutivo = consecutivo,
                                 posicion = 2,
-                                fotoBase64 = fotoBase64
+                                fotoBase64 = fotoBase64,
+                                fechaMovimiento = fechaActual,
+                                nombreArchivo = nombreArchivo
                             )
                             consecutivo++
                         }
                     } else {
                         // Si ya tiene registro SOC, solo permitir fotos 3 y 4
                         if (evidencia3Capturada && evidencia3File != null) {
-                            val fotoBase64 = bllUtil?.convertirImagenABase64(evidencia3File!!)
+                            var nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_3.jpg"
+                            var fotoBase64:String?=null
+                            if(ParametrosSistema.cfgApp!=null
+                                && ParametrosSistema?.cfgApp!!.ManejaGuardadoArchivosEnBD==true)
+                                fotoBase64= bllUtil?.convertirImagenABase64(evidencia3File!!)
+                            else
+                            {
+
+                            }
                             exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
                                 idPaso1LogVehiculo = idPaso1LogVehiculo,
                                 idEntidadArchivoFoto = null,
                                 idUsuarioNubeAlta = idUsuarioNubeAlta,
                                 consecutivo = consecutivo,
                                 posicion = 3,
-                                fotoBase64 = fotoBase64
+                                fotoBase64 = fotoBase64,
+                                fechaMovimiento = fechaActual,
+                                nombreArchivo = nombreArchivo
                             )
                             consecutivo++
                         }
 
                         if (evidencia4Capturada && evidencia4File != null) {
+                            var nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_4.jpg"
                             val fotoBase64 = bllUtil?.convertirImagenABase64(evidencia4File!!)
                             exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
                                 idPaso1LogVehiculo = idPaso1LogVehiculo,
@@ -931,7 +948,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
                                 idUsuarioNubeAlta = idUsuarioNubeAlta,
                                 consecutivo = consecutivo,
                                 posicion = 4,
-                                fotoBase64 = fotoBase64
+                                fotoBase64 = fotoBase64,
+                                fechaMovimiento = fechaActual,
+                                nombreArchivo = nombreArchivo
                             )
                         }
                     }

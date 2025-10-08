@@ -35,7 +35,7 @@ class DALPaso2 {
                     CONVERT(varchar, p.Fechaaltafoto2, 120) as FechaAltaFoto2,
                     CONVERT(varchar, p.Fechaaltafoto3, 120) as FechaAltaFoto3,
                     CONVERT(varchar, p.Fechaaltafoto4, 120) as FechaAltaFoto4,
-                    TieneFoto1, TieneFoto2, TieneFoto3, TieneFoto4
+                    TieneFoto1, TieneFoto2, TieneFoto3, TieneFoto4, 
                 FROM dbo.Paso2LogVehiculo p 
                 INNER JOIN dbo.vehiculo v with (nolock) ON p.IdVehiculo = v.IdVehiculo 
                 INNER JOIN dbo.MarcaAuto m with (nolock) ON v.IdMarca = m.IdMarcaAuto
@@ -84,7 +84,9 @@ class DALPaso2 {
                     TieneFoto1 = resultSet.getBoolean("TieneFoto1"),
                     TieneFoto2 = resultSet.getBoolean("TieneFoto2"),
                     TieneFoto3 = resultSet.getBoolean("TieneFoto3"),
-                    TieneFoto4 = resultSet.getBoolean("TieneFoto4")
+                    TieneFoto4 = resultSet.getBoolean("TieneFoto4"),
+
+                    NombreArchivoFoto1 = resultSet.getString("NombreArchivoFoto1")
                 )
 
                 // Calcular cantidad de fotos

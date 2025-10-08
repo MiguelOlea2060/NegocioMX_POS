@@ -133,7 +133,7 @@ class DescargadorFotos(private val context: Context) {
                         }
                         else
                         {
-                            val urlCompletaImagen=urlVisualArchivos+nombreArchivo
+                            val urlCompletaImagen=urlVisualArchivos+'/'+nombreArchivo
                             var bitmap=mLoad(urlCompletaImagen)
                             bllUtil.saveBitmapToFile(context,bitmap!!,nombreCarpeta,nombreArchivo)
                             guardadoCorrecto=true

@@ -29,6 +29,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_pos.BE.VehiculoPaso2
 import com.example.negociomx_pos.DAL.DALVehiculo
+import com.example.negociomx_pos.Utils.ApiUploadUtil
 import com.example.negociomx_pos.Utils.BLLUtils
 import com.example.negociomx_pos.Utils.ParametrosSistema
 import com.example.negociomx_pos.databinding.ActivityPaso2SocBinding
@@ -384,7 +385,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
                 return
             }
 
-            val archivoFinal = if (archivoLocal.length() > 4.5 * 1024 * 1024) {
+            val archivoFinal = if (archivoLocal.length() > 2.2 * 1024 * 1024) {
                 Log.d("Paso2SOC", "📦 Comprimiendo imagen de ${archivoLocal.length()} bytes")
                 comprimirImagen(archivoLocal)
             } else {
@@ -560,6 +561,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 Toast.makeText(this@Paso2SOC_Activity, "Guardando evidencias del Paso 2...", Toast.LENGTH_SHORT).show()
+                val fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
 
                 // ✅ 1. CREAR O OBTENER REGISTRO PASO2
                 var idPaso2LogVehiculo = vehiculoActual?.IdPaso2LogVehiculo ?: 0
@@ -572,6 +574,10 @@ class Paso2SOC_Activity : AppCompatActivity() {
                     )
                 }
 
+                var urlBase=ParametrosSistema.cfgApp!!.UrlGuardadoArchivos+'/'+
+                        ParametrosSistema.cfgApp!!.UrlAPIControllerGuardadoArchivos
+
+                var nombreArchivo = ""
                 if (idPaso2LogVehiculo > 0) {
                     Log.d("Paso2SOC", "✅ Registro Paso2 con ID: $idPaso2LogVehiculo")
 
@@ -579,30 +585,90 @@ class Paso2SOC_Activity : AppCompatActivity() {
                     var exitoFotos = true
 
                     if (evidencia1Capturada && evidencia1File != null) {
-                        val fotoBase64 = bllUtil?.convertirImagenABase64(evidencia1File!!)
+                        var fotoBase64 = bllUtil?.convertirImagenABase64(evidencia1File!!)
                         if (fotoBase64 != null) {
-                            exitoFotos = exitoFotos && dalVehiculo.actualizarFotoPaso2(idPaso2LogVehiculo, 1, fotoBase64)
+                            if (ParametrosSistema.cfgApp!=null && ParametrosSistema?.cfgApp!!.ManejaGuardadoArchivosEnBD==false)
+                            {
+                                nombreArchivo = "${vehiculoActual?.VIN}_Paso_2_Foto_1.jpg"
+                                val resultadoSubida = ApiUploadUtil.subirFoto(
+                                    urlBase = urlBase,
+                                    nombreArchivo=nombreArchivo,
+                                    file = evidencia1File!!,
+                                    vin = vehiculoActual!!.VIN,
+                                    paso = 2,
+                                    numeroFoto = 1
+                                )
+                                if (resultadoSubida.first)
+                                    fotoBase64=null
+                            }
+                            exitoFotos = exitoFotos && dalVehiculo.actualizarFotoPaso2(idPaso2LogVehiculo, 1,
+                                fotoBase64,fechaActual,nombreArchivo)
                         }
                     }
 
                     if (evidencia2Capturada && evidencia2File != null) {
-                        val fotoBase64 = bllUtil?.convertirImagenABase64(evidencia2File!!)
+                        var fotoBase64 = bllUtil?.convertirImagenABase64(evidencia2File!!)
                         if (fotoBase64 != null) {
-                            exitoFotos = exitoFotos && dalVehiculo.actualizarFotoPaso2(idPaso2LogVehiculo, 2, fotoBase64)
+                            if (ParametrosSistema.cfgApp!=null && ParametrosSistema?.cfgApp!!.ManejaGuardadoArchivosEnBD==false)
+                            {
+                                 nombreArchivo = "${vehiculoActual?.VIN}_Paso_2_Foto_2.jpg"
+                                val resultadoSubida = ApiUploadUtil.subirFoto(
+                                    urlBase = urlBase,
+                                    nombreArchivo=nombreArchivo,
+                                    file = evidencia1File!!,
+                                    vin = vehiculoActual!!.VIN,
+                                    paso = 2,
+                                    numeroFoto = 2
+                                )
+                                if (resultadoSubida.first)
+                                    fotoBase64=null
+                            }
+                            exitoFotos = exitoFotos && dalVehiculo.actualizarFotoPaso2(idPaso2LogVehiculo, 2,
+                                fotoBase64,fechaActual, nombreArchivo )
                         }
                     }
 
                     if (evidencia3Capturada && evidencia3File != null) {
-                        val fotoBase64 =bllUtil?.convertirImagenABase64(evidencia3File!!)
+                        var fotoBase64 =bllUtil?.convertirImagenABase64(evidencia3File!!)
                         if (fotoBase64 != null) {
-                            exitoFotos = exitoFotos && dalVehiculo.actualizarFotoPaso2(idPaso2LogVehiculo, 3, fotoBase64)
+                            if (ParametrosSistema.cfgApp!=null && ParametrosSistema?.cfgApp!!.ManejaGuardadoArchivosEnBD==false)
+                            {
+                                nombreArchivo = "${vehiculoActual?.VIN}_Paso_2_Foto_3.jpg"
+                                val resultadoSubida = ApiUploadUtil.subirFoto(
+                                    urlBase = urlBase,
+                                    nombreArchivo=nombreArchivo,
+                                    file = evidencia1File!!,
+                                    vin = vehiculoActual!!.VIN,
+                                    paso = 2,
+                                    numeroFoto = 3
+                                )
+                                if (resultadoSubida.first)
+                                    fotoBase64=null
+                            }
+                            exitoFotos = exitoFotos && dalVehiculo.actualizarFotoPaso2(idPaso2LogVehiculo, 3,
+                                fotoBase64,fechaActual,nombreArchivo)
                         }
                     }
 
                     if (evidencia4Capturada && evidencia4File != null) {
-                        val fotoBase64 =bllUtil?.convertirImagenABase64(evidencia4File!!)
+                        var fotoBase64 =bllUtil?.convertirImagenABase64(evidencia4File!!)
                         if (fotoBase64 != null) {
-                            exitoFotos = exitoFotos && dalVehiculo.actualizarFotoPaso2(idPaso2LogVehiculo, 4, fotoBase64)
+                            if (ParametrosSistema.cfgApp!=null && ParametrosSistema?.cfgApp!!.ManejaGuardadoArchivosEnBD==false)
+                            {
+                                nombreArchivo = "${vehiculoActual?.VIN}_Paso_2_Foto_4.jpg"
+                                val resultadoSubida = ApiUploadUtil.subirFoto(
+                                    urlBase = urlBase,
+                                    nombreArchivo=nombreArchivo,
+                                    file = evidencia1File!!,
+                                    vin = vehiculoActual!!.VIN,
+                                    paso = 2,
+                                    numeroFoto = 4
+                                )
+                                if (resultadoSubida.first)
+                                    fotoBase64=null
+                            }
+                            exitoFotos = exitoFotos && dalVehiculo.actualizarFotoPaso2(idPaso2LogVehiculo, 4,
+                                fotoBase64,fechaActual,nombreArchivo)
                         }
                     }
 

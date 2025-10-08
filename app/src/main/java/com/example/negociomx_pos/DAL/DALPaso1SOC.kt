@@ -43,8 +43,12 @@ class DALPaso1SOC {
                 SELECT v.IdVehiculo, p.IdPaso1LogVehiculo, v.Vin, b.BL, v.IdMarca, m.Nombre AS Marca, v.IdModelo, 
                        mo.Nombre AS Modelo, v.Annio, v.NumeroMotor, vc.IdColor, vc.IdColorInterior, c.Nombre 
                        AS ColorExterior, c1.Nombre AS ColorInterior, p.Odometro, p.Bateria, p.ModoTransporte,
-                       p.RequiereRecarga, p.FechaAlta, p.IdUsuarioNubeAlta,
-                       (SELECT COUNT(*) FROM Paso1LogVehiculoFotos pf WHERE pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo) AS CantidadFotos
+                       p.RequiereRecarga, p.FechaAlta, p.IdUsuarioNubeAlta
+                    , (SELECT pf.NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pf.Posicion=1 and pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo) NombreArchivo1
+                    , (SELECT pf.NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pf.Posicion=2 and pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo) NombreArchivo2
+                    , (SELECT pf.NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pf.Posicion=3 and pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo) NombreArchivo3
+                    , (SELECT pf.NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pf.Posicion=4 and pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo) NombreArchivo4
+                    , (SELECT COUNT(*) FROM Paso1LogVehiculoFotos pf WHERE pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo) AS CantidadFotos
                     ,Format((SELECT top 1 pf.FechaAlta FROM Paso1LogVehiculoFotos pf WHERE pf.Posicion=1 and pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo), 'dd/MMM/yyyy HH:mm:ss') FechaAltaFoto1
                     ,Format((SELECT top 1 pf.FechaAlta FROM Paso1LogVehiculoFotos pf WHERE pf.Posicion=2 and pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo), 'dd/MMM/yyyy HH:mm:ss') FechaAltaFoto2
                     ,Format((SELECT top 1 pf.FechaAlta FROM Paso1LogVehiculoFotos pf WHERE pf.Posicion=3 and pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo), 'dd/MMM/yyyy HH:mm:ss') FechaAltaFoto3
@@ -99,7 +103,12 @@ class DALPaso1SOC {
                     FechaAltaFoto1 = resultSet.getString("FechaAltaFoto1")?:" ",
                     FechaAltaFoto2 = resultSet.getString("FechaAltaFoto2")?:" ",
                     FechaAltaFoto3 = resultSet.getString("FechaAltaFoto3")?:" ",
-                    FechaAltaFoto4 = resultSet.getString("FechaAltaFoto4")?:" "
+                    FechaAltaFoto4 = resultSet.getString("FechaAltaFoto4")?:" ",
+
+                    NombreArchivoFoto1 = resultSet.getString("NombreArchivo1")?:"",
+                    NombreArchivoFoto2 = resultSet.getString("NombreArchivo2")?:"",
+                    NombreArchivoFoto3 = resultSet.getString("NombreArchivo3")?:"",
+                    NombreArchivoFoto4 = resultSet.getString("NombreArchivo4")?:"",
                 )
                 registros.add(registro)
             }
