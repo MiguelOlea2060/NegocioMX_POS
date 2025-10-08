@@ -27,13 +27,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
+import com.example.negociomx_pos.BE.VehiculoPaso1
 import com.example.negociomx_pos.BE.VehiculoPaso2
 import com.example.negociomx_pos.DAL.DALVehiculo
 import com.example.negociomx_pos.Utils.ApiUploadUtil
 import com.example.negociomx_pos.Utils.BLLUtils
 import com.example.negociomx_pos.Utils.ParametrosSistema
 import com.example.negociomx_pos.databinding.ActivityPaso2SocBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.ApiStatus.NonExtendable
 import java.io.File
 import java.io.FileOutputStream
@@ -47,6 +50,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
     private lateinit var binding: ActivityPaso2SocBinding
     private val dalVehiculo = DALVehiculo()
     private var vehiculoActual: VehiculoPaso2? = null
+ //   private var vehiculoPaso2: VehiculoPaso2? = null
 
     // Variables para manejo de loading
     private lateinit var loadingContainer: LinearLayout
@@ -129,7 +133,8 @@ class Paso2SOC_Activity : AppCompatActivity() {
         // ✅ BOTONES DE EVIDENCIAS
         binding.btnEvidencia1.setOnClickListener {
             if (vehiculoActual?.TieneFoto1 == true) {
-                verFotoExistente(1)
+           //     verFotoExistente(1)
+                verFotoExistente(1,vehiculoActual?.NombreArchivoFoto1!!)
             } else {
                 capturarEvidencia(1)
             }
@@ -137,7 +142,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
 
         binding.btnEvidencia2.setOnClickListener {
             if (vehiculoActual?.TieneFoto2 == true) {
-                verFotoExistente(2)
+                verFotoExistente(1,vehiculoActual?.NombreArchivoFoto2!!)
             } else {
                 capturarEvidencia(2)
             }
@@ -145,7 +150,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
 
         binding.btnEvidencia3.setOnClickListener {
             if (vehiculoActual?.TieneFoto3 == true) {
-                verFotoExistente(3)
+                verFotoExistente(1,vehiculoActual?.NombreArchivoFoto3!!)
             } else {
                 capturarEvidencia(3)
             }
@@ -153,7 +158,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
 
         binding.btnEvidencia4.setOnClickListener {
             if (vehiculoActual?.TieneFoto4 == true) {
-                verFotoExistente(4)
+                verFotoExistente(1,vehiculoActual?.NombreArchivoFoto4!!)
             } else {
                 capturarEvidencia(4)
             }
@@ -428,7 +433,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
         }
     }
 
-    private fun verFotoExistente(numeroFoto: Int) {
+    private fun verFotoExistente(posicion: Int, nombreArchivo:String) {
         val vehiculo = vehiculoActual
         if (vehiculo == null) {
             Toast.makeText(this, "Error: No hay vehículo seleccionado", Toast.LENGTH_SHORT).show()
@@ -439,13 +444,39 @@ class Paso2SOC_Activity : AppCompatActivity() {
             try {
                 Toast.makeText(this@Paso2SOC_Activity, "Cargando foto...", Toast.LENGTH_SHORT).show()
 
-                val fotoBase64 = dalVehiculo.obtenerFotoBase64Paso2(vehiculo.Id.toInt(), numeroFoto)
+
+               /* val fotoBase64 = dalVehiculo.obtenerFotoBase64Paso2(vehiculo.Id.toInt(), numeroFoto)
 
                 if (fotoBase64 != null && fotoBase64.isNotEmpty()) {
                     mostrarDialogoFoto(fotoBase64, numeroFoto)
                 } else {
                     Toast.makeText(this@Paso2SOC_Activity, "No se pudo cargar la foto", Toast.LENGTH_SHORT).show()
+                }*/
+
+
+
+
+                var fotoBase64:String? =null
+                if(ParametrosSistema.cfgApp!=null && ParametrosSistema.cfgApp?.ManejaGuardadoArchivosEnBD==true)
+                    fotoBase64= dalVehiculo.obtenerFotoBase64Paso2(vehiculo.Id.toInt(), posicion)
+
+                if (ParametrosSistema.cfgApp!=null && ParametrosSistema.cfgApp?.ManejaGuardadoArchivosEnBD==true &&
+                    fotoBase64 != null && fotoBase64.isNotEmpty()) {
+                    mostrarDialogoFoto(fotoBase64, posicion)
                 }
+                else if (ParametrosSistema.cfgApp!=null && ParametrosSistema.cfgApp?.ManejaGuardadoArchivosEnBD==false) {
+                    val urlCompletoFoto=ParametrosSistema.cfgApp?.UrlGuardadoArchivos+'/'+
+                            ParametrosSistema.cfgApp?.CarpetaGuardadoArchivosNube?.replace("~/","")+
+                            '/'+nombreArchivo
+                    mostrarDialogoFotoFromUrl(urlCompletoFoto, posicion)
+                }
+                else {
+                    Toast.makeText(
+                        this@Paso2SOC_Activity, "No se pudo cargar la foto", Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+
 
             } catch (e: Exception) {
                 Log.e("Paso2SOC", "Error cargando foto: ${e.message}")
@@ -539,6 +570,54 @@ class Paso2SOC_Activity : AppCompatActivity() {
         } catch (e: Exception) {
             Log.e("Paso2SOC", "Error mostrando foto: ${e.message}")
             Toast.makeText(this, "Error mostrando foto", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
+    private fun mostrarDialogoFotoFromUrl(url: String, posicion: Int) {
+        lifecycleScope.launch {
+
+            try {
+                // Convertir Base64 a Bitmap
+                val bitmap = withContext(Dispatchers.IO) {
+                    bllUtil?.mLoad(url)
+                }
+
+                if (bitmap != null) {
+                    // Crear diálogo personalizado
+                    val dialog = android.app.AlertDialog.Builder(this@Paso2SOC_Activity)
+                    val imageView = android.widget.ImageView(this@Paso2SOC_Activity)
+
+                    // Configurar ImageView
+                    imageView.setImageBitmap(bitmap)
+                    imageView.scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+                    imageView.adjustViewBounds = true
+
+                    // Configurar diálogo
+                    dialog.setTitle("Evidencia $posicion")
+                    dialog.setView(imageView)
+                    dialog.setPositiveButton("Cerrar") { dialogInterface, _ ->
+                        dialogInterface.dismiss()
+                    }
+
+                    val alertDialog = dialog.create()
+                    alertDialog.show()
+
+                    // Ajustar tamaño del diálogo
+                    val window = alertDialog.window
+                    window?.setLayout(
+                        (resources.displayMetrics.widthPixels * 0.9).toInt(),
+                        (resources.displayMetrics.heightPixels * 0.7).toInt()
+                    )
+
+                } else {
+                    Toast.makeText(this@Paso2SOC_Activity, "Error decodificando la imagen", Toast.LENGTH_SHORT).show()
+                }
+
+            } catch (e: Exception) {
+                Log.e("Paso2SOC", "Error mostrando foto: ${e.message}")
+                Toast.makeText(this@Paso2SOC_Activity, "Error mostrando foto", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

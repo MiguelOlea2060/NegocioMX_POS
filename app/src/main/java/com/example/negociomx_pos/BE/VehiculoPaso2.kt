@@ -26,4 +26,5 @@ data class VehiculoPaso2(
     var NombreArchivoFoto2:String="",
     var NombreArchivoFoto3:String="",
     var NombreArchivoFoto4:String=""
+
 )

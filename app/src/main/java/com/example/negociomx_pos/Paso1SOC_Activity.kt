@@ -34,6 +34,8 @@ import com.example.negociomx_pos.BE.VehiculoPaso1
 import com.example.negociomx_pos.BLL.BLLVehiculo
 import com.example.negociomx_pos.Utils.ApiUploadUtil
 import com.example.negociomx_pos.Utils.BLLUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 
 class Paso1SOC_Activity : AppCompatActivity() {
@@ -429,7 +431,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
             try {
                 // Convertir Base64 a Bitmap
-                val bitmap = bllUtil?.mLoad(url)
+                val bitmap = withContext(Dispatchers.IO) {
+                    bllUtil?.mLoad(url)
+                }
 
                 if (bitmap != null) {
                     // Crear diálogo personalizado
