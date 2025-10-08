@@ -25,15 +25,12 @@ class ApiUploadUtil {
          */
         suspend fun subirFoto(
             urlBase:String,
+            nombreArchivo:String,
             file: File,
             vin: String,
             paso: Int,
             numeroFoto: Int
         ): Pair<Boolean, String> = withContext(Dispatchers.IO) {
-
-            // Crear nombre de archivo según el formato especificado
-            // Ejemplo: LGXCE6CC1T0063901_Paso_1_Foto_1.jpg
-            val nombreArchivo = "${vin}_Paso_${paso}_Foto_${numeroFoto}.jpg"
 
             try {
                 Log.d(TAG, "📤 Iniciando subida de foto: $nombreArchivo")

@@ -858,7 +858,8 @@ class DALVehiculo {
         bateria: Int,
         modoTransporte: Boolean,
         requiereRecarga: Boolean,
-        idUsuarioNubeAlta: Int
+        idUsuarioNubeAlta: Int,
+        fechaMovimiento:String
     ): Int = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
@@ -889,7 +890,7 @@ class DALVehiculo {
                 val queryActualizar = """
                 UPDATE Paso1LogVehiculo 
                 SET Odometro = ?, Bateria = ?, ModoTransporte = ?, RequiereRecarga = ?, 
-                    FechaAlta = GETDATE()
+                    FechaAlta = ?
                 WHERE IdVehiculo = ?
             """.trimIndent()
 
@@ -898,7 +899,8 @@ class DALVehiculo {
                 statement.setByte(2, bateria.toByte())
                 statement.setBoolean(3, modoTransporte)
                 statement.setBoolean(4, requiereRecarga)
-                statement.setInt(5, idVehiculo)
+                statement.setString(5, fechaMovimiento)
+                statement.setInt(6, idVehiculo)
 
                 statement.executeUpdate()
                 Log.d("DALVehiculo", "✅ Registro SOC actualizado. ID: $idResultado")
@@ -1462,7 +1464,9 @@ class DALVehiculo {
         idUsuarioNubeAlta: Int,
         consecutivo: Short,
         posicion: Byte?,
-        fotoBase64: String?
+        fotoBase64: String?,
+        nombreArchivo:String="",
+        fechaMovimiento:String=""
     ): Boolean = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
@@ -1477,8 +1481,9 @@ class DALVehiculo {
             }
 
             val query = """
-            INSERT INTO Paso1LogVehiculoFotos (IdPaso1LogVehiculo, IdEntidadArchivoFoto, IdUsuarioNubeAlta, FechaAlta, Consecutivo, Posicion, FotoBase64)
-            VALUES (?, ?, ?, GETDATE(), ?, ?, ?)
+            INSERT INTO Paso1LogVehiculoFotos (IdPaso1LogVehiculo, IdEntidadArchivoFoto, IdUsuarioNubeAlta, FechaAlta, 
+                    Consecutivo, Posicion, FotoBase64, NombreArchivo)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
 
             statement = conexion.prepareStatement(query)
@@ -1489,20 +1494,17 @@ class DALVehiculo {
                 statement.setInt(2, idEntidadArchivoFoto)
             }
             statement.setInt(3, idUsuarioNubeAlta)
-            statement.setShort(4, consecutivo)
+            statement.setString(4, fechaMovimiento)
+            statement.setShort(5, consecutivo)
             if (posicion == null) {
-                statement.setNull(5, java.sql.Types.TINYINT)
+                statement.setNull(6, java.sql.Types.TINYINT)
             } else {
-                statement.setByte(5, posicion)
-
-
-
-                    statement.setString(6, fotoBase64)
-
+                statement.setByte(6, posicion)
+                statement.setString(7, fotoBase64)
             }
+            statement.setString(8, nombreArchivo)
 
             val filasAfectadas = statement.executeUpdate()
-
             if (filasAfectadas > 0) {
                 Log.d("DALVehiculo", "✅ Datos de foto insertados exitosamente")
                 return@withContext true

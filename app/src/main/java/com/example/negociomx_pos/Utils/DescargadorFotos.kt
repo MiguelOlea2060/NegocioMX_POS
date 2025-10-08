@@ -50,7 +50,7 @@ class DescargadorFotos(private val context: Context) {
             {
                 urlVisualArchivos=ParametrosSistema?.cfgApp!!.UrlGuardadoArchivos
                 if(ParametrosSistema.cfgApp?.CarpetaGuardadoArchivosNube!!.isNotEmpty())
-                    urlVisualArchivos=ParametrosSistema.cfgApp?.CarpetaGuardadoArchivosNube!!.replace("~/","")
+                    urlVisualArchivos+='/'+ParametrosSistema.cfgApp?.CarpetaGuardadoArchivosNube!!.replace("~/","")
             }
 
             Log.d(TAG, "🚀 Iniciando descarga de fotos para VIN: ${registro.VIN}")

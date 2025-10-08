@@ -847,6 +847,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
 
+                val fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+
                 val idPaso1LogVehiculo = if (idPaso1LogVehiculoExistente > 0) {
                     // Usar ID existente y actualizar
                     dalVehiculo.insertarOActualizarPaso1LogVehiculo(
@@ -855,7 +857,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
                         bateria = bateria,
                         modoTransporte = binding.cbModoTransporte.isChecked,
                         requiereRecarga = binding.cbRequiereRecarga.isChecked,
-                        idUsuarioNubeAlta = idUsuarioNubeAlta
+                        idUsuarioNubeAlta = idUsuarioNubeAlta,
+                        fechaMovimiento = fechaActual
                     )
                     idPaso1LogVehiculoExistente
                 } else {
@@ -866,7 +869,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
                         bateria = bateria,
                         modoTransporte = binding.cbModoTransporte.isChecked,
                         requiereRecarga = binding.cbRequiereRecarga.isChecked,
-                        idUsuarioNubeAlta = idUsuarioNubeAlta
+                        idUsuarioNubeAlta = idUsuarioNubeAlta,
+                        fechaMovimiento = fechaActual
                     )
                 }
 

@@ -466,6 +466,7 @@ class Paso1SOCPrueba_Activity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 Log.d("Paso1SOCPrueba", "💾 Iniciando proceso de guardado")
+                val fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
 
                 // ✅ PASO 1: Guardar datos SOC en la base de datos
                 val idPaso1LogVehiculo = dalVehiculo.insertarOActualizarPaso1LogVehiculo(
@@ -474,7 +475,8 @@ class Paso1SOCPrueba_Activity : AppCompatActivity() {
                     bateria = bateria,
                     modoTransporte = binding.cbModoTransporte.isChecked,
                     requiereRecarga = binding.cbRequiereRecarga.isChecked,
-                    idUsuarioNubeAlta = idUsuarioNubeAlta
+                    idUsuarioNubeAlta = idUsuarioNubeAlta,
+                    fechaMovimiento = fechaActual,
                 )
 
                 if (idPaso1LogVehiculo > 0) {
@@ -488,12 +490,16 @@ class Paso1SOCPrueba_Activity : AppCompatActivity() {
                     var urlBase=ParametrosSistema.cfgApp!!.UrlGuardadoArchivos+'/'+
                             ParametrosSistema.cfgApp!!.UrlAPIControllerGuardadoArchivos
 
+                    // Crear nombre de archivo según el formato especificado
+                    // Ejemplo: LGXCE6CC1T0063901_Paso_1_Foto_1.jpg
+                    var nombreArchivo = "${vin}_Paso_${paso}_Foto_1.jpg"
                     // Subir foto 1 si fue capturada
                     if (evidencia1Capturada && evidencia1File != null) {
                         Log.d("Paso1SOCPrueba", "📤 Subiendo foto 1 a la API...")
 
                         val resultadoSubida = ApiUploadUtil.subirFoto(
                             urlBase = urlBase,
+                            nombreArchivo=nombreArchivo,
                             file = evidencia1File!!,
                             vin = vin,
                             paso = paso,
@@ -510,7 +516,9 @@ class Paso1SOCPrueba_Activity : AppCompatActivity() {
                                 idUsuarioNubeAlta = idUsuarioNubeAlta,
                                 consecutivo = 1,
                                 posicion = 1,
-                                fotoBase64 = null // NO guardamos Base64
+                                fotoBase64 = null,
+                                fechaMovimiento = fechaActual,
+                                nombreArchivo = nombreArchivo
                             )
                         } else {
                             exitoFotos = false
@@ -521,9 +529,11 @@ class Paso1SOCPrueba_Activity : AppCompatActivity() {
                     // Subir foto 2 si fue capturada
                     if (evidencia2Capturada && evidencia2File != null) {
                         Log.d("Paso1SOCPrueba", "📤 Subiendo foto 2 a la API...")
+                        var nombreArchivo = "${vin}_Paso_${paso}_Foto_2.jpg"
 
                         val resultadoSubida = ApiUploadUtil.subirFoto(
                             urlBase = urlBase,
+                            nombreArchivo=nombreArchivo,
                             file = evidencia2File!!,
                             vin = vin,
                             paso = paso,
@@ -539,7 +549,9 @@ class Paso1SOCPrueba_Activity : AppCompatActivity() {
                                 idUsuarioNubeAlta = idUsuarioNubeAlta,
                                 consecutivo = 2,
                                 posicion = 2,
-                                fotoBase64 = null // NO guardamos Base64
+                                fotoBase64 = null,
+                                fechaMovimiento = fechaActual,
+                                nombreArchivo = nombreArchivo
                             )
                         } else {
                             exitoFotos = false
