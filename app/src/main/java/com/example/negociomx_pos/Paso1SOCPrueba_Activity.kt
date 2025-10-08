@@ -6,13 +6,9 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -20,53 +16,45 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_pos.BE.Vehiculo
-import com.example.negociomx_pos.BE.VehiculoPaso1
-import com.example.negociomx_pos.BLL.BLLVehiculo
 import com.example.negociomx_pos.DAL.DALVehiculo
-import com.example.negociomx_pos.Utils.ApiUploadUtil
 import com.example.negociomx_pos.Utils.ParametrosSistema
 import com.example.negociomx_pos.databinding.ActivityPaso1SocpruebaBinding
+import com.journeyapps.barcodescanner.ScanContract
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import android.os.Handler
+import android.os.Looper
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Button
+import com.example.negociomx_pos.BE.VehiculoPaso1
+import com.example.negociomx_pos.BLL.BLLVehiculo
+import com.example.negociomx_pos.Utils.BLLUtils
+import com.example.negociomx_pos.Utils.ApiUploadUtil
+
 
 class Paso1SOCPrueba_Activity : AppCompatActivity() {
-
-    // Variables para el binding del layout
     private lateinit var binding: ActivityPaso1SocpruebaBinding
-
-    // DAL para acceso a base de datos
     private val dalVehiculo = DALVehiculo()
-
-    // Variables para almacenar información del vehículo
     private var vehiculoActual: Vehiculo? = null
     private var vehiculoPaso1: VehiculoPaso1? = null
-
-    // Variables para el indicador de carga
     private lateinit var loadingContainer: LinearLayout
     private lateinit var tvLoadingText: TextView
     private lateinit var tvLoadingSubtext: TextView
     private var loadingHandler: Handler? = null
     private var loadingRunnable: Runnable? = null
-
-    // Variables para manejo de fotos
     private var evidencia1File: File? = null
     private var evidencia2File: File? = null
     private var evidencia1Capturada: Boolean = false
     private var evidencia2Capturada: Boolean = false
     private var currentPhotoType: Int = 0
     private var fotoUri: Uri? = null
-
-    // ID del usuario que está usando la app
     private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.IdUsuario ?: 1
-
-    // ✅ LAUNCHER PARA CÁMARA
-    // Este launcher se activa cuando se toma una foto
     private val camaraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
-            // Si la foto fue tomada exitosamente, procesarla
             fotoUri?.let { uri ->
                 procesarFoto(uri)
             }
@@ -74,9 +62,6 @@ class Paso1SOCPrueba_Activity : AppCompatActivity() {
             Toast.makeText(this, "Error capturando foto", Toast.LENGTH_SHORT).show()
         }
     }
-
-    // ✅ LAUNCHER PARA PERMISOS
-    // Este launcher se activa cuando se solicita permiso de cámara
     private val permisoLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         if (granted) {
             Toast.makeText(this, "Permiso de cámara concedido", Toast.LENGTH_SHORT).show()
@@ -87,32 +72,17 @@ class Paso1SOCPrueba_Activity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        // Inflar el layout usando View Binding
         binding = ActivityPaso1SocpruebaBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // Inicializar referencias a elementos del layout
         loadingContainer = binding.loadingContainer
         tvLoadingText = binding.tvLoadingText
         tvLoadingSubtext = binding.tvLoadingSubtext
-
-        // Configurar eventos de los botones
         configurarEventos()
-
-        // Verificar si tenemos permiso de cámara
         verificarPermisos()
     }
 
-    /**
-     * Configura todos los eventos de clicks y listeners de la interfaz
-     */
     private fun configurarEventos() {
-        // Poner foco en el campo de VIN al iniciar
         binding.etVIN.requestFocus()
-
-        // Configurar captura de Enter en el campo VIN
-        // Cuando el usuario presiona Enter después de escanear el VIN, se consulta automáticamente
         binding.etVIN.setOnKeyListener { _, keyCode, event ->
             if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_UP) {
                 verificarVINSuministrado()
@@ -120,13 +90,9 @@ class Paso1SOCPrueba_Activity : AppCompatActivity() {
             }
             false
         }
-
-        // Botón para consultar vehículo manualmente
         binding.btnConsultarVehiculo.setOnClickListener {
             verificarVINSuministrado()
         }
-
-        // Botones para capturar evidencias fotográficas
         binding.btnEvidencia1.setOnClickListener {
             capturarEvidencia(1)
         }
@@ -135,58 +101,37 @@ class Paso1SOCPrueba_Activity : AppCompatActivity() {
             capturarEvidencia(2)
         }
 
-        // Botón para guardar SOC y subir fotos a la API
         binding.btnGuardarSOC.setOnClickListener {
             guardarSOC()
         }
     }
 
-    /**
-     * Verifica si tenemos permiso de cámara, si no lo solicita
-     */
     private fun verificarPermisos() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             permisoLauncher.launch(Manifest.permission.CAMERA)
         }
     }
-
-    /**
-     * Verifica que el VIN ingresado sea válido y luego consulta el vehículo
-     */
     private fun verificarVINSuministrado() {
         val vin = binding.etVIN.text.toString().trim()
-
-        // Validar que el VIN tenga al menos 17 caracteres (estándar)
         if (vin.isNotEmpty() && vin.length > 16) {
             consultarVehiculo(vin)
         } else {
             Toast.makeText(this, "Ingrese un VIN válido (mínimo 17 caracteres)", Toast.LENGTH_SHORT).show()
         }
     }
-
-    /**
-     * Consulta el vehículo en la base de datos usando el VIN
-     */
     private fun consultarVehiculo(vin: String) {
         lifecycleScope.launch {
             val bll = BLLVehiculo()
             try {
                 Log.d("Paso1SOCPrueba", "🔍 Consultando vehículo con VIN: $vin")
                 mostrarCargaConsulta()
-
-                // Consultar vehículo en la base de datos
                 vehiculoPaso1 = dalVehiculo.consultarVehiculoPorVINParaPaso1(vin)
-
-                // Convertir a objeto Vehiculo
                 if (vehiculoPaso1 != null) {
                     vehiculoActual = bll.convertToVehiculo(vehiculoPaso1!!)
                 }
-
                 if (vehiculoActual != null) {
-                    // Si se encontró el vehículo, mostrar su información
                     mostrarInformacionVehiculo(vehiculoActual!!)
                     mostrarSeccionesSOC()
-
                     Toast.makeText(
                         this@Paso1SOCPrueba_Activity,
                         "✅ Vehículo encontrado",
