@@ -113,17 +113,22 @@ class DescargadorFotos(private val context: Context) {
                         if(manejaGuardadoArchivosEnBD) {
                             fotoBase64 = dalVeh.obtenerFotoBase64Paso1(registro.IdVehiculo, contador)!!
                         }
-                        else
-                        {
-
+                    }
+                    else if(registro.Paso==2) {
+                        if (manejaGuardadoArchivosEnBD) {
+                            fotoBase64 =dalVeh.obtenerFotoBase64Paso2(registro.IdVehiculo, contador)!!
                         }
                     }
-                    else if(registro.Paso==2)
-                        fotoBase64=dalVeh.obtenerFotoBase64Paso2(registro.IdVehiculo,contador)!!
-                    else if(registro.Paso==3)
-                        fotoBase64=dalVeh.obtenerFotoBase64Paso3(registro.IdVehiculo)!!
-                    else if(registro.Paso==4)
-                        fotoBase64=dalVeh.obtenerFotoBase64Paso4(registro.IdVehiculo,contador.toByte())!!
+                    else if(registro.Paso==3) {
+                            if (manejaGuardadoArchivosEnBD) {
+                                fotoBase64 = dalVeh.obtenerFotoBase64Paso3(registro.IdVehiculo)!!
+                            }
+                        }
+                    else if(registro.Paso==4) {
+                            if(manejaGuardadoArchivosEnBD) {
+                                fotoBase64 = dalVeh.obtenerFotoBase64Paso4(registro.IdVehiculo, contador.toByte())!!
+                            }
+                        }
                     try {
                         var guardadoCorrecto=false
                         if(manejaGuardadoArchivosEnBD) {
