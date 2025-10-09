@@ -34,6 +34,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import com.example.negociomx_pos.Utils.ApiUploadUtil
 
 class Paso3Repuve_Activity : AppCompatActivity() {
 
@@ -338,7 +341,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         }
     }
 
-    private fun verFotoExistente() {
+  /*  private fun verFotoExistente() {
         val vehiculo = vehiculoActual
         if (vehiculo == null) {
             Toast.makeText(this, "Error: No hay vehículo seleccionado", Toast.LENGTH_SHORT).show()
@@ -360,6 +363,58 @@ class Paso3Repuve_Activity : AppCompatActivity() {
             } catch (e: Exception) {
                 Log.e("Paso3REPUVE", "Error cargando foto: ${e.message}")
                 Toast.makeText(this@Paso3Repuve_Activity, "Error cargando foto: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }*/
+
+
+    private fun verFotoExistente() {
+        val vehiculo = vehiculoActual
+        if (vehiculo == null) {
+            Toast.makeText(this, "Error: No hay vehículo seleccionado", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        lifecycleScope.launch {
+            try {
+                Toast.makeText(this@Paso3Repuve_Activity, "Cargando foto...", Toast.LENGTH_SHORT).show()
+
+                var fotoBase64: String? = null
+
+                // ✅ VERIFICAR SI DEBE CARGAR DESDE BD O DESDE WEB API
+                if (ParametrosSistema.cfgApp != null &&
+                    ParametrosSistema.cfgApp?.ManejaGuardadoArchivosEnBD == true) {
+                    // Cargar desde Base de Datos
+                    fotoBase64 = dalVehiculo.obtenerFotoBase64Paso3(vehiculo.Id.toInt())
+                }
+
+                if (ParametrosSistema.cfgApp != null &&
+                    ParametrosSistema.cfgApp?.ManejaGuardadoArchivosEnBD == true &&
+                    fotoBase64 != null && fotoBase64.isNotEmpty()) {
+                    // Mostrar desde Base64
+                    mostrarDialogoFoto(fotoBase64)
+                } else if (ParametrosSistema.cfgApp != null &&
+                    ParametrosSistema.cfgApp?.ManejaGuardadoArchivosEnBD == false) {
+                    // Cargar desde Web API
+                    val urlCompletoFoto = ParametrosSistema.cfgApp?.UrlGuardadoArchivos + '/' +
+                            ParametrosSistema.cfgApp?.CarpetaGuardadoArchivosNube?.replace("~/", "") +
+                            '/' + vehiculoActual?.NombreArchivoFoto
+                    mostrarDialogoFotoFromUrl(urlCompletoFoto)
+                } else {
+                    Toast.makeText(
+                        this@Paso3Repuve_Activity,
+                        "No se pudo cargar la foto",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+            } catch (e: Exception) {
+                Log.e("Paso3REPUVE", "Error cargando foto: ${e.message}")
+                Toast.makeText(
+                    this@Paso3Repuve_Activity,
+                    "Error cargando foto: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -402,6 +457,60 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         }
     }
 
+    private fun mostrarDialogoFotoFromUrl(url: String) {
+        lifecycleScope.launch {
+            try {
+                // ✅ CARGAR IMAGEN DESDE URL EN BACKGROUND THREAD
+                val bitmap = withContext(Dispatchers.IO) {
+                    bllUtil?.mLoad(url)
+                }
+
+                if (bitmap != null) {
+                    // Crear diálogo personalizado
+                    val dialog = android.app.AlertDialog.Builder(this@Paso3Repuve_Activity)
+                    val imageView = android.widget.ImageView(this@Paso3Repuve_Activity)
+
+                    // Configurar ImageView
+                    imageView.setImageBitmap(bitmap)
+                    imageView.scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+                    imageView.adjustViewBounds = true
+
+                    // Configurar diálogo
+                    dialog.setTitle("Paso 3 - Foto REPUVE")
+                    dialog.setView(imageView)
+                    dialog.setPositiveButton("Cerrar") { dialogInterface, _ ->
+                        dialogInterface.dismiss()
+                    }
+
+                    val alertDialog = dialog.create()
+                    alertDialog.show()
+
+                    // Ajustar tamaño del diálogo
+                    val window = alertDialog.window
+                    window?.setLayout(
+                        (resources.displayMetrics.widthPixels * 0.9).toInt(),
+                        (resources.displayMetrics.heightPixels * 0.7).toInt()
+                    )
+
+                } else {
+                    Toast.makeText(
+                        this@Paso3Repuve_Activity,
+                        "Error decodificando la imagen",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+            } catch (e: Exception) {
+                Log.e("Paso3REPUVE", "Error mostrando foto: ${e.message}")
+                Toast.makeText(
+                    this@Paso3Repuve_Activity,
+                    "Error mostrando foto",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
     private fun guardarPaso3() {
         val vehiculo = vehiculoActual
         if (vehiculo == null) {
@@ -432,7 +541,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
 
                 Toast.makeText(this@Paso3Repuve_Activity, "Guardando foto REPUVE...", Toast.LENGTH_SHORT).show()
 
-                val fotoBase64 =bllUtil?.convertirImagenABase64(evidenciaFile!!)
+         /*       val fotoBase64 =bllUtil?.convertirImagenABase64(evidenciaFile!!)
                 if (fotoBase64 != null) {
                     val idPaso3LogVehiculo = dalVehiculo.insertarPaso3LogVehiculo(
                         idVehiculo = vehiculo.Id.toInt(),
@@ -470,6 +579,81 @@ class Paso3Repuve_Activity : AppCompatActivity() {
                     ocultarCarga()
                     Toast.makeText(this@Paso3Repuve_Activity,
                         "❌ Error procesando la imagen",
+                        Toast.LENGTH_LONG).show()
+                }*/
+
+                // ✅ CONFIGURAR URL BASE PARA API
+                val urlBase = ParametrosSistema.cfgApp!!.UrlGuardadoArchivos + '/' +
+                        ParametrosSistema.cfgApp!!.UrlAPIControllerGuardadoArchivos
+
+// ✅ GENERAR NOMBRE DE ARCHIVO
+                val nombreArchivo = "${vehiculoActual?.VIN}_Paso_3_Foto_1.jpg"
+
+// ✅ CONVERTIR IMAGEN A BASE64
+                var fotoBase64: String? = bllUtil?.convertirImagenABase64(evidenciaFile!!)
+
+// ✅ VALIDAR SI DEBE GUARDAR EN API O EN BASE DE DATOS
+                if (ParametrosSistema.cfgApp != null &&
+                    ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == false) {
+
+                    // Subir a API Web
+                    val resultadoSubida = ApiUploadUtil.subirFoto(
+                        urlBase = urlBase,
+                        nombreArchivo = nombreArchivo,
+                        file = evidenciaFile!!,
+                        vin = vehiculoActual!!.VIN,
+                        paso = 3,
+                        numeroFoto = 1
+                    )
+
+                    // Si la subida fue exitosa, NO guardar en BD (setear fotoBase64 a null)
+                    if (resultadoSubida.first) {
+                        fotoBase64 = null
+                        Log.d("Paso3REPUVE", "✅ Foto subida a API exitosamente")
+                    } else {
+                        Log.e("Paso3REPUVE", "❌ Error subiendo a API: ${resultadoSubida.second}")
+                    }
+                }
+
+// ✅ GUARDAR REGISTRO EN BD (con o sin Base64 según configuración)
+                val idPaso3LogVehiculo = dalVehiculo.insertarPaso3LogVehiculo(
+                    idVehiculo = vehiculo.Id.toInt(),
+                    idUsuarioNube = idUsuarioNubeAlta,
+                    fotoBase64 = fotoBase64.toString(),
+                    nombreArchivo= nombreArchivo
+                )
+
+                ocultarCarga()
+
+                if (idPaso3LogVehiculo > 0) {
+                    val mensajeGuardado = if (fotoBase64 != null) {
+                        "✅ Foto REPUVE guardada exitosamente en Base de Datos"
+                    } else {
+                        "✅ Foto REPUVE guardada exitosamente en Web API"
+                    }
+
+                    Toast.makeText(this@Paso3Repuve_Activity,
+                        mensajeGuardado,
+                        Toast.LENGTH_LONG).show()
+
+                    // ✅ ACTUALIZAR ESTADO DESPUÉS DE GUARDAR
+                    vehiculoActual?.IdPaso3LogVehiculo = idPaso3LogVehiculo
+                    vehiculoActual?.IdVehiculo = vehiculoActual!!.Id.toInt()
+                    vehiculoActual?.TieneFoto = true
+                    vehiculoActual?.NombreArchivoFoto = nombreArchivo
+
+                    // ✅ RECONFIGURAR BOTÓN PARA MODO VER
+                    binding.btnEvidencia.text = "👁️ Ver Foto REPUVE"
+                    binding.tvEstadoEvidencia.text = "📷"
+                    binding.btnGuardarPaso3.alpha = 0.5f
+                    binding.tvMensajeInfo.text = "✅ Foto REPUVE guardada - No se puede modificar"
+
+                    // ✅ LIMPIAR VARIABLES DE CAPTURA
+                    evidenciaFile = null
+                    evidenciaCapturada = false
+                } else {
+                    Toast.makeText(this@Paso3Repuve_Activity,
+                        "❌ Error guardando foto REPUVE",
                         Toast.LENGTH_LONG).show()
                 }
 

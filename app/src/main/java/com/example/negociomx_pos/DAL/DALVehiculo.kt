@@ -1169,7 +1169,7 @@ class DALVehiculo {
     // ✅ MÉTODOS PARA PASO 3 - REPUVE
 
     // ✅ INSERTAR REGISTRO EN PASO3LOGVEHICULO
-    suspend fun insertarPaso3LogVehiculo(
+   /* suspend fun insertarPaso3LogVehiculo(
         idVehiculo: Int,
         idUsuarioNube: Int,
         fotoBase64: String
@@ -1223,7 +1223,73 @@ class DALVehiculo {
             }
         }
     }
+*/
 
+
+    suspend fun insertarPaso3LogVehiculo(
+        idVehiculo: Int,
+        idUsuarioNube: Int,
+        fotoBase64: String?,  // ✅ Ahora acepta null
+        nombreArchivo: String  // ✅ PARÁMETRO AGREGADO
+    ): Int = withContext(Dispatchers.IO) {
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var generatedKey: Int = -1
+
+        try {
+            Log.d("DALVehiculo", "💾 Insertando registro en Paso3LogVehiculo para IdVehiculo: $idVehiculo")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext -1
+            }
+
+            // ✅ DETERMINAR SI TIENE FOTO SEGÚN SI fotoBase64 ES NULL O NO
+            val tieneFoto = if (fotoBase64 != null && fotoBase64.isNotEmpty()) 1 else 1
+
+            val query = """
+            INSERT INTO Paso3LogVehiculo (IdVehiculo, IdUsuarioNube, FechaAlta, Foto, Tienefoto, NombreArchivoFoto)
+            VALUES (?, ?, GETDATE(), ?, ?, ?)
+        """.trimIndent()
+
+            statement = conexion.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)
+            statement.setInt(1, idVehiculo)
+            statement.setInt(2, idUsuarioNube)
+
+            // ✅ SI fotoBase64 ES NULL, GUARDAR NULL EN BD
+            if (fotoBase64 != null && fotoBase64.isNotEmpty()) {
+                statement.setString(3, fotoBase64)
+            } else {
+                statement.setNull(3, java.sql.Types.VARCHAR)
+            }
+
+            statement.setInt(4, tieneFoto)
+            statement.setString(5, nombreArchivo)
+
+            statement.executeUpdate()
+
+            val rs = statement.generatedKeys
+            if (rs.next()) {
+                generatedKey = rs.getInt(1)
+            }
+
+            Log.d("DALVehiculo", "✅ Registro Paso3 insertado exitosamente. Id generado: $generatedKey")
+            return@withContext generatedKey
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error insertando registro Paso3: ${e.message}")
+            e.printStackTrace()
+            return@withContext -1
+        } finally {
+            try {
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+    }
     // ✅ OBTENER FOTO BASE64 PASO3
     suspend fun obtenerFotoBase64Paso3(idVehiculo: Int): String? = withContext(Dispatchers.IO) {
         var conexion: Connection? = null

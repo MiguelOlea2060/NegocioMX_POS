@@ -455,7 +455,6 @@ class Paso2SOC_Activity : AppCompatActivity() {
 
 
 
-
                 var fotoBase64:String? =null
                 if(ParametrosSistema.cfgApp!=null && ParametrosSistema.cfgApp?.ManejaGuardadoArchivosEnBD==true)
                     fotoBase64= dalVehiculo.obtenerFotoBase64Paso2(vehiculo.Id.toInt(), posicion)

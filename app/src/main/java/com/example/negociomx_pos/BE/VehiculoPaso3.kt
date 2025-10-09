@@ -21,5 +21,6 @@ data class VehiculoPaso3(
     var IdPaso3LogVehiculo:Int=0,
     var TieneFoto:Boolean=false,
     var NombreArchivoFoto:String="",
-    var FechaAltaFoto:String=""
+    var FechaAltaFoto:String="",
+
 )
