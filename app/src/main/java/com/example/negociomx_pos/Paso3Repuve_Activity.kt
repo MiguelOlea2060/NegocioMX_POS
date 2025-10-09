@@ -588,14 +588,12 @@ class Paso3Repuve_Activity : AppCompatActivity() {
 
 // ✅ GENERAR NOMBRE DE ARCHIVO
                 val nombreArchivo = "${vehiculoActual?.VIN}_Paso_3_Foto_1.jpg"
-
 // ✅ CONVERTIR IMAGEN A BASE64
                 var fotoBase64: String? = bllUtil?.convertirImagenABase64(evidenciaFile!!)
 
 // ✅ VALIDAR SI DEBE GUARDAR EN API O EN BASE DE DATOS
                 if (ParametrosSistema.cfgApp != null &&
                     ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == false) {
-
                     // Subir a API Web
                     val resultadoSubida = ApiUploadUtil.subirFoto(
                         urlBase = urlBase,
@@ -615,14 +613,15 @@ class Paso3Repuve_Activity : AppCompatActivity() {
                     }
                 }
 
+                val fechaActual = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
 // ✅ GUARDAR REGISTRO EN BD (con o sin Base64 según configuración)
                 val idPaso3LogVehiculo = dalVehiculo.insertarPaso3LogVehiculo(
                     idVehiculo = vehiculo.Id.toInt(),
                     idUsuarioNube = idUsuarioNubeAlta,
                     fotoBase64 = fotoBase64.toString(),
-                    nombreArchivo= nombreArchivo
+                    nombreArchivo= nombreArchivo,
+                    fechaMovimiento = fechaActual
                 )
-
                 ocultarCarga()
 
                 if (idPaso3LogVehiculo > 0) {
