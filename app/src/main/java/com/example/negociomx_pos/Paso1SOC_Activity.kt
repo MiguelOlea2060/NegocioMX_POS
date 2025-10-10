@@ -73,16 +73,21 @@ class Paso1SOC_Activity : AppCompatActivity() {
             }
         }
     private var fotosExistentes: Int = 0
-    private var tieneRegistroSOC: Boolean = false
-    private var evidencia3File: File? = null
-    private var evidencia4File: File? = null
-    private var evidencia3Capturada: Boolean = false
-    private var evidencia4Capturada: Boolean = false
-    private var esSegundaEntrada: Boolean = false
-    private var esTerceraEntradaOMas: Boolean = false
-    private var puedeCapturarFotos12: Boolean = true
-    private var puedeCapturarFotos34: Boolean = false
-    private var idPaso1LogVehiculoExistente: Int = -1
+    private var vezActual: Short = 0
+    private var esPrimeraVez: Boolean = true
+    private var puedeCapturarFotos: Boolean = true
+    private var idPasoNumLogVehiculoNotificacion: Int = 0
+    private var idPasoNumLogVehiculoExistente: Int = 0
+    //private var tieneRegistroSOC: Boolean = false
+    //private var evidencia3File: File? = null
+    //private var evidencia4File: File? = null
+    //private var evidencia3Capturada: Boolean = false
+    //private var evidencia4Capturada: Boolean = false
+    //private var esSegundaEntrada: Boolean = false
+   // private var esTerceraEntradaOMas: Boolean = false
+   // private var puedeCapturarFotos12: Boolean = true
+   // private var puedeCapturarFotos34: Boolean = false
+    //private var idPaso1LogVehiculoExistente: Int = -1
     var bllUtil: BLLUtils?=null
 
     private val barcodeLauncher = registerForActivityResult(ScanContract()) { result ->
@@ -147,21 +152,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
         tvLoadingText = findViewById(R.id.tvLoadingText)
         tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
 
-        binding.btnEvidencia3.setOnClickListener {
-            if (vehiculoPaso1?.FotosPosicion3!! > 0) {
-                verFotoExistente(3,vehiculoPaso1?.NombreArchivo3!!)
-            } else {
-                capturarEvidencia(3)
-            }
-        }
 
-        binding.btnEvidencia4.setOnClickListener {
-            if (vehiculoPaso1?.FotosPosicion4!! > 0) {
-                verFotoExistente(4,vehiculoPaso1?.NombreArchivo4!!)
-            } else {
-                capturarEvidencia(4)
-            }
-        }
     }
     private fun verificaVINSuministrado() {
         val vin = binding.etVIN.text.toString().trim()
@@ -182,7 +173,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
     }
     private fun consultarVehiculo(vin: String) {
         lifecycleScope.launch {
-            val bll=BLLVehiculo()
+            val bll = BLLVehiculo()
             try {
                 Log.d("Paso1SOC", "🔍 Consultando vehículo con VIN: $vin")
                 mostrarCargaConsulta()
@@ -192,90 +183,55 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
 
-
                 val fecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                vehiculoPaso1=dalVehiculo.consultarVehiculoPorVINParaPaso1(vin,fecha)
-                if(vehiculoPaso1!=null)
+                vehiculoPaso1 = dalVehiculo.consultarVehiculoPorVINParaPaso1(vin, fecha)
+
+                if (vehiculoPaso1 != null) {
                     vehiculo = bll.convertToVehiculo(vehiculoPaso1!!)
-                if (vehiculo != null) {
+                }
+
+                if (vehiculo?.IdPaso1LogVehiculo != 0) {
                     vehiculoActual = vehiculo
-                    var datosSOCExistentes:Vehiculo?=null
-                    if(vehiculoPaso1!=null && vehiculoPaso1?.IdPaso1LogVehiculo!!>0)
-                        datosSOCExistentes=vehiculo
-                    if (datosSOCExistentes != null) {
-                        tieneRegistroSOC = true
 
-                        // Verificar si ya tiene fotos 1 y 2
-                        val tieneFotos12 = (vehiculoPaso1?.FotosPosicion1!! > 0) && (vehiculoPaso1?.FotosPosicion2!! > 0)
-                        val tieneFotos34 = (vehiculoPaso1?.FotosPosicion3!! > 0) || (vehiculoPaso1?.FotosPosicion4!! > 0)
+                    // ✅ OBTENER EL VALOR DE VEZ DEL VEHÍCULO
+                    vezActual = vehiculo?.Vez ?: 0
+                    esPrimeraVez = (vezActual == 0.toShort())
 
-                        if (!tieneFotos12) {
-                            // Primera entrada: puede capturar fotos 1 y 2
-                            esSegundaEntrada = false
-                            esTerceraEntradaOMas = false
-                            puedeCapturarFotos12 = true
-                            puedeCapturarFotos34 = false
-                        } else if (!tieneFotos34) {
-                            // Segunda entrada: ver fotos 1 y 2, capturar fotos 3 y 4
-                            esSegundaEntrada = true
-                            esTerceraEntradaOMas = false
-                            puedeCapturarFotos12 = false
-                            puedeCapturarFotos34 = true
-                        } else {
-                            // Tercera entrada o más: solo ver fotos
-                            esSegundaEntrada = false
-                            esTerceraEntradaOMas = true
-                            puedeCapturarFotos12 = false
-                            puedeCapturarFotos34 = false
-                        }
-                    } else {
-                        // Primera vez: puede capturar fotos 1 y 2
-                        tieneRegistroSOC = false
-                        esSegundaEntrada = false
-                        esTerceraEntradaOMas = false
-                        puedeCapturarFotos12 = true
-                        puedeCapturarFotos34 = false
-                    }
+                    // ✅ OBTENER IDs DE NOTIFICACIÓN
+                    idPasoNumLogVehiculoNotificacion = vehiculo?.IdPasoNumLogVehiculoNotificacion ?: 0
+                    idPasoNumLogVehiculoExistente = vehiculo?.IdPasoNumLogVehiculo ?: 0
 
+                    Log.d("Paso1SOC", "📊 Vez actual: $vezActual, Es primera vez: $esPrimeraVez")
+
+                    // ✅ MOSTRAR INFORMACIÓN DEL VEHÍCULO
                     mostrarInformacionVehiculo(vehiculo!!)
-                    // ✅ MOSTRAR DATOS SOC SI EXISTEN
-                    if (datosSOCExistentes != null && vehiculoPaso1?.IdPaso1LogVehiculo!!>0) {
-                        tieneRegistroSOC = true
-                        mostrarDatosSOCExistentes(datosSOCExistentes)
-                    } else {
-                        binding.apply {
-                            etOdometro.isEnabled = true
-                            etBateria.isEnabled = true
-                            cbModoTransporte.isEnabled = true
-                            cbRequiereRecarga.isEnabled = true
-
-                            etOdometro.requestFocus()
-                            etOdometro.selectAll()
-                        }
-                    }
-
                     mostrarSeccionesSOC()
-                    // ✅ CONFIGURAR BOTONES DE FOTOS SEGÚN ESTADO
-                    configurarBotonesSegunFotos()
-                    if (vehiculoPaso1 != null) {
-                        fotosExistentes = vehiculoPaso1?.FotosPosicion1!! + vehiculoPaso1?.FotosPosicion2!! +
-                                vehiculoPaso1?.FotosPosicion3!! + vehiculoPaso1?.FotosPosicion4!!
 
+                    // ✅ CONFIGURAR CAMPOS Y BOTONES SEGÚN VEZ
+                    configurarCamposSegunVez()
+                    configurarBotonesSegunFotos()
+
+                    // ✅ CONTAR FOTOS EXISTENTES (SOLO POSICIONES 1 Y 2)
+                    fotosExistentes = vehiculoPaso1?.FotosPosicion1!! + vehiculoPaso1?.FotosPosicion2!!
+
+                    // ✅ MENSAJE AL USUARIO
+                    val mensaje = if (esPrimeraVez) {
                         if (fotosExistentes > 0) {
-                            Toast.makeText(
-                                this@Paso1SOC_Activity,
-                                "✅ Vehículo encontrado. Ya tiene $fotosExistentes foto(s) registrada(s)",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            "✅ Vehículo encontrado. Primera entrada completada con $fotosExistentes foto(s)"
                         } else {
-                            Toast.makeText(
-                                this@Paso1SOC_Activity,
-                                "✅ Vehículo encontrado. Sin fotos previas",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            "✅ Vehículo encontrado. Primera entrada - Capture al menos 1 foto"
+                        }
+                    } else {
+                        if (fotosExistentes > 0) {
+                            "✅ Vehículo encontrado. Entrada #${vezActual + 1} - Ya tiene $fotosExistentes foto(s)"
+                        } else {
+                            "✅ Vehículo encontrado. Entrada #${vezActual + 1} - Capture al menos 1 foto"
                         }
                     }
+                    Toast.makeText(this@Paso1SOC_Activity, mensaje, Toast.LENGTH_LONG).show()
+
                     ocultarCargaConsulta()
+
                 } else {
                     ocultarSeccionesSOC()
                     Toast.makeText(
@@ -284,7 +240,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
                         Toast.LENGTH_LONG
                     ).show()
                     ocultarCargaConsulta()
-
                     binding.etVIN.selectAll()
                 }
 
@@ -297,6 +252,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun mostrarInformacionVehiculo(vehiculo: Vehiculo) {
         binding.apply {
@@ -485,6 +441,67 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
     }
 
+    private fun configurarCamposSegunVez() {
+        binding.apply {
+            if (esPrimeraVez && vehiculoActual?.IdPaso1LogVehiculo == 0) {
+                // ✅ PRIMERA VEZ (Vez = 0): Todos los campos habilitados
+                etOdometro.isEnabled = true
+                etBateria.isEnabled = true
+                cbModoTransporte.isEnabled = true
+                cbRequiereRecarga.isEnabled = true
+
+                etOdometro.alpha = 1.0f
+                etBateria.alpha = 1.0f
+                cbModoTransporte.alpha = 1.0f
+                cbRequiereRecarga.alpha = 1.0f
+
+                puedeCapturarFotos = true
+
+                // Limpiar campos para nueva entrada
+                etOdometro.setText("")
+                etBateria.setText("")
+                cbModoTransporte.isChecked = false
+                cbRequiereRecarga.isChecked = false
+
+                etOdometro.requestFocus()
+
+                Log.d("Paso1SOC", "✅ Modo Primera Vez: Todos los campos habilitados")
+
+            } else {
+                // ✅ VEZ >= 1: Solo Batería y Requiere Recarga habilitados
+                etOdometro.isEnabled = false
+                etBateria.isEnabled = true
+                cbModoTransporte.isEnabled = false
+                cbRequiereRecarga.isEnabled = true
+
+                etOdometro.alpha = 0.5f
+                etBateria.alpha = 1.0f
+                cbModoTransporte.alpha = 0.5f
+                cbRequiereRecarga.alpha = 1.0f
+
+                puedeCapturarFotos = true
+
+                // Mantener valores existentes en campos bloqueados
+                if (vehiculoActual?.Odometro != null && vehiculoActual?.Odometro!! > 0) {
+                    etOdometro.setText(vehiculoActual?.Odometro.toString())
+                }
+                if (vehiculoActual?.ModoTransporte != null) {
+                    cbModoTransporte.isChecked = vehiculoActual?.ModoTransporte!!
+                }
+
+                // Limpiar solo los campos editables
+                etBateria.setText("")
+                cbRequiereRecarga.isChecked = false
+
+                // Enfocar en Batería para entrada rápida
+                etBateria.requestFocus()
+                etBateria.selectAll()
+
+                Log.d("Paso1SOC", "✅ Modo Subsecuente (Vez $vezActual): Solo Batería y Requiere Recarga habilitados")
+            }
+        }
+    }
+
     private fun ocultarSeccionesSOC() {
         binding.apply {
             layoutInfoVehiculo.visibility = View.GONE
@@ -504,66 +521,26 @@ class Paso1SOC_Activity : AppCompatActivity() {
             return
         }
 
-        // ✅ VALIDACIONES SEGÚN REGLAS DE NEGOCIO
-        when (numeroEvidencia) {
-            1, 2 -> {
-                if (!puedeCapturarFotos12) {
-                    Toast.makeText(this, "Ya no puede capturar fotos 1 y 2. Solo puede verlas.", Toast.LENGTH_LONG).show()
-                    return
-                }
-            }
-            3, 4 -> {
-                if (!puedeCapturarFotos34) {
-                    Toast.makeText(this, "Primero debe completar las fotos 1 y 2.", Toast.LENGTH_LONG).show()
-                    return
-                }
-            }
+        // ✅ VALIDAR QUE SOLO SEA FOTO 1 O 2
+        if (numeroEvidencia !in 1..2) {
+            Toast.makeText(this, "Solo se permiten fotos 1 y 2", Toast.LENGTH_SHORT).show()
+            return
         }
 
-// ✅ VALIDAR MÁXIMO DE FOTOS PARA SEGUNDA ENTRADA
-        if (esSegundaEntrada) {
-            val fotosCapturadas34 = (if (evidencia3Capturada) 1 else 0) + (if (evidencia4Capturada) 1 else 0)
-            if (fotosCapturadas34 >= 2) {
-                Toast.makeText(this, "Ya capturó el máximo de fotos permitidas para esta entrada.", Toast.LENGTH_LONG).show()
-                return
-            }
+// ✅ VALIDAR SI PUEDE CAPTURAR FOTOS
+        if (!puedeCapturarFotos) {
+            Toast.makeText(this, "No puede capturar más fotos en este momento", Toast.LENGTH_LONG).show()
+            return
         }
 
-        // ✅ VALIDAR SI YA TIENE FOTO CAPTURADA PARA POSICIONES 1 Y 2
+// ✅ VALIDAR SI YA TIENE FOTO CAPTURADA
         if (numeroEvidencia == 1 && evidencia1Capturada) {
-            Toast.makeText(
-                this,
-                "Ya tiene evidencia 1 capturada. Presione Guardar para confirmar.",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "Ya tiene evidencia 1 capturada. Presione Guardar para confirmar.", Toast.LENGTH_SHORT).show()
             return
         }
 
         if (numeroEvidencia == 2 && evidencia2Capturada) {
-            Toast.makeText(
-                this,
-                "Ya tiene evidencia 2 capturada. Presione Guardar para confirmar.",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-
-        // ✅ VALIDAR SI YA TIENE FOTO CAPTURADA PARA POSICIONES 3 Y 4
-        if (numeroEvidencia == 3 && evidencia3Capturada) {
-            Toast.makeText(
-                this,
-                "Ya tiene evidencia 3 capturada. Presione Guardar para confirmar.",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-
-        if (numeroEvidencia == 4 && evidencia4Capturada) {
-            Toast.makeText(
-                this,
-                "Ya tiene evidencia 4 capturada. Presione Guardar para confirmar.",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "Ya tiene evidencia 2 capturada. Presione Guardar para confirmar.", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -694,53 +671,21 @@ class Paso1SOC_Activity : AppCompatActivity() {
                 archivoLocal
             }
 
-            // ✅ GUARDAR REFERENCIA DEL ARCHIVO SEGÚN LA EVIDENCIA
+            // ✅ GUARDAR REFERENCIA DEL ARCHIVO SEGÚN LA EVIDENCIA (SOLO 1 Y 2)
             when (currentPhotoType) {
                 1 -> {
                     evidencia1File = archivoFinal
                     evidencia1Capturada = true
                     binding.tvEstadoEvidencia1.text = "📷"
-                    Toast.makeText(
-                        this@Paso1SOC_Activity,
-                        "✅ Evidencia 1 capturada (sin guardar)",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 1 capturada (sin guardar)", Toast.LENGTH_SHORT).show()
                 }
-
                 2 -> {
                     evidencia2File = archivoFinal
                     evidencia2Capturada = true
                     binding.tvEstadoEvidencia2.text = "📷"
-                    Toast.makeText(
-                        this@Paso1SOC_Activity,
-                        "✅ Evidencia 2 capturada (sin guardar)",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                3 -> {
-                    evidencia3File = archivoFinal
-                    evidencia3Capturada = true
-                    binding.tvEstadoEvidencia3.text = "📷"
-                    Toast.makeText(
-                        this@Paso1SOC_Activity,
-                        "✅ Evidencia 3 capturada (sin guardar)",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
-                4 -> {
-                    evidencia4File = archivoFinal
-                    evidencia4Capturada = true
-                    binding.tvEstadoEvidencia4.text = "📷"
-                    Toast.makeText(
-                        this@Paso1SOC_Activity,
-                        "✅ Evidencia 4 capturada (sin guardar)",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@Paso1SOC_Activity, "✅ Evidencia 2 capturada (sin guardar)", Toast.LENGTH_SHORT).show()
                 }
             }
-
             Log.d("Paso1SOC", "✅ Evidencia $currentPhotoType lista para guardar")
 
         } catch (e: Exception) {
@@ -820,19 +765,30 @@ class Paso1SOC_Activity : AppCompatActivity() {
             return
         }
 
-        val odometroText = binding.etOdometro.text.toString().trim()
         val bateriaText = binding.etBateria.text.toString().trim()
 
-        if (odometroText.isEmpty() || bateriaText.isEmpty()) {
-            Toast.makeText(this, "Complete todos los campos obligatorios", Toast.LENGTH_SHORT)
-                .show()
+        // ✅ VALIDAR CAMPOS SEGÚN VEZ
+        if (esPrimeraVez) {
+            // Primera vez: validar todos los campos
+            val odometroText = binding.etOdometro.text.toString().trim()
 
-            binding.etOdometro.selectAll()
-            binding.etOdometro.requestFocus()
-            return
+            if (odometroText.isEmpty() || bateriaText.isEmpty()) {
+                Toast.makeText(this, "Complete todos los campos obligatorios", Toast.LENGTH_SHORT).show()
+                binding.etOdometro.selectAll()
+                binding.etOdometro.requestFocus()
+                return
+            }
+        } else {
+            // Vez >= 1: solo validar batería
+            if (bateriaText.isEmpty()) {
+                Toast.makeText(this, "Ingrese el nivel de batería", Toast.LENGTH_SHORT).show()
+                binding.etBateria.selectAll()
+                binding.etBateria.requestFocus()
+                return
+            }
         }
 
-        val odometro = odometroText.toIntOrNull() ?: 0
+        val odometro = binding.etOdometro.text.toString().trim().toIntOrNull() ?: 0
         val bateria = bateriaText.toIntOrNull() ?: 0
 
         if (bateria < 0 || bateria > 100) {
@@ -846,12 +802,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
         mostrarCargaConMensajes()
         lifecycleScope.launch {
             try {
-                // ✅ MANEJAR BOTÓN ATRÁS
-                if (esTerceraEntradaOMas) {
-                    ocultarCarga()
-                    finish() // Cerrar actividad
-                    return@launch
-                }
+
 
 // ✅ VALIDAR FOTOS MÍNIMAS SEGÚN ENTRADA
                 val validacionFotos = validarFotosMinimas()
@@ -874,266 +825,87 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
                 var nombreArchivo = ""
 
-                val idPaso1LogVehiculo = if (idPaso1LogVehiculoExistente > 0) {
-                    // Usar ID existente y actualizar
-                    dalVehiculo.insertarOActualizarPaso1LogVehiculo(
-                        idVehiculo = vehiculo.Id.toInt(),
-                        odometro = odometro,
-                        bateria = bateria,
-                        modoTransporte = binding.cbModoTransporte.isChecked,
-                        requiereRecarga = binding.cbRequiereRecarga.isChecked,
-                        idUsuarioNubeAlta = idUsuarioNubeAlta,
-                        fechaMovimiento = fechaActual
-                    )
-                    idPaso1LogVehiculoExistente
-                } else {
-                    // Crear nuevo registro
-                    dalVehiculo.insertarOActualizarPaso1LogVehiculo(
-                        idVehiculo = vehiculo.Id.toInt(),
-                        odometro = odometro,
-                        bateria = bateria,
-                        modoTransporte = binding.cbModoTransporte.isChecked,
-                        requiereRecarga = binding.cbRequiereRecarga.isChecked,
-                        idUsuarioNubeAlta = idUsuarioNubeAlta,
-                        fechaMovimiento = fechaActual
-                    )
-                }
+                // ✅ SIEMPRE CREAR NUEVO REGISTRO (no actualizar existente)
+                val idPaso1LogVehiculo = dalVehiculo.insertarOActualizarPaso1LogVehiculo(
+                    idVehiculo = vehiculo.Id.toInt(),
+                    odometro = odometro,
+                    bateria = bateria,
+                    modoTransporte = binding.cbModoTransporte.isChecked,
+                    requiereRecarga = binding.cbRequiereRecarga.isChecked,
+                    idUsuarioNubeAlta = idUsuarioNubeAlta,
+                    fechaMovimiento = fechaActual
+                )
 
                 if (idPaso1LogVehiculo > 0) {
                     Log.d("Paso1SOC", "✅ Datos SOC guardados con ID: $idPaso1LogVehiculo")
 
-                    // ✅ 2. GUARDAR FOTOS DIRECTAMENTE EN BD
+                    // ✅ 2. GUARDAR SOLO FOTOS 1 Y 2
                     var exitoFotos = true
                     var consecutivo: Short = 1
-                    var nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_1.jpg"
 
-                    // Solo permitir guardar nuevas fotos si no tiene registro SOC previo
-                    if (!tieneRegistroSOC) {
-                     /*   if (evidencia1Capturada && evidencia1File != null) {
-                            val fotoBase64 =bllUtil?.convertirImagenABase64(evidencia1File!!)
-                            exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
-                                idPaso1LogVehiculo = idPaso1LogVehiculo,
-                                idEntidadArchivoFoto = null,
-                                idUsuarioNubeAlta = idUsuarioNubeAlta,
-                                consecutivo = consecutivo,
-                                posicion = 1,
-                                fotoBase64 = fotoBase64,
-                                fechaMovimiento = fechaActual,
-                                nombreArchivo = nombreArchivo
+                    if (evidencia1Capturada && evidencia1File != null) {
+                        var fotoBase64 = bllUtil?.convertirImagenABase64(evidencia1File!!)
+                        val nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_1_Vez${vezActual}.jpg"
+
+                        if (ParametrosSistema.cfgApp != null &&
+                            ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == false) {
+                            val resultadoSubida = ApiUploadUtil.subirFoto(
+                                urlBase = urlBase,
+                                nombreArchivo = nombreArchivo,
+                                file = evidencia1File!!,
+                                vin = vehiculoActual!!.VIN,
+                                paso = 1,
+                                numeroFoto = 1
                             )
-                            consecutivo++
-                        }*/
-
-                        if (evidencia1Capturada && evidencia1File != null) {
-                            var fotoBase64 = bllUtil?.convertirImagenABase64(evidencia1File!!)
-                            nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_1.jpg"
-
-                            // ✅ VALIDAR SI DEBE GUARDAR EN API O EN BASE DE DATOS
-                            if (ParametrosSistema.cfgApp != null &&
-                                ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == false) {
-
-                                // Subir a API Web
-                                val resultadoSubida = ApiUploadUtil.subirFoto(
-                                    urlBase = urlBase,
-                                    nombreArchivo = nombreArchivo,
-                                    file = evidencia1File!!,
-                                    vin = vehiculoActual!!.VIN,
-                                    paso = 1,
-                                    numeroFoto = 1
-                                )
-
-                                // Si la subida fue exitosa, NO guardar en BD
-                                if (resultadoSubida.first) {
-                                    fotoBase64 = null
-                                }
+                            if (resultadoSubida.first) {
+                                fotoBase64 = null
                             }
-
-                            exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
-                                idPaso1LogVehiculo = idPaso1LogVehiculo,
-                                idEntidadArchivoFoto = null,
-                                idUsuarioNubeAlta = idUsuarioNubeAlta,
-                                consecutivo = consecutivo,
-                                posicion = 1,
-                                fotoBase64 = fotoBase64,
-                                fechaMovimiento = fechaActual,
-                                nombreArchivo = nombreArchivo
-                            )
-                            consecutivo++
                         }
 
-                       /* if (evidencia2Capturada && evidencia2File != null) {
-                            var nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_2.jpg"
-                            val fotoBase64 = bllUtil?.convertirImagenABase64(evidencia2File!!)
-                            exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
-                                idPaso1LogVehiculo = idPaso1LogVehiculo,
-                                idEntidadArchivoFoto = null,
-                                idUsuarioNubeAlta = idUsuarioNubeAlta,
-                                consecutivo = consecutivo,
-                                posicion = 2,
-                                fotoBase64 = fotoBase64,
-                                fechaMovimiento = fechaActual,
-                                nombreArchivo = nombreArchivo
-                            )
-
-                            consecutivo++
-                        }*/
-
-
-
-                        if (evidencia2Capturada && evidencia2File != null) {
-                            var fotoBase64 = bllUtil?.convertirImagenABase64(evidencia2File!!)
-                            nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_2.jpg"
-
-                            // ✅ VALIDAR SI DEBE GUARDAR EN API O EN BASE DE DATOS
-                            if (ParametrosSistema.cfgApp != null &&
-                                ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == false) {
-
-                                val resultadoSubida = ApiUploadUtil.subirFoto(
-                                    urlBase = urlBase,
-                                    nombreArchivo = nombreArchivo,
-                                    file = evidencia2File!!,
-                                    vin = vehiculoActual!!.VIN,
-                                    paso = 1,
-                                    numeroFoto = 2
-                                )
-
-                                if (resultadoSubida.first) {
-                                    fotoBase64 = null
-                                }
-                            }
-
-                            exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
-                                idPaso1LogVehiculo = idPaso1LogVehiculo,
-                                idEntidadArchivoFoto = null,
-                                idUsuarioNubeAlta = idUsuarioNubeAlta,
-                                consecutivo = consecutivo,
-                                posicion = 2,
-                                fotoBase64 = fotoBase64,
-                                fechaMovimiento = fechaActual,
-                                nombreArchivo = nombreArchivo
-                            )
-                            consecutivo++
-                        }
-                    } else {
-
-                        // Si ya tiene registro SOC, solo permitir fotos 3 y 4
-                     /*   if (evidencia3Capturada && evidencia3File != null) {
-                            var nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_3.jpg"
-                            var fotoBase64:String?=null
-                            if(ParametrosSistema.cfgApp!=null
-                                && ParametrosSistema?.cfgApp!!.ManejaGuardadoArchivosEnBD==true)
-                                fotoBase64= bllUtil?.convertirImagenABase64(evidencia3File!!)
-                            else
-                            {
-
-                            }
-                            exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
-                                idPaso1LogVehiculo = idPaso1LogVehiculo,
-                                idEntidadArchivoFoto = null,
-                                idUsuarioNubeAlta = idUsuarioNubeAlta,
-                                consecutivo = consecutivo,
-                                posicion = 3,
-                                fotoBase64 = fotoBase64,
-                                fechaMovimiento = fechaActual,
-                                nombreArchivo = nombreArchivo
-                            )
-                            consecutivo++
-                        }*/
-
-
-                        if (evidencia3Capturada && evidencia3File != null) {
-                            var fotoBase64: String? = null
-                            nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_3.jpg"
-
-                            // ✅ VALIDAR SI DEBE GUARDAR EN API O EN BASE DE DATOS
-                            if (ParametrosSistema.cfgApp != null &&
-                                ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == true) {
-                                // Guardar en BD
-                                fotoBase64 = bllUtil?.convertirImagenABase64(evidencia3File!!)
-                            } else {
-                                // Subir a API Web
-                                val resultadoSubida = ApiUploadUtil.subirFoto(
-                                    urlBase = urlBase,
-                                    nombreArchivo = nombreArchivo,
-                                    file = evidencia3File!!,
-                                    vin = vehiculoActual!!.VIN,
-                                    paso = 1,
-                                    numeroFoto = 3
-                                )
-
-                                if (!resultadoSubida.first) {
-                                    // Si falló la subida, intentar guardar en BD como backup
-                                    fotoBase64 = bllUtil?.convertirImagenABase64(evidencia3File!!)
-                                }
-                            }
-
-                            exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
-                                idPaso1LogVehiculo = idPaso1LogVehiculo,
-                                idEntidadArchivoFoto = null,
-                                idUsuarioNubeAlta = idUsuarioNubeAlta,
-                                consecutivo = consecutivo,
-                                posicion = 3,
-                                fotoBase64 = fotoBase64,
-                                fechaMovimiento = fechaActual,
-                                nombreArchivo = nombreArchivo
-                            )
-                            consecutivo++
-                        }
-
-                       /* if (evidencia4Capturada && evidencia4File != null) {
-                            var nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_4.jpg"
-                            val fotoBase64 = bllUtil?.convertirImagenABase64(evidencia4File!!)
-                            exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
-                                idPaso1LogVehiculo = idPaso1LogVehiculo,
-                                idEntidadArchivoFoto = null,
-                                idUsuarioNubeAlta = idUsuarioNubeAlta,
-                                consecutivo = consecutivo,
-                                posicion = 4,
-                                fotoBase64 = fotoBase64,
-                                fechaMovimiento = fechaActual,
-                                nombreArchivo = nombreArchivo
-                            )
-                        }*/
-
-
-                        if (evidencia4Capturada && evidencia4File != null) {
-                            var fotoBase64: String? = null
-                            nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_4.jpg"
-
-                            // ✅ VALIDAR SI DEBE GUARDAR EN API O EN BASE DE DATOS
-                            if (ParametrosSistema.cfgApp != null &&
-                                ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == true) {
-                                fotoBase64 = bllUtil?.convertirImagenABase64(evidencia4File!!)
-                            } else {
-                                val resultadoSubida = ApiUploadUtil.subirFoto(
-                                    urlBase = urlBase,
-                                    nombreArchivo = nombreArchivo,
-                                    file = evidencia4File!!,
-                                    vin = vehiculoActual!!.VIN,
-                                    paso = 1,
-                                    numeroFoto = 4
-                                )
-
-                                if (!resultadoSubida.first) {
-                                    fotoBase64 = bllUtil?.convertirImagenABase64(evidencia4File!!)
-                                }
-                            }
-
-                            exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
-                                idPaso1LogVehiculo = idPaso1LogVehiculo,
-                                idEntidadArchivoFoto = null,
-                                idUsuarioNubeAlta = idUsuarioNubeAlta,
-                                consecutivo = consecutivo,
-                                posicion = 4,
-                                fotoBase64 = fotoBase64,
-                                fechaMovimiento = fechaActual,
-                                nombreArchivo = nombreArchivo
-                            )
-                        }
-
-
-
+                        exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
+                            idPaso1LogVehiculo = idPaso1LogVehiculo,
+                            idEntidadArchivoFoto = null,
+                            idUsuarioNubeAlta = idUsuarioNubeAlta,
+                            consecutivo = consecutivo,
+                            posicion = 1,
+                            fotoBase64 = fotoBase64,
+                            fechaMovimiento = fechaActual,
+                            nombreArchivo = nombreArchivo
+                        )
+                        consecutivo++
                     }
+
+                    if (evidencia2Capturada && evidencia2File != null) {
+                        var fotoBase64 = bllUtil?.convertirImagenABase64(evidencia2File!!)
+                        val nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_2_Vez${vezActual}.jpg"
+
+                        if (ParametrosSistema.cfgApp != null &&
+                            ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == false) {
+                            val resultadoSubida = ApiUploadUtil.subirFoto(
+                                urlBase = urlBase,
+                                nombreArchivo = nombreArchivo,
+                                file = evidencia2File!!,
+                                vin = vehiculoActual!!.VIN,
+                                paso = 1,
+                                numeroFoto = 2
+                            )
+                            if (resultadoSubida.first) {
+                                fotoBase64 = null
+                            }
+                        }
+
+                        exitoFotos = exitoFotos && dalVehiculo.insertarPaso1LogVehiculoFotos(
+                            idPaso1LogVehiculo = idPaso1LogVehiculo,
+                            idEntidadArchivoFoto = null,
+                            idUsuarioNubeAlta = idUsuarioNubeAlta,
+                            consecutivo = consecutivo,
+                            posicion = 2,
+                            fotoBase64 = fotoBase64,
+                            fechaMovimiento = fechaActual,
+                            nombreArchivo = nombreArchivo
+                        )
+                    }
+
 
                     if (exitoFotos) {
                         ocultarCarga()
@@ -1170,29 +942,15 @@ class Paso1SOC_Activity : AppCompatActivity() {
     }
 
     private fun validarFotosMinimas(): Pair<Boolean, String> {
-        return when {
-            !tieneRegistroSOC -> {
-                // Primera entrada: mínimo 1 foto de las posiciones 1 o 2
-                val fotosCapturadas12 = (if (evidencia1Capturada) 1 else 0) + (if (evidencia2Capturada) 1 else 0)
-                if (fotosCapturadas12 < 1) {
-                    Pair(false, "Debe capturar al menos 1 foto (Foto 1 o Foto 2)")
-                } else {
-                    Pair(true, "")
-                }
-            }
-            esSegundaEntrada -> {
-                // Segunda entrada: mínimo 1 foto de las posiciones 3 o 4
-                val fotosCapturadas34 = (if (evidencia3Capturada) 1 else 0) + (if (evidencia4Capturada) 1 else 0)
-                if (fotosCapturadas34 < 1) {
-                    Pair(false, "Debe capturar al menos 1 foto (Foto 3 o Foto 4)")
-                } else {
-                    Pair(true, "")
-                }
-            }
-            else -> Pair(true, "") // Tercera entrada o más: no requiere validación
+        // ✅ SIEMPRE REQUERIR MÍNIMO 1 FOTO (FOTO 1 O FOTO 2)
+        val fotosCapturadas = (if (evidencia1Capturada) 1 else 0) + (if (evidencia2Capturada) 1 else 0)
+
+        return if (fotosCapturadas < 1) {
+            Pair(false, "Debe capturar al menos 1 foto (Foto 1 o Foto 2)")
+        } else {
+            Pair(true, "")
         }
     }
-
     private fun limpiarFormulario() {
         binding.apply {
             etVIN.setText("")
@@ -1223,119 +981,60 @@ class Paso1SOC_Activity : AppCompatActivity() {
         vehiculoActual = null
         evidencia1File = null
         evidencia2File = null
-        evidencia3File = null
-        evidencia4File = null
         evidencia1Capturada = false
         evidencia2Capturada = false
-        evidencia3Capturada = false
-        evidencia4Capturada = false
         fotosExistentes = 0
-        tieneRegistroSOC = false
         vehiculoPaso1 = null
-
-        // ✅ RESETEAR VARIABLES DE CONTROL
-        esSegundaEntrada = false
-        esTerceraEntradaOMas = false
-        puedeCapturarFotos12 = true
-        puedeCapturarFotos34 = false
-        idPaso1LogVehiculoExistente = -1
-
+        // ✅ RESETEAR VARIABLES DE CONTROL NUEVAS
+        vezActual = 0
+        esPrimeraVez = true
+        puedeCapturarFotos = true
+        idPasoNumLogVehiculoNotificacion = 0
+        idPasoNumLogVehiculoExistente = 0
         ocultarSeccionesSOC()
     }
 
     private fun configurarBotonesSegunFotos() {
-        if (vehiculoPaso1 == null) return
+        if (vehiculoActual == null) return
 
-        // ✅ CONFIGURAR BOTONES SEGÚN REGLAS DE NEGOCIO
+        binding.apply {
+            // ✅ SOLO MANEJAR BOTONES 1 Y 2
 
-        // Botón evidencia 1
-        if (vehiculoPaso1?.FotosPosicion1!! > 0) {
-            binding.btnEvidencia1.text = "👁️ Ver Foto 1"
-            binding.btnEvidencia1.isEnabled = true
-            binding.tvEstadoEvidencia1.text = "📷"
-        } else if (puedeCapturarFotos12) {
-            binding.btnEvidencia1.text = "📷 Foto 1"
-            binding.btnEvidencia1.isEnabled = true
-            binding.tvEstadoEvidencia1.text = "❌"
-        } else {
-            binding.btnEvidencia1.text = "🚫 Foto 1"
-            binding.btnEvidencia1.isEnabled = false
-            binding.tvEstadoEvidencia1.text = "❌"
-        }
-
-        // Botón evidencia 2
-        if (vehiculoPaso1?.FotosPosicion2!! > 0) {
-            binding.btnEvidencia2.text = "👁️ Ver Foto 2"
-            binding.btnEvidencia2.isEnabled = true
-            binding.tvEstadoEvidencia2.text = "📷"
-        } else if (puedeCapturarFotos12) {
-            binding.btnEvidencia2.text = "📷 Foto 2"
-            binding.btnEvidencia2.isEnabled = true
-            binding.tvEstadoEvidencia2.text = "❌"
-        } else {
-            binding.btnEvidencia2.text = "🚫 Foto 2"
-            binding.btnEvidencia2.isEnabled = false
-            binding.tvEstadoEvidencia2.text = "❌"
-        }
-
-        // ✅ MOSTRAR FOTOS 3 Y 4 SOLO SI YA TIENE FOTOS 1 Y 2
-        if ((vehiculoPaso1?.FotosPosicion1!! > 0) && (vehiculoPaso1?.FotosPosicion2!! > 0)) {
-            mostrarBotonesEvidenciasAdicionales()
-        }
-
-        // ✅ CONFIGURAR BOTÓN GUARDAR SEGÚN ESTADO
-        configurarBotonGuardar()
-    }
-
-    private fun configurarBotonGuardar() {
-        when {
-            esTerceraEntradaOMas -> {
-                binding.btnGuardarSOC.text = "⬅️ ATRÁS"
-                binding.btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    android.graphics.Color.parseColor("#FF9800")
-                )
+            // Configurar botón evidencia 1
+            if (fotosExistentes >= 1) {
+                btnEvidencia1.text = "👁️ Ver Foto 1"
+                btnEvidencia1.isEnabled = true
+                tvEstadoEvidencia1.text = "📷"
+            } else if (puedeCapturarFotos) {
+                btnEvidencia1.text = "📷 Foto 1"
+                btnEvidencia1.isEnabled = true
+                tvEstadoEvidencia1.text = "❌"
+            } else {
+                btnEvidencia1.text = "🚫 Foto 1"
+                btnEvidencia1.isEnabled = false
+                tvEstadoEvidencia1.text = "❌"
             }
-            else -> {
-                binding.btnGuardarSOC.text = "💾 GUARDAR"
-                binding.btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    android.graphics.Color.parseColor("#4CAF50")
-                )
+
+            // Configurar botón evidencia 2
+            if (fotosExistentes >= 2) {
+                btnEvidencia2.text = "👁️ Ver Foto 2"
+                btnEvidencia2.isEnabled = true
+                tvEstadoEvidencia2.text = "📷"
+            } else if (puedeCapturarFotos) {
+                btnEvidencia2.text = "📷 Foto 2"
+                btnEvidencia2.isEnabled = true
+                tvEstadoEvidencia2.text = "❌"
+            } else {
+                btnEvidencia2.text = "🚫 Foto 2"
+                btnEvidencia2.isEnabled = false
+                tvEstadoEvidencia2.text = "❌"
             }
-        }
-    }
 
-    private fun mostrarBotonesEvidenciasAdicionales() {
-        // Mostrar layouts de evidencias 3 y 4
-        binding.layoutEvidencia3.visibility = View.VISIBLE
-        binding.layoutEvidencia4.visibility = View.VISIBLE
+            // ✅ OCULTAR BOTONES 3 Y 4 PERMANENTEMENTE
+            layoutEvidencia3.visibility = View.GONE
+            layoutEvidencia4.visibility = View.GONE
 
-        // Configurar botón evidencia 3
-        if (vehiculoPaso1?.FotosPosicion3!! > 0) {
-            binding.btnEvidencia3.text = "👁️ Ver Foto 3"
-            binding.btnEvidencia3.isEnabled = true
-            binding.tvEstadoEvidencia3.text = "📷"
-        } else if (puedeCapturarFotos34) {
-            binding.btnEvidencia3.text = "📷 Foto 3"
-            binding.btnEvidencia3.isEnabled = true
-            binding.tvEstadoEvidencia3.text = "❌"
-        } else {
-            binding.btnEvidencia3.text = "🚫 Foto 3"
-            binding.btnEvidencia3.isEnabled = false
-            binding.tvEstadoEvidencia3.text = "❌"
-        }
-        // Configurar botón evidencia 4
-        if (vehiculoPaso1?.FotosPosicion4!! > 0) {
-            binding.btnEvidencia4.text = "👁️ Ver Foto 4"
-            binding.btnEvidencia4.isEnabled = true
-            binding.tvEstadoEvidencia4.text = "📷"
-        } else if (puedeCapturarFotos34) {
-            binding.btnEvidencia4.text = "📷 Foto 4"
-            binding.btnEvidencia4.isEnabled = true
-            binding.tvEstadoEvidencia4.text = "❌"
-        } else {
-            binding.btnEvidencia4.text = "🚫 Foto 4"
-            binding.btnEvidencia4.isEnabled = false
-            binding.tvEstadoEvidencia4.text = "❌"
+            Log.d("Paso1SOC", "✅ Botones configurados: Puede capturar=$puedeCapturarFotos, Fotos existentes=$fotosExistentes")
         }
     }
 

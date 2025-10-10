@@ -17,6 +17,7 @@ data class Vehiculo(
     var TipoCombustible:String="",
     var TipoVehiculo:String="",
     var BL:String="",
+    var IdPaso1LogVehiculo:Int?=null,
 
     // ✅ CAMPOS SOC (State of Charge)
     var Odometro: Int = 0,
@@ -25,6 +26,11 @@ data class Vehiculo(
     var RequiereRecarga: Boolean = false,
     var Evidencia1: String = "",
     var Evidencia2: String = "",
-    var FechaActualizacion: String = ""
+    var FechaActualizacion: String = "",
+
+
+    var Vez:Short?=null,
+    var IdPasoNumLogVehiculoNotificacion:Int?=null,
+    var IdPasoNumLogVehiculo:Int?=null
 
 )

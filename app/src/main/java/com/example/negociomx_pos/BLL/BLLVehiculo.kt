@@ -5,12 +5,14 @@ import com.example.negociomx_pos.BE.Paso1SOCItem
 import com.example.negociomx_pos.BE.PasoNumLogVehiculo
 import com.example.negociomx_pos.BE.Vehiculo
 import com.example.negociomx_pos.BE.VehiculoPaso1
+import kotlin.Short
 
 class BLLVehiculo {
     fun convertToVehiculo(v1:VehiculoPaso1):Vehiculo
     {
         var v:Vehiculo=Vehiculo(
             Id=v1.Id,
+            IdPaso1LogVehiculo = v1.IdPaso1LogVehiculo,
             IdEmpresa = v1.IdEmpresa,
             Odometro = v1.Odometro,
             VIN = v1.VIN,
@@ -25,7 +27,10 @@ class BLLVehiculo {
             Modelo = v1.Modelo,
             NumeroSerie = v1.NumeroSerie,
             Activo = v1.Activo,
-            ModoTransporte = v1.ModoTransporte
+            ModoTransporte = v1.ModoTransporte,
+            Vez =v1.Vez,
+            IdPasoNumLogVehiculoNotificacion = v1.IdPasoNumLogVehiculoNotificacion,
+            IdPasoNumLogVehiculo = v1.IdPasoNumLogVehiculo
         )
 
         return v
@@ -61,6 +66,9 @@ class BLLVehiculo {
             NombreArchivoFoto2 = a.NombreArchivoFoto2,
             NombreArchivoFoto3 = a.NombreArchivoFoto3,
             NombreArchivoFoto4 = a.NombreArchivoFoto4
+
+
+
         )
         return b
     }
