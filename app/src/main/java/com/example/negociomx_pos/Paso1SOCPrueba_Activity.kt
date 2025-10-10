@@ -125,7 +125,8 @@ class Paso1SOCPrueba_Activity : AppCompatActivity() {
             try {
                 Log.d("Paso1SOCPrueba", "🔍 Consultando vehículo con VIN: $vin")
                 mostrarCargaConsulta()
-                vehiculoPaso1 = dalVehiculo.consultarVehiculoPorVINParaPaso1(vin)
+                val fecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                vehiculoPaso1 = dalVehiculo.consultarVehiculoPorVINParaPaso1(vin,fecha)
                 if (vehiculoPaso1 != null) {
                     vehiculoActual = bll.convertToVehiculo(vehiculoPaso1!!)
                 }

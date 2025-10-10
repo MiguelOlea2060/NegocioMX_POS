@@ -141,7 +141,7 @@ class acceso_activity : AppCompatActivity() {
 
             mainHandler.postDelayed(loginTimeoutRunnable, 60000) // 60 segundos
 
-            loguearUsuario(nombreUsuarioEmail, pwd) { usuario,cfg, usuarioLogueado ->
+            loguearUsuario(nombreUsuarioEmail, pwd) { usuario,cfg, mensajeError, usuarioLogueado ->
                 mainHandler.removeCallbacks(loginTimeoutRunnable)
 
                 if (usuarioLogueado == true) {
@@ -161,9 +161,21 @@ class acceso_activity : AppCompatActivity() {
                     }
                 } else {
                     Log.e("AccesoActivity", "❌ LOGIN FALLIDO")
-                    mainHandler.post {
-                        resetLoginUI()
-                        bllUtil.MessageShow(this, "El usuario o contraseña son incorrectas, o hay un problema de conectividad con el Servidor de base de datos.", "Aviso") { res -> }
+                    if(mensajeError.isEmpty()) {
+                        mainHandler.post {
+                            resetLoginUI()
+                            bllUtil.MessageShow(
+                                this,
+                                "El usuario o contraseña son incorrectas, o hay un problema de conectividad con el Servidor de base de datos.",
+                                "Aviso"
+                            ) { res -> }
+                        }
+                    }
+                    else
+                    {
+                        mainHandler.post {
+                            resetLoginUI()
+                        }
                     }
                 }
             }
@@ -181,9 +193,10 @@ class acceso_activity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    fun loguearUsuario(email:String, pwd:String,onLoginFinish: (Usuario?,CfgApp?, Boolean) -> Unit)
+    fun loguearUsuario(email:String, pwd:String,onLoginFinish: (Usuario?,CfgApp?,String, Boolean) -> Unit)
     {
         //CoroutineScope(Dispatchers.Main).launch {
+        var mensajeError:String=""
         GlobalScope.launch{
             try {
                 val (usuario,cfg) = dalUsuSql.getUsuarioByEmailAndPassword(email, pwd,)
@@ -196,46 +209,52 @@ class acceso_activity : AppCompatActivity() {
 
                     if (!usuario.Contrasena.equals(pwd)) {
                         Log.w("AccesoActivity", "⚠️ Acceso invalido")
+                        mensajeError="El correo o la contraseña son incorrectos. Favor de verificarlo"
                         mainHandler.post {
                             bllUtil.MessageShow(
                                 this@acceso_activity,
-                                "El correo o la contraseña son incorrectos. Favor de verificarlo",
+                                mensajeError,
                                 "Aviso"
                             ) { res -> }
                         }
-                        onLoginFinish(null,null, false)
+                        onLoginFinish(null,null, mensajeError, false)
                     }
                     else if (cuentaVerificada != true) {
                         Log.w("AccesoActivity", "⚠️ Cuenta no verificada")
+                        mensajeError="La cuenta no se encuentra verificada. Comunicarse con el Administrador"
                         mainHandler.post {
                             bllUtil.MessageShow(
                                 this@acceso_activity,
-                                "La cuenta no se encuentra verificada. Comunicarse con el Administrador",
+                                mensajeError,
                                 "Aviso"
                             ) { res -> }
                         }
-                        onLoginFinish(null,null, false)
+                        onLoginFinish(null,null, mensajeError, false)
                     }
                     else if (activo != true) {
                         Log.w("AccesoActivity", "⚠️ Cuenta no activa")
+                        mensajeError="La cuenta no se encuentra Activa. Comunicarse con el Administrador"
                         mainHandler.post {
                             bllUtil.MessageShow(
                                 this@acceso_activity,
-                                "La cuenta no se encuentra Activa. Comunicarse con el Administrador",
+                                mensajeError,
                                 "Aviso"
                             ) { res -> }
                         }
-                        onLoginFinish(null,null, false)
+                        onLoginFinish(null,null, mensajeError, false)
                     }
-                    onLoginFinish(usuario,cfg, true)
+                    else
+                        onLoginFinish(usuario,cfg, mensajeError, true)
                 } else {
-                    onLoginFinish(null,null, false)
+                    onLoginFinish(null,null, mensajeError, false)
                 }
             } catch (e: Exception) {
                 Log.e("AccesoActivity", "💥 Error en login: ${e.message}")
-                bllUtil.MessageShow(this@acceso_activity, "Error de conexión: ${e.message}",
+                mensajeError= "Error de conexión: ${e.message}"
+
+                bllUtil.MessageShow(this@acceso_activity,mensajeError,
                     "Error") { res -> }
-                onLoginFinish(null,null, false)
+                onLoginFinish(null,null, mensajeError, false)
             }
         }
     }

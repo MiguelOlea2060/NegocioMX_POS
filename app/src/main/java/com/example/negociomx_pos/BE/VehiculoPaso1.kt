@@ -38,5 +38,9 @@ data class VehiculoPaso1(
     var NombreArchivo1:String="",
     var NombreArchivo2:String="",
     var NombreArchivo3:String="",
-    var NombreArchivo4:String=""
+    var NombreArchivo4:String="",
+
+    var Vez:Short?=null,
+    var IdPasoNumLogVehiculoNotificacion:Int?=null,
+    var IdPasoNumLogVehiculo:Int?=null,
 )

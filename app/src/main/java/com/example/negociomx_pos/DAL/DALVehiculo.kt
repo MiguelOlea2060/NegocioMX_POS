@@ -369,7 +369,7 @@ class DALVehiculo {
         return@withContext vehiculo
     }
 
-    suspend fun consultarVehiculoPorVINParaPaso1(vin: String): VehiculoPaso1? = withContext(Dispatchers.IO) {
+    suspend fun consultarVehiculoPorVINParaPaso1(vin: String, fechaActual:String): VehiculoPaso1? = withContext(Dispatchers.IO) {
         var vehiculo: VehiculoPaso1? = null
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
@@ -387,17 +387,18 @@ class DALVehiculo {
             // ✅ QUERY CORREGIDO PARA EL ESQUEMA REAL DE LA BASE DE DATOS
             val query = """                
                 select p.IdPaso1LogVehiculo, p.Odometro, p.Bateria, p.ModoTransporte, p.RequiereRecarga, p.FechaAlta
-				        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=1) FotosPosicion1
-				        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=2) FotosPosicion2
-				        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pf.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=3) FotosPosicion3
-				        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pf.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=4) FotosPosicion4                        
-				        ,(SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=1) NombreArchivoFoto1
-				        ,(SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=2) NombreArchivoFoto2
-				        ,(SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=3) NombreArchivoFoto3
-				        ,(SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=4) NombreArchivoFoto4
+                        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=1) FotosPosicion1
+                        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=2) FotosPosicion2
+                        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pf.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=3) FotosPosicion3
+                        ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pf.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=4) FotosPosicion4                        
+                        ,(SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=1) NombreArchivoFoto1
+                        ,(SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=2) NombreArchivoFoto2
+                        ,(SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=3) NombreArchivoFoto3
+                        ,(SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=4) NombreArchivoFoto4
                         ,v.vin, v.idmarca, v.idmodelo, ma.nombre Marca, m.nombre Modelo, v.Annio, Motor, 
                         v.idvehiculo, ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, 
-                        tv.Nombre TipoVehiculo, bl
+                        tv.Nombre TipoVehiculo, bl,
+                        n.IdPasoNumLogVehiculoNotificacion, n.Vez, n.Paso, n.IdPasoNumLogVehiculo 
                 from vehiculo v inner join dbo.MarcaAuto ma with (nolock) on v.IdMarca=ma.IdMarcaAuto
                         inner join dbo.Modelo m with (nolock) on v.IdModelo=m.IdModelo
                         left join dbo.VehiculoColor vc with (nolock) on v.IdVehiculo=vc.IdVehiculo
@@ -406,14 +407,16 @@ class DALVehiculo {
                         left join dbo.TipoCombustible tc with (nolock) on v.idtipocombustible=tc.idtipocombustible
                         left join dbo.tipovehiculo tv with (nolock) on v.idtipovehiculo=tv.idtipovehiculo
                         left join dbo.bl b with (nolock) on v.idbl=b.idbl
-						left join dbo.Paso1LogVehiculo p on p.IdVehiculo=v.IdVehiculo
+                        left join dbo.Paso1LogVehiculo p on p.IdVehiculo=v.IdVehiculo
+                        left join dbo.PasoNumLogVehiculoNotificacion n on v.idvehiculo=n.idvehiculo and n.Paso=1 and (n.IdPasoNumLogVehiculo<=0 or n.IdPasoNumLogVehiculo is null) 
+                                                                and  n.activo=1 and (n.realizada is null or n.realizada=0) 
+                                                                and cast(n.fechaactividad as date)<= ?
                 where v.vin = ?
-       
-              
             """.trimIndent()
 
             statement = conexion.prepareStatement(query)
-            statement.setString(1, vin)
+            statement.setString(1, fechaActual)
+            statement.setString(2, vin)
 
             resultSet = statement.executeQuery()
 
@@ -454,7 +457,10 @@ class DALVehiculo {
                     NombreArchivo1 = resultSet.getString("NombreArchivoFoto1")?:"",
                     NombreArchivo2 = resultSet.getString("NombreArchivoFoto2")?:"",
                     NombreArchivo3 = resultSet.getString("NombreArchivoFoto3")?:"",
-                    NombreArchivo4 = resultSet.getString("NombreArchivoFoto4")?:""
+                    NombreArchivo4 = resultSet.getString("NombreArchivoFoto4")?:"",
+
+                    Vez = resultSet.getShort("Vez")?:0,
+                    IdPasoNumLogVehiculoNotificacion = resultSet.getInt("IdPasoNumLogVehiculoNotificacion")?:0,
                 )
                 //Log.d("DALVehiculo", "✅ Vehículo encontrado: ${vehiculo.Marca} ${vehiculo.Modelo} ${vehiculo.Anio}")
             } else {
