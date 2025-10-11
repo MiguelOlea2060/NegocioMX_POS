@@ -30,6 +30,7 @@ import android.os.Looper
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Button
+import androidx.core.view.isVisible
 import com.example.negociomx_pos.BE.VehiculoPaso1
 import com.example.negociomx_pos.BLL.BLLVehiculo
 import com.example.negociomx_pos.Utils.ApiUploadUtil
@@ -190,57 +191,59 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     vehiculo = bll.convertToVehiculo(vehiculoPaso1!!)
                 }
 
-                if (vehiculo?.IdPaso1LogVehiculo != 0) {
-                    vehiculoActual = vehiculo
+                vehiculo?.IdPaso1LogVehiculo?.let {
+                    if (it >= 0 ) {
+                        vehiculoActual = vehiculo
 
-                    // ✅ OBTENER EL VALOR DE VEZ DEL VEHÍCULO
-                    vezActual = vehiculo?.Vez ?: 0
-                    esPrimeraVez = (vezActual == 0.toShort())
+                        // ✅ OBTENER EL VALOR DE VEZ DEL VEHÍCULO
+                        vezActual = vehiculo?.Vez ?: 0
+                        esPrimeraVez = (vezActual == 0.toShort())
 
-                    // ✅ OBTENER IDs DE NOTIFICACIÓN
-                    idPasoNumLogVehiculoNotificacion = vehiculo?.IdPasoNumLogVehiculoNotificacion ?: 0
-                    idPasoNumLogVehiculoExistente = vehiculo?.IdPasoNumLogVehiculo ?: 0
+                        // ✅ OBTENER IDs DE NOTIFICACIÓN
+                        idPasoNumLogVehiculoNotificacion = vehiculo?.IdPasoNumLogVehiculoNotificacion ?: 0
+                        idPasoNumLogVehiculoExistente = vehiculo?.IdPasoNumLogVehiculo ?: 0
 
-                    Log.d("Paso1SOC", "📊 Vez actual: $vezActual, Es primera vez: $esPrimeraVez")
+                        Log.d("Paso1SOC", "📊 Vez actual: $vezActual, Es primera vez: $esPrimeraVez")
 
-                    // ✅ MOSTRAR INFORMACIÓN DEL VEHÍCULO
-                    mostrarInformacionVehiculo(vehiculo!!)
-                    mostrarSeccionesSOC()
+                        // ✅ MOSTRAR INFORMACIÓN DEL VEHÍCULO
+                        mostrarInformacionVehiculo(vehiculo!!)
+                        mostrarSeccionesSOC()
 
-                    // ✅ CONFIGURAR CAMPOS Y BOTONES SEGÚN VEZ
-                    configurarCamposSegunVez()
-                    configurarBotonesSegunFotos()
+                        // ✅ CONFIGURAR CAMPOS Y BOTONES SEGÚN VEZ
+                        configurarCamposSegunVez()
+                        configurarBotonesSegunFotos()
 
-                    // ✅ CONTAR FOTOS EXISTENTES (SOLO POSICIONES 1 Y 2)
-                    fotosExistentes = vehiculoPaso1?.FotosPosicion1!! + vehiculoPaso1?.FotosPosicion2!!
+                        // ✅ CONTAR FOTOS EXISTENTES (SOLO POSICIONES 1 Y 2)
+                        fotosExistentes = vehiculoPaso1?.FotosPosicion1!! + vehiculoPaso1?.FotosPosicion2!!
 
-                    // ✅ MENSAJE AL USUARIO
-                    val mensaje = if (esPrimeraVez) {
-                        if (fotosExistentes > 0) {
-                            "✅ Vehículo encontrado. Primera entrada completada con $fotosExistentes foto(s)"
+                        // ✅ MENSAJE AL USUARIO
+                        val mensaje = if (esPrimeraVez) {
+                            if (fotosExistentes > 0) {
+                                "✅ Vehículo encontrado. Primera entrada completada con $fotosExistentes foto(s)"
+                            } else {
+                                "✅ Vehículo encontrado. Primera entrada - Capture al menos 1 foto"
+                            }
                         } else {
-                            "✅ Vehículo encontrado. Primera entrada - Capture al menos 1 foto"
+                            if (fotosExistentes > 0) {
+                                "✅ Vehículo encontrado. Entrada #${vezActual + 1} - Ya tiene $fotosExistentes foto(s)"
+                            } else {
+                                "✅ Vehículo encontrado. Entrada #${vezActual + 1} - Capture al menos 1 foto"
+                            }
                         }
+                        Toast.makeText(this@Paso1SOC_Activity, mensaje, Toast.LENGTH_LONG).show()
+
+                        ocultarCargaConsulta()
+
                     } else {
-                        if (fotosExistentes > 0) {
-                            "✅ Vehículo encontrado. Entrada #${vezActual + 1} - Ya tiene $fotosExistentes foto(s)"
-                        } else {
-                            "✅ Vehículo encontrado. Entrada #${vezActual + 1} - Capture al menos 1 foto"
-                        }
+                        ocultarSeccionesSOC()
+                        Toast.makeText(
+                            this@Paso1SOC_Activity,
+                            "❌ Vehículo no encontrado",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        ocultarCargaConsulta()
+                        binding.etVIN.selectAll()
                     }
-                    Toast.makeText(this@Paso1SOC_Activity, mensaje, Toast.LENGTH_LONG).show()
-
-                    ocultarCargaConsulta()
-
-                } else {
-                    ocultarSeccionesSOC()
-                    Toast.makeText(
-                        this@Paso1SOC_Activity,
-                        "❌ Vehículo no encontrado",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    ocultarCargaConsulta()
-                    binding.etVIN.selectAll()
                 }
 
             } catch (e: Exception) {
@@ -469,14 +472,15 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
             } else {
                 // ✅ VEZ >= 1: Solo Batería y Requiere Recarga habilitados
-                etOdometro.isEnabled = false
+                etOdometro.isVisible = false
+                txtOdometro.isVisible = false
                 etBateria.isEnabled = true
-                cbModoTransporte.isEnabled = false
+                cbModoTransporte.isVisible = false
                 cbRequiereRecarga.isEnabled = true
 
-                etOdometro.alpha = 0.5f
+               // etOdometro.alpha = 0.5f
                 etBateria.alpha = 1.0f
-                cbModoTransporte.alpha = 0.5f
+              //  cbModoTransporte.alpha = 0.5f
                 cbRequiereRecarga.alpha = 1.0f
 
                 puedeCapturarFotos = true
