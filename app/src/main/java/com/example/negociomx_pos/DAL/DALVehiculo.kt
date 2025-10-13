@@ -386,7 +386,7 @@ class DALVehiculo {
 
             // ✅ QUERY CORREGIDO PARA EL ESQUEMA REAL DE LA BASE DE DATOS
             val query = """                
-                select p.IdPaso1LogVehiculo, p.Odometro, p.Bateria, p.ModoTransporte, p.RequiereRecarga, p.FechaAlta
+                       select top 1 p.IdPaso1LogVehiculo, p.Odometro, p.Bateria, p.ModoTransporte, p.RequiereRecarga, p.FechaAlta
                         ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=1) FotosPosicion1
                         ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=2) FotosPosicion2
                         ,(SELECT count(*) FROM Paso1LogVehiculoFotos pf WHERE pf.IdPaso1LogVehiculo =p.IdPaso1LogVehiculo and pf.posicion=3) FotosPosicion3
@@ -412,6 +412,7 @@ class DALVehiculo {
                                                                 and  n.activo=1 and (n.realizada is null or n.realizada=0) 
                                                                 and cast(n.fechaactividad as date)<= ?
                 where v.vin = ?
+                order by FechaAlta desc
             """.trimIndent()
 
             statement = conexion.prepareStatement(query)

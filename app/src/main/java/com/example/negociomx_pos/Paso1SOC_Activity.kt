@@ -209,12 +209,17 @@ class Paso1SOC_Activity : AppCompatActivity() {
                         // ✅ CONTAR FOTOS EXISTENTES (SOLO POSICIONES 1 Y 2)
                         fotosExistentes = vehiculoPaso1?.FotosPosicion1!! + vehiculoPaso1?.FotosPosicion2!!
 
-                        // ✅ MENSAJE AL USUARIO
-                        val mensaje = if (esPrimeraVez) {
+                        // ✅ MENSAJE AL USUARIO SEGÚN EL MODO
+                        val tieneNotificacionActiva = (vezActual > 0 && idPasoNumLogVehiculoNotificacion > 0)
+
+                        val mensaje = if (!tieneNotificacionActiva) {
+                            "ℹ️ Vehículo encontrado - MODO CONSULTA (Sin notificación activa)"
+                        } else if (esPrimeraVez) {
                             "✅ Vehículo encontrado. Primera entrada - Capture al menos 1 foto"
                         } else {
                             "✅ Vehículo encontrado. Entrada #${vezActual + 1} - Actualice batería y capture al menos 1 foto"
                         }
+                        Toast.makeText(this@Paso1SOC_Activity, mensaje, Toast.LENGTH_LONG).show()
                         Toast.makeText(this@Paso1SOC_Activity, mensaje, Toast.LENGTH_LONG).show()
 
                         ocultarCargaConsulta()
@@ -429,7 +434,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
     }
 
-    private fun configurarCamposSegunVez() {
+  /*  private fun configurarCamposSegunVez() {
         binding.apply {
             if (esPrimeraVez && vehiculoActual?.IdPaso1LogVehiculo == 0) {
                 // ✅ PRIMERA VEZ (Vez = 0): Todos los campos habilitados
@@ -492,7 +497,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
             }
         }
     }
-
+*/
     private fun ocultarSeccionesSOC() {
         binding.apply {
             layoutInfoVehiculo.visibility = View.GONE
@@ -779,8 +784,31 @@ class Paso1SOC_Activity : AppCompatActivity() {
             }
         }
 
-        val odometro = binding.etOdometro.text.toString().trim().toIntOrNull() ?: 0
-        val bateria = bateriaText.toIntOrNull() ?: 0
+        // ✅ SOLO GUARDAR VALORES QUE EL USUARIO INGRESÓ
+// Si el campo está deshabilitado, guardar 0 o false
+        val odometro = if (binding.etOdometro.isEnabled) {
+            binding.etOdometro.text.toString().trim().toIntOrNull() ?: 0
+        } else {
+            0  // Campo deshabilitado = guardar 0
+        }
+
+        val bateria = if (binding.etBateria.isEnabled) {
+            bateriaText.toIntOrNull() ?: 0
+        } else {
+            0  // Campo deshabilitado = guardar 0
+        }
+
+        val modoTransporte = if (binding.cbModoTransporte.isEnabled) {
+            binding.cbModoTransporte.isChecked
+        } else {
+            false  // Campo deshabilitado = guardar false
+        }
+
+        val requiereRecarga = if (binding.cbRequiereRecarga.isEnabled) {
+            binding.cbRequiereRecarga.isChecked
+        } else {
+            false  // Campo deshabilitado = guardar false
+        }
 
         if (bateria < 0 || bateria > 100) {
             Toast.makeText(this, "El nivel de batería debe estar entre 0 y 100", Toast.LENGTH_SHORT)
@@ -819,14 +847,14 @@ class Paso1SOC_Activity : AppCompatActivity() {
                 // ✅ SIEMPRE INSERTAR NUEVO REGISTRO CON VEZ
                 val idPaso1LogVehiculo = dalVehiculo.insertarPaso1LogVehiculo(
                     idVehiculo = vehiculo.Id.toInt(),
-                    odometro = odometro,
-                    bateria = bateria,
-                    modoTransporte = binding.cbModoTransporte.isChecked,
-                    requiereRecarga = binding.cbRequiereRecarga.isChecked,
+                    odometro = odometro,  // Ya calculado arriba según si está habilitado
+                    bateria = bateria,  // Ya calculado arriba según si está habilitado
+                    modoTransporte = modoTransporte,  // Ya calculado arriba según si está habilitado
+                    requiereRecarga = requiereRecarga,  // Ya calculado arriba según si está habilitado
                     idUsuarioNubeAlta = idUsuarioNubeAlta,
-                    vez = vezActual,  // ✅ PASAR VEZ ACTUAL
+                    vez = vezActual,
                     fechaMovimiento = fechaActual,
-                    idPasoNumLogVehiculoNotificacion=vehiculo.IdPasoNumLogVehiculoNotificacion
+                    idPasoNumLogVehiculoNotificacion = vehiculo.IdPasoNumLogVehiculoNotificacion
                 )
 
                 if (idPaso1LogVehiculo > 0) {
@@ -987,50 +1015,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
         ocultarSeccionesSOC()
     }
 
-  /*  private fun configurarBotonesSegunFotos() {
-        if (vehiculoActual == null) return
-
-        binding.apply {
-            // ✅ SOLO MANEJAR BOTONES 1 Y 2
-
-            // Configurar botón evidencia 1
-            if (fotosExistentes >= 1) {
-                btnEvidencia1.text = "👁️ Ver Foto 1"
-                btnEvidencia1.isEnabled = true
-                tvEstadoEvidencia1.text = "📷"
-            } else if (puedeCapturarFotos) {
-                btnEvidencia1.text = "📷 Foto 1"
-                btnEvidencia1.isEnabled = true
-                tvEstadoEvidencia1.text = "❌"
-            } else {
-                btnEvidencia1.text = "🚫 Foto 1"
-                btnEvidencia1.isEnabled = false
-                tvEstadoEvidencia1.text = "❌"
-            }
-
-            // Configurar botón evidencia 2
-            if (fotosExistentes >= 2) {
-                btnEvidencia2.text = "👁️ Ver Foto 2"
-                btnEvidencia2.isEnabled = true
-                tvEstadoEvidencia2.text = "📷"
-            } else if (puedeCapturarFotos) {
-                btnEvidencia2.text = "📷 Foto 2"
-                btnEvidencia2.isEnabled = true
-                tvEstadoEvidencia2.text = "❌"
-            } else {
-                btnEvidencia2.text = "🚫 Foto 2"
-                btnEvidencia2.isEnabled = false
-                tvEstadoEvidencia2.text = "❌"
-            }
-
-            // ✅ OCULTAR BOTONES 3 Y 4 PERMANENTEMENTE
-            layoutEvidencia3.visibility = View.GONE
-            layoutEvidencia4.visibility = View.GONE
-
-            Log.d("Paso1SOC", "✅ Botones configurados: Puede capturar=$puedeCapturarFotos, Fotos existentes=$fotosExistentes")
-        }
-    }*/
-  private fun configurarBotonesSegunFotos() {
+  /*private fun configurarBotonesSegunFotos() {
       if (vehiculoActual == null) return
 
       binding.apply {
@@ -1052,7 +1037,290 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
           Log.d("Paso1SOC", "✅ Botones configurados para solo captura")
       }
+  }*/
+
+   /* private fun configurarBotonesSegunFotos() {
+        if (vehiculoActual == null) return
+
+        binding.apply {
+            // ✅ SI NO PUEDE CAPTURAR FOTOS (MODO LECTURA), DESHABILITAR BOTONES
+            if (!puedeCapturarFotos) {
+                btnEvidencia1.text = "🚫 Foto 1"
+                btnEvidencia1.isEnabled = false
+                btnEvidencia1.alpha = 0.5f
+                tvEstadoEvidencia1.text = "❌"
+
+                btnEvidencia2.text = "🚫 Foto 2"
+                btnEvidencia2.isEnabled = false
+                btnEvidencia2.alpha = 0.5f
+                tvEstadoEvidencia2.text = "❌"
+
+                layoutEvidencia3.visibility = View.GONE
+                layoutEvidencia4.visibility = View.GONE
+
+                Log.d("Paso1SOC", "🚫 Botones de fotos deshabilitados (modo lectura)")
+                return@apply
+            }
+
+            // ✅ RESTO DEL CÓDIGO EXISTENTE (botones habilitados normalmente)
+            btnEvidencia1.text = "📷 Foto 1"
+            btnEvidencia1.isEnabled = true
+            btnEvidencia1.alpha = 1.0f
+            tvEstadoEvidencia1.text = if (evidencia1Capturada) "📷" else "❌"
+
+            btnEvidencia2.text = "📷 Foto 2"
+            btnEvidencia2.isEnabled = true
+            btnEvidencia2.alpha = 1.0f
+            tvEstadoEvidencia2.text = if (evidencia2Capturada) "📷" else "❌"
+
+            layoutEvidencia3.visibility = View.GONE
+            layoutEvidencia4.visibility = View.GONE
+
+            Log.d("Paso1SOC", "✅ Botones configurados para captura")
+        }
+    }*/
+   private fun configurarBotonesSegunFotos() {
+       if (vehiculoActual == null) return
+
+       binding.apply {
+           // ✅ SI NO PUEDE CAPTURAR FOTOS (MODO LECTURA), DESHABILITAR BOTONES
+           if (!puedeCapturarFotos) {
+               btnEvidencia1.text = "🚫 Foto 1"
+               btnEvidencia1.isEnabled = false
+               btnEvidencia1.alpha = 0.5f
+               tvEstadoEvidencia1.text = "❌"
+
+               btnEvidencia2.text = "🚫 Foto 2"
+               btnEvidencia2.isEnabled = false
+               btnEvidencia2.alpha = 0.5f
+               tvEstadoEvidencia2.text = "❌"
+
+               layoutEvidencia3.visibility = View.GONE
+               layoutEvidencia4.visibility = View.GONE
+
+               Log.d("Paso1SOC", "🚫 Botones de fotos deshabilitados (modo lectura)")
+               return@apply
+           }
+
+           // ✅ RESTO DEL CÓDIGO EXISTENTE (botones habilitados normalmente)
+           btnEvidencia1.text = "📷 Foto 1"
+           btnEvidencia1.isEnabled = true
+           btnEvidencia1.alpha = 1.0f
+           tvEstadoEvidencia1.text = if (evidencia1Capturada) "📷" else "❌"
+
+           btnEvidencia2.text = "📷 Foto 2"
+           btnEvidencia2.isEnabled = true
+           btnEvidencia2.alpha = 1.0f
+           tvEstadoEvidencia2.text = if (evidencia2Capturada) "📷" else "❌"
+
+           layoutEvidencia3.visibility = View.GONE
+           layoutEvidencia4.visibility = View.GONE
+
+           Log.d("Paso1SOC", "✅ Botones configurados para captura")
+       }
+   }
+  private fun configurarCamposSegunVez() {
+      binding.apply {
+          // ✅ VERIFICAR SI HAY NOTIFICACIÓN ACTIVA
+          val tieneNotificacionActiva = (vezActual > 0 && idPasoNumLogVehiculoNotificacion > 0)
+
+          if (!tieneNotificacionActiva) {
+              // ✅ MODO SOLO LECTURA - NO HAY NOTIFICACIÓN ACTIVA
+              Log.d("Paso1SOC", "⚠️ MODO SOLO LECTURA: Sin notificación activa")
+
+              // Deshabilitar TODOS los campos
+              etOdometro.isEnabled = false
+              etBateria.isEnabled = false
+              cbModoTransporte.isEnabled = false
+              cbRequiereRecarga.isEnabled = false
+
+              // Cambiar aspecto visual para indicar que son de solo lectura
+              etOdometro.alpha = 0.6f
+              etBateria.alpha = 0.6f
+              cbModoTransporte.alpha = 0.6f
+              cbRequiereRecarga.alpha = 0.6f
+
+              // Deshabilitar captura de fotos
+              puedeCapturarFotos = false
+
+              // Cargar y mostrar ÚLTIMOS datos registrados
+              cargarUltimosDatosSOC()
+
+              // Cambiar botón Guardar por botón Regresar
+              btnGuardarSOC.text = "⬅️ REGRESAR"
+              btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                  android.graphics.Color.parseColor("#FF9800")  // Color naranja
+              )
+              btnGuardarSOC.visibility = View.VISIBLE
+
+              // Cambiar la acción del botón
+              btnGuardarSOC.setOnClickListener {
+                  finish()  // Regresar a la pantalla anterior
+              }
+
+              Toast.makeText(
+                  this@Paso1SOC_Activity,
+                  "ℹ️ Modo consulta: No hay notificación activa para este vehículo",
+                  Toast.LENGTH_LONG
+              ).show()
+
+              return@apply
+          }
+
+          // ✅ MODO EDICIÓN - HAY NOTIFICACIÓN ACTIVA
+          if (esPrimeraVez && vehiculoActual?.IdPaso1LogVehiculo == 0) {
+              // PRIMERA VEZ (Vez = 0): Todos los campos habilitados
+              etOdometro.isEnabled = true
+              etBateria.isEnabled = true
+              cbModoTransporte.isEnabled = true
+              cbRequiereRecarga.isEnabled = true
+
+              etOdometro.alpha = 1.0f
+              etBateria.alpha = 1.0f
+              cbModoTransporte.alpha = 1.0f
+              cbRequiereRecarga.alpha = 1.0f
+
+              puedeCapturarFotos = true
+
+              // Limpiar campos para nueva entrada
+              etOdometro.setText("")
+              etBateria.setText("")
+              cbModoTransporte.isChecked = false
+              cbRequiereRecarga.isChecked = false
+
+              // Mostrar todos los campos
+              etOdometro.isVisible = true
+              txtOdometro.isVisible = true
+              cbModoTransporte.isVisible = true
+
+              etOdometro.requestFocus()
+
+              // Configurar botón Guardar normal
+              btnGuardarSOC.text = "💾 GUARDAR"
+              btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                  android.graphics.Color.parseColor("#4CAF50")  // Color verde
+              )
+              btnGuardarSOC.setOnClickListener {
+                  guardarSOC()
+              }
+
+              Log.d("Paso1SOC", "✅ Modo Primera Vez: Todos los campos habilitados")
+
+          }
+
+          else {
+              // VEZ >= 1: Solo Batería y Requiere Recarga habilitados
+              etOdometro.isVisible = false
+              txtOdometro.isVisible = false
+              cbModoTransporte.isVisible = false
+
+              etOdometro.isEnabled = false
+              cbModoTransporte.isEnabled = false
+
+              etBateria.isEnabled = true
+              cbRequiereRecarga.isEnabled = true
+
+              etBateria.alpha = 1.0f
+              cbRequiereRecarga.alpha = 1.0f
+
+              puedeCapturarFotos = true
+
+              // Cargar valores existentes en campos deshabilitados
+              if (vehiculoActual?.Odometro != null && vehiculoActual?.Odometro!! > 0) {
+                  etOdometro.setText(vehiculoActual?.Odometro.toString())
+              }
+              if (vehiculoActual?.ModoTransporte != null) {
+                  cbModoTransporte.isChecked = vehiculoActual?.ModoTransporte!!
+              }
+
+              // Limpiar solo los campos editables
+              etBateria.setText("")
+              cbRequiereRecarga.isChecked = false
+
+              // Enfocar en Batería para entrada rápida
+              etBateria.requestFocus()
+              etBateria.selectAll()
+
+              // Configurar botón Guardar normal
+              btnGuardarSOC.text = "💾 GUARDAR"
+              btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                  android.graphics.Color.parseColor("#4CAF50")  // Color verde
+              )
+              btnGuardarSOC.setOnClickListener {
+                  guardarSOC()
+              }
+
+              Log.d("Paso1SOC", "✅ Modo Subsecuente (Vez $vezActual): Solo Batería y Requiere Recarga habilitados")
+          }
+      }
   }
+
+
+    private fun cargarUltimosDatosSOC() {
+        val vehiculo = vehiculoActual
+        if (vehiculo == null) return
+
+        lifecycleScope.launch {
+            try {
+                Log.d("Paso1SOC", "📊 Cargando últimos datos SOC para consulta")
+
+                // Consultar últimos datos de la BD
+      //          val ultimosDatos = dalVehiculo. consultarVehiculoPorVINParaPaso1(vehiculo.Id.toInt())
+
+                val fecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                val ultimosDatos = dalVehiculo.consultarVehiculoPorVINParaPaso1(vehiculoActual!!.VIN, fecha)
+
+                if (ultimosDatos != null) {
+                    binding.apply {
+                        // Mostrar datos según si es primera o subsecuente entrada
+                        if (vehiculoActual?.IdPaso1LogVehiculo == 0) {
+                            // Primera entrada: Mostrar TODOS los datos
+                            etOdometro.setText(ultimosDatos.Odometro.toString())
+                            etBateria.setText(ultimosDatos.Bateria.toString())
+                            cbModoTransporte.isChecked = ultimosDatos.ModoTransporte
+                            cbRequiereRecarga.isChecked = ultimosDatos.RequiereRecarga
+
+                            // Mostrar todos los campos
+                            etOdometro.isVisible = true
+                            txtOdometro.isVisible = true
+                            cbModoTransporte.isVisible = true
+
+                        } else {
+                            // Subsecuente: Solo mostrar Batería y Requiere Recarga
+                            etBateria.setText(ultimosDatos.Bateria.toString())
+                            cbRequiereRecarga.isChecked = ultimosDatos.RequiereRecarga
+
+                            // Ocultar campos no relevantes
+                            etOdometro.isVisible = false
+                            txtOdometro.isVisible = false
+                            cbModoTransporte.isVisible = false
+                        }
+                    }
+
+                    Toast.makeText(
+                        this@Paso1SOC_Activity,
+                        "✅ Últimos datos cargados (solo consulta)",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                } else {
+                    Toast.makeText(
+                        this@Paso1SOC_Activity,
+                        "⚠️ No hay datos previos para este vehículo",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+            } catch (e: Exception) {
+                Log.e("Paso1SOC", "Error cargando últimos datos: ${e.message}")
+                Toast.makeText(
+                    this@Paso1SOC_Activity,
+                    "Error cargando datos: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
