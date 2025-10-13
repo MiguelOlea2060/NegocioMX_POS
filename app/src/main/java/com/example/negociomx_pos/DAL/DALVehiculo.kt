@@ -803,164 +803,6 @@ class DALVehiculo {
     }
 
 
-
-    // ✅ INSERTAR DATOS SOC EN LA NUEVA TABLA
- /*   suspend fun insertarPaso1LogVehiculo(
-        idVehiculo: Int,
-        odometro: Int,
-        bateria: Int,
-        modoTransporte: Boolean,
-        requiereRecarga: Boolean,
-        idUsuarioNubeAlta: Int
-    ): Int = withContext(Dispatchers.IO) {
-
-
-        var conexion: Connection? = null
-        var statement: PreparedStatement? = null
-        var generatedKey: Int = -1
-
-        try {
-            Log.d("DALVehiculo", "💾 Insertando datos SOC en Paso1LogVehiculo para IdVehiculo: $idVehiculo")
-
-            conexion = ConexionSQLServer.obtenerConexion()
-            if (conexion == null) {
-                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
-                return@withContext -1
-            }
-
-            val query = """
-            INSERT INTO Paso1LogVehiculo (IdVehiculo, Odometro, Bateria, ModoTransporte, RequiereRecarga, FechaAlta, IdUsuarioNubeAlta)
-            VALUES (?, ?, ?, ?, ?, GETDATE(), ?)
-        """.trimIndent()
-
-            statement = conexion.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)
-            statement.setInt(1, idVehiculo)
-            statement.setShort(2, odometro.toShort())
-            statement.setByte(3, bateria.toByte())
-            statement.setBoolean(4, modoTransporte)
-            statement.setBoolean(5, requiereRecarga)
-            statement.setInt(6, idUsuarioNubeAlta)
-
-            statement.executeUpdate()
-
-            val rs = statement.generatedKeys
-            if (rs.next()) {
-                generatedKey = rs.getInt(1)
-            }
-
-            Log.d("DALVehiculo", "✅ Datos SOC insertados exitosamente. Id generado: $generatedKey")
-            return@withContext generatedKey
-
-        } catch (e: Exception) {
-            Log.e("DALVehiculo", "💥 Error insertando datos SOC: ${e.message}")
-            e.printStackTrace()
-            return@withContext -1
-        } finally {
-            try {
-                statement?.close()
-                conexion?.close()
-            } catch (e: Exception) {
-                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
-            }
-        }
-    }*/
-
-
-    // ✅ INSERTAR O ACTUALIZAR DATOS SOC EN LA TABLA PRINCIPAL (ÚNICO REGISTRO)
-  /*  suspend fun insertarOActualizarPaso1LogVehiculo(
-        idVehiculo: Int,
-        odometro: Int,
-        bateria: Int,
-        modoTransporte: Boolean,
-        requiereRecarga: Boolean,
-        idUsuarioNubeAlta: Int,
-        fechaMovimiento:String
-    ): Int = withContext(Dispatchers.IO) {
-        var conexion: Connection? = null
-        var statement: PreparedStatement? = null
-        var idResultado: Int = -1
-
-        try {
-            Log.d("DALVehiculo", "💾 Insertando/Actualizando datos SOC para IdVehiculo: $idVehiculo")
-
-            conexion = ConexionSQLServer.obtenerConexion()
-            if (conexion == null) {
-                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
-                return@withContext -1
-            }
-
-            // ✅ VERIFICAR SI YA EXISTE REGISTRO
-            val queryVerificar = """
-            SELECT IdPaso1LogVehiculo FROM Paso1LogVehiculo WHERE IdVehiculo = ?
-        """.trimIndent()
-
-            val stmtVerificar = conexion.prepareStatement(queryVerificar)
-            stmtVerificar.setInt(1, idVehiculo)
-            val rsVerificar = stmtVerificar.executeQuery()
-
-            if (rsVerificar.next()) {
-                // ✅ ACTUALIZAR REGISTRO EXISTENTE
-                idResultado = rsVerificar.getInt("IdPaso1LogVehiculo")
-
-                val queryActualizar = """
-                UPDATE Paso1LogVehiculo 
-                SET Odometro = ?, Bateria = ?, ModoTransporte = ?, RequiereRecarga = ?, 
-                    FechaAlta = ?
-                WHERE IdVehiculo = ?
-            """.trimIndent()
-
-                statement = conexion.prepareStatement(queryActualizar)
-                statement.setShort(1, odometro.toShort())
-                statement.setByte(2, bateria.toByte())
-                statement.setBoolean(3, modoTransporte)
-                statement.setBoolean(4, requiereRecarga)
-                statement.setString(5, fechaMovimiento)
-                statement.setInt(6, idVehiculo)
-
-                statement.executeUpdate()
-                Log.d("DALVehiculo", "✅ Registro SOC actualizado. ID: $idResultado")
-
-            } else {
-                // ✅ INSERTAR NUEVO REGISTRO
-                val queryInsertar = """
-                INSERT INTO Paso1LogVehiculo (IdVehiculo, Odometro, Bateria, ModoTransporte, RequiereRecarga, FechaAlta, IdUsuarioNubeAlta)
-                VALUES (?, ?, ?, ?, ?, GETDATE(), ?)
-            """.trimIndent()
-
-                statement = conexion.prepareStatement(queryInsertar, PreparedStatement.RETURN_GENERATED_KEYS)
-                statement.setInt(1, idVehiculo)
-                statement.setShort(2, odometro.toShort())
-                statement.setByte(3, bateria.toByte())
-                statement.setBoolean(4, modoTransporte)
-                statement.setBoolean(5, requiereRecarga)
-                statement.setInt(6, idUsuarioNubeAlta)
-
-                statement.executeUpdate()
-
-                val rs = statement.generatedKeys
-                if (rs.next()) {
-                    idResultado = rs.getInt(1)
-                }
-                Log.d("DALVehiculo", "✅ Nuevo registro SOC insertado. ID: $idResultado")
-            }
-
-            rsVerificar.close()
-            stmtVerificar.close()
-            return@withContext idResultado
-
-        } catch (e: Exception) {
-            Log.e("DALVehiculo", "💥 Error insertando/actualizando SOC: ${e.message}")
-            e.printStackTrace()
-            return@withContext -1
-        } finally {
-            try {
-                statement?.close()
-                conexion?.close()
-            } catch (e: Exception) {
-                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
-            }
-        }
-    }*/
     // ✅ INSERTAR SIEMPRE NUEVO REGISTRO (NUNCA ACTUALIZAR)
     suspend fun insertarPaso1LogVehiculo(
         idVehiculo: Int,
@@ -970,10 +812,12 @@ class DALVehiculo {
         requiereRecarga: Boolean,
         idUsuarioNubeAlta: Int,
         vez: Short,  // ✅ NUEVO PARÁMETRO
-        fechaMovimiento: String
+        fechaMovimiento: String,
+        idPasoNumLogVehiculoNotificacion:Int?=null
     ): Int = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
+        var statementNot: PreparedStatement? = null
         var idResultado: Int = -1
 
         try {
@@ -1006,6 +850,23 @@ class DALVehiculo {
             val rs = statement.generatedKeys
             if (rs.next()) {
                 idResultado = rs.getInt(1)
+            }
+
+            if (idPasoNumLogVehiculoNotificacion!=null && idPasoNumLogVehiculoNotificacion>0)
+            {
+                // ✅ SIEMPRE INSERTAR - NUNCA ACTUALIZAR
+                val queryNot = """
+                    UPDATE PASONUMLOGVEHICULONOTIFICACION 
+                    SET  IDPASONUMLOGVEHICULO= ?,  ACTIVO= ?
+                    WHERE IDPASONUMLOGVEHICULONOTIFICACION = ?
+                """.trimIndent()
+
+                statementNot = conexion.prepareStatement(queryNot, PreparedStatement.RETURN_GENERATED_KEYS)
+                statementNot.setInt(1, idResultado)
+                statementNot.setBoolean(2, false)
+                statementNot.setInt(3, idPasoNumLogVehiculoNotificacion)
+
+                statementNot.executeUpdate()
             }
 
             Log.d("DALVehiculo", "✅ Nuevo registro SOC insertado. ID: $idResultado, Vez: $vez")

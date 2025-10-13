@@ -459,33 +459,35 @@ class Paso1SOC_Activity : AppCompatActivity() {
                 // ✅ VEZ >= 1: Solo Batería y Requiere Recarga habilitados
                 etOdometro.isVisible = false
                 txtOdometro.isVisible = false
-                etBateria.isEnabled = true
-                cbModoTransporte.isVisible = false
-                cbRequiereRecarga.isEnabled = true
 
-               // etOdometro.alpha = 0.5f
-                etBateria.alpha = 1.0f
-              //  cbModoTransporte.alpha = 0.5f
-                cbRequiereRecarga.alpha = 1.0f
+                if(vehiculoActual?.IdPasoNumLogVehiculoNotificacion!!>0) {
+                    etBateria.isEnabled = true
+                    cbModoTransporte.isVisible = false
+                    cbRequiereRecarga.isEnabled = true
 
-                puedeCapturarFotos = true
+                    // etOdometro.alpha = 0.5f
+                    etBateria.alpha = 1.0f
+                    //  cbModoTransporte.alpha = 0.5f
+                    cbRequiereRecarga.alpha = 1.0f
 
-                // Mantener valores existentes en campos bloqueados
-                if (vehiculoActual?.Odometro != null && vehiculoActual?.Odometro!! > 0) {
-                    etOdometro.setText(vehiculoActual?.Odometro.toString())
+                    puedeCapturarFotos = true
+
+                    // Mantener valores existentes en campos bloqueados
+                    if (vehiculoActual?.Odometro != null && vehiculoActual?.Odometro!! > 0) {
+                        etOdometro.setText(vehiculoActual?.Odometro.toString())
+                    }
+                    if (vehiculoActual?.ModoTransporte != null) {
+                        cbModoTransporte.isChecked = vehiculoActual?.ModoTransporte!!
+                    }
+
+                    // Limpiar solo los campos editables
+                    etBateria.setText("")
+                    cbRequiereRecarga.isChecked = false
+
+                    // Enfocar en Batería para entrada rápida
+                    etBateria.requestFocus()
+                    etBateria.selectAll()
                 }
-                if (vehiculoActual?.ModoTransporte != null) {
-                    cbModoTransporte.isChecked = vehiculoActual?.ModoTransporte!!
-                }
-
-                // Limpiar solo los campos editables
-                etBateria.setText("")
-                cbRequiereRecarga.isChecked = false
-
-                // Enfocar en Batería para entrada rápida
-                etBateria.requestFocus()
-                etBateria.selectAll()
-
                 Log.d("Paso1SOC", "✅ Modo Subsecuente (Vez $vezActual): Solo Batería y Requiere Recarga habilitados")
             }
         }
@@ -814,16 +816,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
                 var nombreArchivo = ""
 
-                // ✅ SIEMPRE CREAR NUEVO REGISTRO (no actualizar existente)
-            /*    val idPaso1LogVehiculo = dalVehiculo.insertarOActualizarPaso1LogVehiculo(
-                    idVehiculo = vehiculo.Id.toInt(),
-                    odometro = odometro,
-                    bateria = bateria,
-                    modoTransporte = binding.cbModoTransporte.isChecked,
-                    requiereRecarga = binding.cbRequiereRecarga.isChecked,
-                    idUsuarioNubeAlta = idUsuarioNubeAlta,
-                    fechaMovimiento = fechaActual
-                )*/
                 // ✅ SIEMPRE INSERTAR NUEVO REGISTRO CON VEZ
                 val idPaso1LogVehiculo = dalVehiculo.insertarPaso1LogVehiculo(
                     idVehiculo = vehiculo.Id.toInt(),
@@ -833,7 +825,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     requiereRecarga = binding.cbRequiereRecarga.isChecked,
                     idUsuarioNubeAlta = idUsuarioNubeAlta,
                     vez = vezActual,  // ✅ PASAR VEZ ACTUAL
-                    fechaMovimiento = fechaActual
+                    fechaMovimiento = fechaActual,
+                    idPasoNumLogVehiculoNotificacion=vehiculo.IdPasoNumLogVehiculoNotificacion
                 )
 
                 if (idPaso1LogVehiculo > 0) {
