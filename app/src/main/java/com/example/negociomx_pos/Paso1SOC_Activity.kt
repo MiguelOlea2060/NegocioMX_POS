@@ -131,20 +131,13 @@ class Paso1SOC_Activity : AppCompatActivity() {
         binding.btnConsultarVehiculo.setOnClickListener {
             verificaVINSuministrado()
         }
+// ✅ SOLO CAPTURAR FOTOS - NO VER FOTOS EXISTENTES
         binding.btnEvidencia1.setOnClickListener {
-            if (vehiculoPaso1?.FotosPosicion1!! > 0) {
-
-                verFotoExistente(1, vehiculoPaso1?.NombreArchivo1!!)
-            } else {
-                capturarEvidencia(1)
-            }
+            capturarEvidencia(1)
         }
+
         binding.btnEvidencia2.setOnClickListener {
-            if (vehiculoPaso1?.FotosPosicion2!! > 0) {
-                verFotoExistente(2,vehiculoPaso1?.NombreArchivo2!!)
-            } else {
-                capturarEvidencia(2)
-            }
+            capturarEvidencia(2)
         }
         binding.btnGuardarSOC.setOnClickListener {
             guardarSOC()
@@ -218,17 +211,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
                         // ✅ MENSAJE AL USUARIO
                         val mensaje = if (esPrimeraVez) {
-                            if (fotosExistentes > 0) {
-                                "✅ Vehículo encontrado. Primera entrada completada con $fotosExistentes foto(s)"
-                            } else {
-                                "✅ Vehículo encontrado. Primera entrada - Capture al menos 1 foto"
-                            }
+                            "✅ Vehículo encontrado. Primera entrada - Capture al menos 1 foto"
                         } else {
-                            if (fotosExistentes > 0) {
-                                "✅ Vehículo encontrado. Entrada #${vezActual + 1} - Ya tiene $fotosExistentes foto(s)"
-                            } else {
-                                "✅ Vehículo encontrado. Entrada #${vezActual + 1} - Capture al menos 1 foto"
-                            }
+                            "✅ Vehículo encontrado. Entrada #${vezActual + 1} - Actualice batería y capture al menos 1 foto"
                         }
                         Toast.makeText(this@Paso1SOC_Activity, mensaje, Toast.LENGTH_LONG).show()
 
@@ -830,13 +815,24 @@ class Paso1SOC_Activity : AppCompatActivity() {
                 var nombreArchivo = ""
 
                 // ✅ SIEMPRE CREAR NUEVO REGISTRO (no actualizar existente)
-                val idPaso1LogVehiculo = dalVehiculo.insertarOActualizarPaso1LogVehiculo(
+            /*    val idPaso1LogVehiculo = dalVehiculo.insertarOActualizarPaso1LogVehiculo(
                     idVehiculo = vehiculo.Id.toInt(),
                     odometro = odometro,
                     bateria = bateria,
                     modoTransporte = binding.cbModoTransporte.isChecked,
                     requiereRecarga = binding.cbRequiereRecarga.isChecked,
                     idUsuarioNubeAlta = idUsuarioNubeAlta,
+                    fechaMovimiento = fechaActual
+                )*/
+                // ✅ SIEMPRE INSERTAR NUEVO REGISTRO CON VEZ
+                val idPaso1LogVehiculo = dalVehiculo.insertarPaso1LogVehiculo(
+                    idVehiculo = vehiculo.Id.toInt(),
+                    odometro = odometro,
+                    bateria = bateria,
+                    modoTransporte = binding.cbModoTransporte.isChecked,
+                    requiereRecarga = binding.cbRequiereRecarga.isChecked,
+                    idUsuarioNubeAlta = idUsuarioNubeAlta,
+                    vez = vezActual,  // ✅ PASAR VEZ ACTUAL
                     fechaMovimiento = fechaActual
                 )
 
@@ -998,7 +994,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
         ocultarSeccionesSOC()
     }
 
-    private fun configurarBotonesSegunFotos() {
+  /*  private fun configurarBotonesSegunFotos() {
         if (vehiculoActual == null) return
 
         binding.apply {
@@ -1040,7 +1036,30 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
             Log.d("Paso1SOC", "✅ Botones configurados: Puede capturar=$puedeCapturarFotos, Fotos existentes=$fotosExistentes")
         }
-    }
+    }*/
+  private fun configurarBotonesSegunFotos() {
+      if (vehiculoActual == null) return
+
+      binding.apply {
+          // ✅ SOLO BOTONES PARA CAPTURAR - SIN LÓGICA DE "VER"
+
+          // Botón evidencia 1 - siempre disponible
+          btnEvidencia1.text = "📷 Foto 1"
+          btnEvidencia1.isEnabled = puedeCapturarFotos
+          tvEstadoEvidencia1.text = if (evidencia1Capturada) "📷" else "❌"
+
+          // Botón evidencia 2 - siempre disponible
+          btnEvidencia2.text = "📷 Foto 2"
+          btnEvidencia2.isEnabled = puedeCapturarFotos
+          tvEstadoEvidencia2.text = if (evidencia2Capturada) "📷" else "❌"
+
+          // ✅ OCULTAR BOTONES 3 Y 4 PERMANENTEMENTE
+          layoutEvidencia3.visibility = View.GONE
+          layoutEvidencia4.visibility = View.GONE
+
+          Log.d("Paso1SOC", "✅ Botones configurados para solo captura")
+      }
+  }
 
     override fun onDestroy() {
         super.onDestroy()
