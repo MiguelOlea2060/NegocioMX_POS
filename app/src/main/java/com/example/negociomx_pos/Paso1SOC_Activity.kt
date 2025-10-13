@@ -257,12 +257,12 @@ class Paso1SOC_Activity : AppCompatActivity() {
             tvTipoVehiculo.text = "Tipo de Vehiculo: ${vehiculo.TipoVehiculo}"
 
             // Mostrar datos SOC existentes
-            etOdometro.setText(vehiculo.Odometro.toString())
+            /*etOdometro.setText(vehiculo.Odometro.toString())
             etBateria.setText(vehiculo.Bateria.toString())
             cbModoTransporte.isChecked = vehiculo.ModoTransporte
             cbRequiereRecarga.isChecked = vehiculo.RequiereRecarga
 
-            layoutInfoVehiculo.visibility = View.VISIBLE
+            layoutInfoVehiculo.visibility = View.VISIBLE*/
         }
     }
 
