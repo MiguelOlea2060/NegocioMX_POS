@@ -845,7 +845,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
                     if (evidencia1Capturada && evidencia1File != null) {
                         var fotoBase64 = bllUtil?.convertirImagenABase64(evidencia1File!!)
-                        val nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_1_Vez${vezActual}.jpg"
+                        val nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_1_Vez_${vezActual}.jpg"
 
                         if (ParametrosSistema.cfgApp != null &&
                             ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == false) {
@@ -877,7 +877,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
                     if (evidencia2Capturada && evidencia2File != null) {
                         var fotoBase64 = bllUtil?.convertirImagenABase64(evidencia2File!!)
-                        val nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_2_Vez${vezActual}.jpg"
+                        val nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_2_Vez_${vezActual}.jpg"
 
                         if (ParametrosSistema.cfgApp != null &&
                             ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == false) {
