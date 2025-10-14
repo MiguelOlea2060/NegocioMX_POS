@@ -31,6 +31,7 @@ data class Vehiculo(
 
     var Vez:Short?=null,
     var IdPasoNumLogVehiculoNotificacion:Int?=null,
-    var IdPasoNumLogVehiculo:Int?=null
+    var IdPasoNumLogVehiculo:Int?=null,
+    var VezPaso1LogVehiculo:Short?=null
 
 )

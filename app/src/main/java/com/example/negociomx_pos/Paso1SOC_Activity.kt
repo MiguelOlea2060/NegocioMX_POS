@@ -931,8 +931,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
    private fun configurarBotonesSegunFotos() {
        binding.apply {
-
+           if(vehiculoActual?.VezPaso1LogVehiculo!! > 0) esPrimeraVez=false
            if ( esPrimeraVez && vehiculoActual?.IdPaso1LogVehiculo == 0) {
+               //Entrada nueva
                layoutEvidencias.isVisible=true
 
                btnEvidencia1.isVisible=true
@@ -957,11 +958,13 @@ class Paso1SOC_Activity : AppCompatActivity() {
                btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
                    android.graphics.Color.parseColor("#4CAF50")  // Color verde
                )
-
+               return@apply
            }
 
            var tieneNotificacionActiva = (vezActual > 0 && idPasoNumLogVehiculoNotificacion >0 )
-           if ( tieneNotificacionActiva&& (vehiculoActual?.IdPaso1LogVehiculo!! > 0) ) {
+
+           if ( tieneNotificacionActiva && (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && (vehiculoActual?.VezPaso1LogVehiculo!! >= 0 )) {
+               //entrada modicada
                layoutEvidencias.isVisible=true
 
                btnEvidencia1.isVisible=true
@@ -986,9 +989,11 @@ class Paso1SOC_Activity : AppCompatActivity() {
                btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
                    android.graphics.Color.parseColor("#4CAF50")  // Color verde
                )
+               return@apply
            }
 
-           if ((esPrimeraVez) && (vehiculoActual?.IdPaso1LogVehiculo!! > 0) ) {
+           if ((esPrimeraVez) && (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && !tieneNotificacionActiva  ) {
+               //ver entra completa
                layoutEvidencias.isVisible=true
 
                btnEvidencia1.isVisible=true
@@ -1018,9 +1023,11 @@ class Paso1SOC_Activity : AppCompatActivity() {
                btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
                    android.graphics.Color.parseColor("#4CAF50")  // Color verde
                )
+               return@apply
            }
 
-           if(!tieneNotificacionActiva  && (vehiculoActual?.IdPaso1LogVehiculo!! > 0)){
+           if(!tieneNotificacionActiva  && (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && (vehiculoActual?.VezPaso1LogVehiculo!! > 0 ) ){
+               //ver entrada modificada
                   layoutEvidencias.isVisible=true
 
                   btnEvidencia1.isVisible=true
@@ -1044,6 +1051,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                   btnGuardarSOC.text = "⬅\uFE0F Regresar"
                   btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
                       android.graphics.Color.parseColor("#4CAF50"))  // Color verde
+               return@apply
 
               }
 
@@ -1051,7 +1059,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
    }
   private fun configurarCamposSegunVez() {
       binding.apply {
-
+    if(vehiculoActual?.VezPaso1LogVehiculo!! > 0) esPrimeraVez=false
           // ✅ MODO EDICIÓN - HAY NOTIFICACIÓN ACTIVA
           if ( esPrimeraVez && vehiculoActual?.IdPaso1LogVehiculo == 0) {
 
@@ -1084,7 +1092,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
               return@apply
           }
           var tieneNotificacionActiva = (vezActual > 0 && idPasoNumLogVehiculoNotificacion >0 )
-          if ( tieneNotificacionActiva && (vehiculoActual?.IdPaso1LogVehiculo!! > 0)) {
+
+          if ( tieneNotificacionActiva && (vehiculoActual?.IdPaso1LogVehiculo!! > 0)&& (vehiculoActual?.VezPaso1LogVehiculo!! >= 0 )) {
               layoutSOC.isVisible = true
 
               //ocultos
@@ -1111,7 +1120,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
 
            vehiculo = vehiculoActual
-          if ((esPrimeraVez) && (vehiculoActual?.IdPaso1LogVehiculo!! > 0) ) {
+          if ((esPrimeraVez) && (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && !tieneNotificacionActiva ) {
               layoutSOC.isVisible = true
 
               etOdometro.setText(vehiculo?.Odometro?.toString() ?: "")
@@ -1132,10 +1141,11 @@ class Paso1SOC_Activity : AppCompatActivity() {
               return@apply
           }
 
-          if(!tieneNotificacionActiva  && (vehiculoActual?.IdPaso1LogVehiculo!! > 0)){
+          if(!tieneNotificacionActiva  && (vehiculoActual?.IdPaso1LogVehiculo!! > 0)&& (vehiculoActual?.VezPaso1LogVehiculo!! > 0 )){
               layoutSOC.isVisible = true
 
               etBateria.setText(vehiculo?.Bateria?.toString() ?: "")
+
               cbRequiereRecarga.isChecked = vehiculo?.RequiereRecarga ?: false
 
 
@@ -1147,6 +1157,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
               etOdometro.isVisible=false
               cbModoTransporte.isVisible=false
+              txtOdometro.isVisible=false
 
               return@apply
           }
@@ -1159,6 +1170,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
 
   }
+
+
 
     private fun cargarUltimosDatosSOC() {
         val vehiculo = vehiculoActual

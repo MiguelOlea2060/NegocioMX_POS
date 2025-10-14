@@ -30,7 +30,8 @@ class BLLVehiculo {
             ModoTransporte = v1.ModoTransporte,
             Vez =v1.Vez,
             IdPasoNumLogVehiculoNotificacion = v1.IdPasoNumLogVehiculoNotificacion,
-            IdPasoNumLogVehiculo = v1.IdPasoNumLogVehiculo
+            IdPasoNumLogVehiculo = v1.IdPasoNumLogVehiculo,
+            VezPaso1LogVehiculo = v1.VezPaso1LogVehiculo
         )
 
         return v
