@@ -397,7 +397,7 @@ class DALVehiculo {
                         ,(SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf WHERE pF.IdPaso1LogVehiculo =P.IdPaso1LogVehiculo and pf.posicion=4) NombreArchivoFoto4
                         ,v.vin, v.idmarca, v.idmodelo, ma.nombre Marca, m.nombre Modelo, v.Annio, Motor, 
                         v.idvehiculo, ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible, 
-                        tv.Nombre TipoVehiculo, bl,
+                        tv.Nombre TipoVehiculo, bl, p.Vez VezPaso1LogVehiculo,
                         n.IdPasoNumLogVehiculoNotificacion, n.Vez, n.Paso, n.IdPasoNumLogVehiculo 
                 from vehiculo v inner join dbo.MarcaAuto ma with (nolock) on v.IdMarca=ma.IdMarcaAuto
                         inner join dbo.Modelo m with (nolock) on v.IdModelo=m.IdModelo
@@ -462,6 +462,7 @@ class DALVehiculo {
 
                     Vez = resultSet.getShort("Vez")?:0,
                     IdPasoNumLogVehiculoNotificacion = resultSet.getInt("IdPasoNumLogVehiculoNotificacion")?:0,
+                    VezPaso1LogVehiculo = resultSet.getShort("VezPaso1LogVehiculo")?:0
                 )
                 //Log.d("DALVehiculo", "✅ Vehículo encontrado: ${vehiculo.Marca} ${vehiculo.Modelo} ${vehiculo.Anio}")
             } else {

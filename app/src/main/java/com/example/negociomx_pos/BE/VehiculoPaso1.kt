@@ -43,4 +43,5 @@ data class VehiculoPaso1(
     var Vez:Short?=null,
     var IdPasoNumLogVehiculoNotificacion:Int?=null,
     var IdPasoNumLogVehiculo:Int?=null,
+    var VezPaso1LogVehiculo:Short?=null
 )
