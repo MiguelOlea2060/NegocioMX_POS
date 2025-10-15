@@ -36,6 +36,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".DatosAnteriores_Activity"
+            android:exported="false" />
+        <activity
             android:name=".Paso1SOCPrueba_Activity"
             android:exported="false" />
         <activity

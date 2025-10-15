@@ -20,6 +20,7 @@ object ConexionSQLServer {
     private const val DATABASE = "softsyst_n1egoc10mx_byd"
     private const val USERNAME = "softsyst_samx01"
     private const val PASSWORD = "N1T1z1u7MX#.25L1c@01"
+
     private const val PORT = "1433"
 
 

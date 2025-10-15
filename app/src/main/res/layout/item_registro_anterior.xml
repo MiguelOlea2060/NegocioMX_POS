@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!--  Header del registro-->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:id="@+id/tvVezNumero"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="VEZ 0"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2196F3"
+                android:background="#E3F2FD"
+                android:padding="8dp"
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:id="@+id/tvFechaRegistro"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="📅 Fecha: 2024-01-15 10:30:25"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:gravity="end|center_vertical" />
+
+        </LinearLayout>
+
+        <!--  Datos SOC-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#F5F5F5"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp">
+
+            <LinearLayout
+                android:id="@+id/layoutOdometro"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="🛣️ Odómetro:"
+                    android:textSize="14sp"
+                    android:textColor="#424242" />
+
+                <TextView
+                    android:id="@+id/tvOdometro"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12,500 km"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#2E7D32" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="🔋 Batería:"
+                    android:textSize="14sp"
+                    android:textColor="#424242" />
+
+                <TextView
+                    android:id="@+id/tvBateria"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="85%"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#2E7D32" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/layoutModoTransporte"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:id="@+id/tvModoTransporte"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="🚛 Modo Transporte: SÍ"
+                    android:textSize="14sp"
+                    android:textColor="#424242" />
+
+                <TextView
+                    android:id="@+id/tvRequiereRecarga"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚡ Recarga: NO"
+                    android:textSize="14sp"
+                    android:textColor="#424242" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <!--  Botones de fotos-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnVerFoto1"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="👁️ Foto 1"
+                android:textSize="14sp"
+                android:backgroundTint="#9C27B0"
+                android:textColor="@android:color/white"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btnVerFoto2"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:text="👁️ Foto 2"
+                android:textSize="14sp"
+                android:backgroundTint="#9C27B0"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

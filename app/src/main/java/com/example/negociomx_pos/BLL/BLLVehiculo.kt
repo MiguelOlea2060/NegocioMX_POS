@@ -5,6 +5,7 @@ import com.example.negociomx_pos.BE.Paso1SOCItem
 import com.example.negociomx_pos.BE.PasoNumLogVehiculo
 import com.example.negociomx_pos.BE.Vehiculo
 import com.example.negociomx_pos.BE.VehiculoPaso1
+import kotlin.Boolean
 import kotlin.Short
 
 class BLLVehiculo {
@@ -31,7 +32,8 @@ class BLLVehiculo {
             Vez =v1.Vez,
             IdPasoNumLogVehiculoNotificacion = v1.IdPasoNumLogVehiculoNotificacion,
             IdPasoNumLogVehiculo = v1.IdPasoNumLogVehiculo,
-            VezPaso1LogVehiculo = v1.VezPaso1LogVehiculo
+            VezPaso1LogVehiculo = v1.VezPaso1LogVehiculo,
+            RequiereRecarga = v1.RequiereRecarga
         )
 
         return v

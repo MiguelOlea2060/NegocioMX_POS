@@ -1,6 +1,7 @@
 package com.example.negociomx_pos
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -123,21 +124,78 @@ class Paso1SOC_Activity : AppCompatActivity() {
             verificaVINSuministrado()
         }
 
+        // ✅ BOTÓN EVIDENCIA 1 - CON DOBLE FUNCIONALIDAD
         binding.btnEvidencia1.setOnClickListener {
-            capturarEvidencia(1)
+            val textoBoton = binding.btnEvidencia1.text.toString()
+
+            if (textoBoton.contains("Ver", ignoreCase = true)) {
+                // Si el botón dice "Ver Foto", mostrar foto existente
+                val nombreArchivo = vehiculoPaso1?.NombreArchivo1 ?: ""
+                if (nombreArchivo.isNotEmpty()) {
+                    verFotoExistente(1, nombreArchivo)
+                } else {
+                    Toast.makeText(this, "No hay foto 1 para mostrar", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                // Si el botón dice "Foto", capturar nueva foto
+                capturarEvidencia(1)
+            }
         }
 
+// ✅ BOTÓN EVIDENCIA 2 - CON DOBLE FUNCIONALIDAD
         binding.btnEvidencia2.setOnClickListener {
-            capturarEvidencia(2)
+            val textoBoton = binding.btnEvidencia2.text.toString()
+
+            if (textoBoton.contains("Ver", ignoreCase = true)) {
+                // Si el botón dice "Ver Foto", mostrar foto existente
+                val nombreArchivo = vehiculoPaso1?.NombreArchivo2 ?: ""
+                if (nombreArchivo.isNotEmpty()) {
+                    verFotoExistente(2, nombreArchivo)
+                } else {
+                    Toast.makeText(this, "No hay foto 2 para mostrar", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                // Si el botón dice "Foto", capturar nueva foto
+                capturarEvidencia(2)
+            }
         }
         binding.btnGuardarSOC.setOnClickListener {
-            guardarSOC()
+            val textoBoton = binding.btnGuardarSOC.text.toString()
+
+            if (textoBoton.contains("Regresar", ignoreCase = true)) {
+                // MODO CONSULTA: Cerrar el activity
+                Log.d("Paso1SOC", "🔙 Regresando al activity anterior")
+                Toast.makeText(this, "Regresando...", Toast.LENGTH_SHORT).show()
+                finish()  // ← Cierra el activity actual
+            } else {
+                // MODO EDICIÓN: Guardar datos
+                Log.d("Paso1SOC", "💾 Guardando datos SOC")
+                guardarSOC()  // ← Llama a la función de guardado
+            }
         }
         loadingContainer = findViewById(R.id.loadingContainer)
         tvLoadingText = findViewById(R.id.tvLoadingText)
         tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
 
+        binding.btnDatosAnteriores.setOnClickListener {
+            val vehiculo = vehiculoActual
+            if (vehiculo == null) {
+                Toast.makeText(this, "❌ Primero consulte un vehículo", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
+            if (vehiculoActual?.VezPaso1LogVehiculo!! <= 0) {
+                Toast.makeText(this, "ℹ️ Este es el primer registro, no hay datos anteriores", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
+            // ✅ PASAR DATOS AL NUEVO ACTIVITY
+            val intent = Intent(this, DatosAnteriores_Activity::class.java)
+            intent.putExtra("Vin", vehiculo.VIN)
+            intent.putExtra("VezActual", vehiculoActual?.VezPaso1LogVehiculo!!)
+            intent.putExtra("IdVehiculo", vehiculo.Id.toInt())
+            startActivity(intent)
+        }
     }
     private fun verificaVINSuministrado() {
         val vin = binding.etVIN.text.toString().trim()
@@ -931,7 +989,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
    private fun configurarBotonesSegunFotos() {
        binding.apply {
-           if(vehiculoActual?.VezPaso1LogVehiculo!! > 0) esPrimeraVez=false
+           if(vehiculoActual?.VezPaso1LogVehiculo!! > 0){
+               esPrimeraVez=false
+           }
            if ( esPrimeraVez && vehiculoActual?.IdPaso1LogVehiculo == 0) {
                //Entrada nueva
                layoutEvidencias.isVisible=true
@@ -993,73 +1053,105 @@ class Paso1SOC_Activity : AppCompatActivity() {
            }
 
            if ((esPrimeraVez) && (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && !tieneNotificacionActiva  ) {
-               //ver entra completa
+               //ver entrada completa
                layoutEvidencias.isVisible=true
 
-               btnEvidencia1.isVisible=true
-               btnEvidencia1.text = "📷 Ver Foto 1"
-               btnEvidencia1.isEnabled = true
-               btnEvidencia1.alpha = 1.0f
-               if (evidencia1Capturada) {
-                   tvEstadoEvidencia1.text = "📷"
+               // ✅ BOTÓN 1: Solo mostrar si tiene foto
+               val tieneFoto1 = (vehiculoPaso1?.FotosPosicion1 ?: 0) > 0
+               if (tieneFoto1) {
+                   btnEvidencia1.isVisible = true
+                   btnEvidencia1.text = "👁️ Ver Foto 1"  // ✅ Ícono de ojo para claridad
+                   btnEvidencia1.isEnabled = true
+                   btnEvidencia1.alpha = 1.0f
+                   tvEstadoEvidencia1.text = "✅"
+               } else {
+                   btnEvidencia1.isVisible = true
+                   btnEvidencia1.text = "❌ Sin Foto 1"
+                   btnEvidencia1.isEnabled = false
+                   btnEvidencia1.alpha = 0.5f
+                   tvEstadoEvidencia1.text = "❌"
                }
 
-               btnEvidencia2.isVisible=true
-               btnEvidencia2.text = "📷 Ver Foto 1"
-               btnEvidencia2.isEnabled = true
-               btnEvidencia2.alpha = 1.0f
-               if (evidencia2Capturada) {
-                   tvEstadoEvidencia2.text = "📷"
+               // ✅ BOTÓN 2: Solo mostrar si tiene foto (CORREGIDO)
+               val tieneFoto2 = (vehiculoPaso1?.FotosPosicion2 ?: 0) > 0
+               if (tieneFoto2) {
+                   btnEvidencia2.isVisible = true
+                   btnEvidencia2.text = "👁️ Ver Foto 2"  // ✅ CORREGIDO: Ahora dice "Ver Foto 2"
+                   btnEvidencia2.isEnabled = true
+                   btnEvidencia2.alpha = 1.0f
+                   tvEstadoEvidencia2.text = "✅"
+               } else {
+                   btnEvidencia2.isVisible = true
+                   btnEvidencia2.text = "❌ Sin Foto 2"
+                   btnEvidencia2.isEnabled = false
+                   btnEvidencia2.alpha = 0.5f
+                   tvEstadoEvidencia2.text = "❌"
                }
-
 
                layoutEvidencia3.visibility = View.GONE
                layoutEvidencia4.visibility = View.GONE
 
-
                btnGuardarSOC.isVisible=true
-               // Configurar botón Guardar normal
-               btnGuardarSOC.text = "⬅\uFE0F Regresar"
+               btnGuardarSOC.text = "⬅️ Regresar"
                btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                   android.graphics.Color.parseColor("#4CAF50")  // Color verde
+                   android.graphics.Color.parseColor("#4CAF50")  // Color naranja para "Regresar"
                )
                return@apply
            }
-
            if(!tieneNotificacionActiva  && (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && (vehiculoActual?.VezPaso1LogVehiculo!! > 0 ) ){
                //ver entrada modificada
-                  layoutEvidencias.isVisible=true
+               layoutEvidencias.isVisible=true
+               btnDatosAnteriores.isVisible=true
 
-                  btnEvidencia1.isVisible=true
-                  btnEvidencia1.text = "📷 Ver Foto 1"
-                  btnEvidencia1.isEnabled = true
-                  btnEvidencia1.alpha = 1.0f
-                  tvEstadoEvidencia1.text = if (evidencia1Capturada) "📷" else "❌"
+               // ✅ BOTÓN 1: Solo mostrar si tiene foto
+               val tieneFoto1 = (vehiculoPaso1?.FotosPosicion1 ?: 0) > 0
+               if (tieneFoto1) {
+                   btnEvidencia1.isVisible = true
+                   btnEvidencia1.text = "👁️ Ver Foto 1"
+                   btnEvidencia1.isEnabled = true
+                   btnEvidencia1.alpha = 1.0f
+                   tvEstadoEvidencia1.text = "✅"
+               } else {
+                   btnEvidencia1.isVisible = true
+                   btnEvidencia1.text = "❌ Sin Foto 1"
+                   btnEvidencia1.isEnabled = false
+                   btnEvidencia1.alpha = 0.5f
+                   tvEstadoEvidencia1.text = "❌"
+               }
 
-                  btnEvidencia2.isVisible=true
-                  btnEvidencia2.text = "📷 VerFoto 2"
-                  btnEvidencia2.isEnabled = true
-                  btnEvidencia2.alpha = 1.0f
-                  tvEstadoEvidencia2.text = if (evidencia2Capturada) "📷" else "❌"
+               // ✅ BOTÓN 2: Solo mostrar si tiene foto (CORREGIDO)
+               val tieneFoto2 = (vehiculoPaso1?.FotosPosicion2 ?: 0) > 0
+               if (tieneFoto2) {
+                   btnEvidencia2.isVisible = true
+                   btnEvidencia2.text = "👁️ Ver Foto 2"  // ✅ CORREGIDO: Espacio agregado
+                   btnEvidencia2.isEnabled = true
+                   btnEvidencia2.alpha = 1.0f
+                   tvEstadoEvidencia2.text = "✅"
+               } else {
+                   btnEvidencia2.isVisible = true
+                   btnEvidencia2.text = "❌ Sin Foto 2"
+                   btnEvidencia2.isEnabled = false
+                   btnEvidencia2.alpha = 0.5f
+                   tvEstadoEvidencia2.text = "❌"
+               }
 
-                  layoutEvidencia3.visibility = View.GONE
-                  layoutEvidencia4.visibility = View.GONE
+               layoutEvidencia3.visibility = View.GONE
+               layoutEvidencia4.visibility = View.GONE
 
-
-                  btnGuardarSOC.isVisible=true
-                  // Configurar botón Guardar normal
-                  btnGuardarSOC.text = "⬅\uFE0F Regresar"
-                  btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                      android.graphics.Color.parseColor("#4CAF50"))  // Color verde
+               btnGuardarSOC.isVisible=true
+               btnGuardarSOC.text = "⬅️ Regresar"
+               btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
+                   android.graphics.Color.parseColor("#4CAF50"))  // Color naranja
                return@apply
-
-              }
+           }
 
        }
    }
   private fun configurarCamposSegunVez() {
       binding.apply {
-    if(vehiculoActual?.VezPaso1LogVehiculo!! > 0) esPrimeraVez=false
+    if(vehiculoActual?.VezPaso1LogVehiculo!! > 0){
+        esPrimeraVez=false
+    }
           // ✅ MODO EDICIÓN - HAY NOTIFICACIÓN ACTIVA
           if ( esPrimeraVez && vehiculoActual?.IdPaso1LogVehiculo == 0) {
 
@@ -1100,6 +1192,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
               etOdometro.isVisible = false
               etOdometro.isVisible = false
               cbModoTransporte.isVisible = false
+              txtOdometro.isVisible=false
 
               //visibles
               etBateria.isEnabled = true

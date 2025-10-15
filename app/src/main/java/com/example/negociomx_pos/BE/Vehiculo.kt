@@ -19,6 +19,7 @@ data class Vehiculo(
     var BL:String="",
     var IdPaso1LogVehiculo:Int?=null,
 
+
     // ✅ CAMPOS SOC (State of Charge)
     var Odometro: Int = 0,
     var Bateria: Int = 0,

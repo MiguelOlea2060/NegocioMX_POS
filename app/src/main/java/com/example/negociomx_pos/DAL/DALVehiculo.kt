@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.negociomx_pos.BE.DireccionVehiculo
 import com.example.negociomx_pos.BE.Marca
 import com.example.negociomx_pos.BE.Modelo
+import com.example.negociomx_pos.BE.RegistroAnteriorSOC
 import com.example.negociomx_pos.BE.StatusFotoVehiculo
 import com.example.negociomx_pos.BE.Transmision
 import com.example.negociomx_pos.BE.Vehiculo
@@ -804,6 +805,87 @@ class DALVehiculo {
         }
     }
 
+    // ✅ NUEVO MetoDO PARA CONSULTAR REGISTROS ANTERIORES (NO MODIFICA EL TOP 1 EXISTENTE)
+    suspend fun consultarRegistrosAnterioresPaso1(
+        vin: String,
+        vezActual: Short
+    ): List<RegistroAnteriorSOC> = withContext(Dispatchers.IO) {
+        val registros = mutableListOf<RegistroAnteriorSOC>()
+        var conexion: Connection? = null
+        var statement: PreparedStatement? = null
+        var resultSet: ResultSet? = null
+
+        try {
+            Log.d("DALVehiculo", "🔍 Consultando registros anteriores para VIN: $vin, Vez actual: $vezActual")
+
+            conexion = ConexionSQLServer.obtenerConexion()
+            if (conexion == null) {
+                Log.e("DALVehiculo", "❌ No se pudo obtener conexión")
+                return@withContext registros
+            }
+
+            // ✅ QUERY SIN TOP 1 - OBTIENE TODOS LOS REGISTROS ANTERIORES
+            val query = """
+            SELECT p.IdPaso1LogVehiculo, p.Odometro, p.Bateria, p.ModoTransporte, 
+                   p.RequiereRecarga, p.FechaAlta, p.Vez,
+                   (SELECT COUNT(*) FROM Paso1LogVehiculoFotos pf 
+                    WHERE pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo AND pf.posicion = 1) FotosPosicion1,
+                   (SELECT COUNT(*) FROM Paso1LogVehiculoFotos pf 
+                    WHERE pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo AND pf.posicion = 2) FotosPosicion2,
+                   (SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf 
+                    WHERE pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo AND pf.posicion = 1) NombreArchivoFoto1,
+                   (SELECT NombreArchivo FROM Paso1LogVehiculoFotos pf 
+                    WHERE pf.IdPaso1LogVehiculo = p.IdPaso1LogVehiculo AND pf.posicion = 2) NombreArchivoFoto2,
+                   v.IdVehiculo, v.VIN
+            FROM Paso1LogVehiculo p
+            INNER JOIN Vehiculo v ON p.IdVehiculo = v.IdVehiculo
+            WHERE v.VIN = ? AND p.Vez < ?
+            ORDER BY p.Vez DESC, p.FechaAlta DESC
+        """.trimIndent()
+
+            statement = conexion.prepareStatement(query)
+            statement.setString(1, vin)
+            statement.setShort(2, vezActual)
+
+            resultSet = statement.executeQuery()
+
+            // ✅ LEER TODOS LOS REGISTROS (NO SOLO EL PRIMERO)
+            while (resultSet.next()) {
+                val registro = RegistroAnteriorSOC(
+                    IdPaso1LogVehiculo = resultSet.getInt("IdPaso1LogVehiculo"),
+                    Vez = resultSet.getShort("Vez"),
+                    Odometro = resultSet.getInt("Odometro"),
+                    Bateria = resultSet.getInt("Bateria"),
+                    ModoTransporte = resultSet.getBoolean("ModoTransporte"),
+                    RequiereRecarga = resultSet.getBoolean("RequiereRecarga"),
+                    FechaAlta = resultSet.getString("FechaAlta") ?: "",
+                    FotosPosicion1 = resultSet.getInt("FotosPosicion1"),
+                    FotosPosicion2 = resultSet.getInt("FotosPosicion2"),
+                    NombreArchivo1 = resultSet.getString("NombreArchivoFoto1") ?: "",
+                    NombreArchivo2 = resultSet.getString("NombreArchivoFoto2") ?: "",
+                    IdVehiculo = resultSet.getInt("IdVehiculo"),
+                    VIN = resultSet.getString("VIN") ?: ""
+                )
+                registros.add(registro)
+            }
+
+            Log.d("DALVehiculo", "✅ Se encontraron ${registros.size} registros anteriores")
+
+        } catch (e: Exception) {
+            Log.e("DALVehiculo", "💥 Error consultando registros anteriores: ${e.message}")
+            e.printStackTrace()
+        } finally {
+            try {
+                resultSet?.close()
+                statement?.close()
+                conexion?.close()
+            } catch (e: Exception) {
+                Log.e("DALVehiculo", "Error cerrando recursos: ${e.message}")
+            }
+        }
+
+        return@withContext registros
+    }
 
     // ✅ INSERTAR SIEMPRE NUEVO REGISTRO (NUNCA ACTUALIZAR)
     suspend fun insertarPaso1LogVehiculo(
@@ -859,14 +941,16 @@ class DALVehiculo {
                 // ✅ SIEMPRE INSERTAR - NUNCA ACTUALIZAR
                 val queryNot = """
                     UPDATE PASONUMLOGVEHICULONOTIFICACION 
-                    SET  IDPASONUMLOGVEHICULO= ?,  ACTIVO= ?
+                    SET  IDPASONUMLOGVEHICULO= ?,  ACTIVO= ?, FechaRealizada=?, Realizada=?
                     WHERE IDPASONUMLOGVEHICULONOTIFICACION = ?
                 """.trimIndent()
 
                 statementNot = conexion.prepareStatement(queryNot, PreparedStatement.RETURN_GENERATED_KEYS)
                 statementNot.setInt(1, idResultado)
                 statementNot.setBoolean(2, false)
-                statementNot.setInt(3, idPasoNumLogVehiculoNotificacion)
+                statementNot.setString(3, fechaMovimiento)
+                statementNot.setBoolean(4, true)
+                statementNot.setInt(5, idPasoNumLogVehiculoNotificacion)
 
                 statementNot.executeUpdate()
             }

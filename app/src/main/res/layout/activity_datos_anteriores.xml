@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5"
+    tools:context=".DatosAnteriores_Activity">
+
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/naranja_ligero"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+
+        <ImageView
+            android:id="@+id/btnRegresar"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:contentDescription="Volver"
+            android:src="@android:drawable/ic_menu_revert"
+            app:tint="#2196F3" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="📊 Historial de SOC"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#2E7D32"
+            android:gravity="center"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+    <!-- Información del Vehículo -->
+
+    <LinearLayout
+        android:id="@+id/layoutInfoVehiculo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/card_background"
+        android:padding="16dp"
+        android:layout_margin="16dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🚗 Datos del Vehículo"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#1976D2"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:id="@+id/tvVIN"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="VIN: -"
+            android:textSize="14sp"
+            android:textColor="#424242"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tvVezActual"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Vez Actual: -"
+            android:textSize="14sp"
+            android:textColor="#424242"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!--  Mensaje cuando no hay datos -->
+
+    <TextView
+        android:id="@+id/tvMensajeVacio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ℹ️ No hay registros anteriores para este vehículo"
+        android:textSize="16sp"
+        android:textColor="#757575"
+        android:gravity="center"
+        android:padding="32dp"
+        android:visibility="gone" />
+
+    <!--  Lista de Registros Anteriores -->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvRegistrosAnteriores"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="8dp"
+        android:clipToPadding="false" />
+
+
+    <!--  Loading Indicator -->
+    <LinearLayout
+        android:id="@+id/loadingContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            style="?android:attr/progressBarStyleLarge"
+            android:indeterminateTint="#2196F3" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Cargando historial..."
+            android:textSize="16sp"
+            android:textColor="#2196F3" />
+
+    </LinearLayout>
+
+</LinearLayout>
