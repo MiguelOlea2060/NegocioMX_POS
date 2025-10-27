@@ -390,7 +390,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
                 return
             }
 
-            val archivoFinal = if (archivoLocal.length() > 2.2 * 1024 * 1024) {
+            val archivoFinal = if (archivoLocal.length() > 1.8 * 1024 * 1024) {
                 Log.d("Paso2SOC", "📦 Comprimiendo imagen de ${archivoLocal.length()} bytes")
                 comprimirImagen(archivoLocal)
             } else {
@@ -693,7 +693,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
                                 val resultadoSubida = ApiUploadUtil.subirFoto(
                                     urlBase = urlBase,
                                     nombreArchivo=nombreArchivo,
-                                    file = evidencia1File!!,
+                                    file = evidencia2File!!,
                                     vin = vehiculoActual!!.VIN,
                                     paso = 2,
                                     numeroFoto = 2
@@ -715,7 +715,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
                                 val resultadoSubida = ApiUploadUtil.subirFoto(
                                     urlBase = urlBase,
                                     nombreArchivo=nombreArchivo,
-                                    file = evidencia1File!!,
+                                    file = evidencia3File!!,
                                     vin = vehiculoActual!!.VIN,
                                     paso = 2,
                                     numeroFoto = 3
@@ -737,7 +737,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
                                 val resultadoSubida = ApiUploadUtil.subirFoto(
                                     urlBase = urlBase,
                                     nombreArchivo=nombreArchivo,
-                                    file = evidencia1File!!,
+                                    file = evidencia4File!!,
                                     vin = vehiculoActual!!.VIN,
                                     paso = 2,
                                     numeroFoto = 4
@@ -811,7 +811,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
         return try {
             val bitmap = BitmapFactory.decodeFile(archivoOriginal.absolutePath)
 
-            val maxSize = 2048
+            val maxSize = 1800
             val ratio = minOf(maxSize.toFloat() / bitmap.width, maxSize.toFloat() / bitmap.height)
             val newWidth = (bitmap.width * ratio).toInt()
             val newHeight = (bitmap.height * ratio).toInt()
@@ -822,7 +822,7 @@ class Paso2SOC_Activity : AppCompatActivity() {
             val archivoComprimido = File(getExternalFilesDir(null), "compressed_paso2_$timeStamp.jpg")
 
             val outputStream = FileOutputStream(archivoComprimido)
-            bitmapRedimensionado.compress(Bitmap.CompressFormat.JPEG, 85, outputStream)
+            bitmapRedimensionado.compress(Bitmap.CompressFormat.JPEG, 80, outputStream)
             outputStream.close()
 
             bitmap.recycle()
