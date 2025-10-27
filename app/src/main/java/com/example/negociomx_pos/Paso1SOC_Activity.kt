@@ -1021,9 +1021,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
                return@apply
            }
 
-           var tieneNotificacionActiva = (vezActual > 0 && idPasoNumLogVehiculoNotificacion >0 )
+         //  var tieneNotificacionActiva = (vezActual > 0 && idPasoNumLogVehiculoNotificacion >0 )
 
-           if ( tieneNotificacionActiva && (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && (vehiculoActual?.VezPaso1LogVehiculo!! >= 0 )) {
+           if ( /*tieneNotificacionActiva &&*/ (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && (vehiculoActual?.VezPaso1LogVehiculo!! >= 0 )) {
                //entrada modicada
                layoutEvidencias.isVisible=true
 
@@ -1052,7 +1052,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                return@apply
            }
 
-           if ((esPrimeraVez) && (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && !tieneNotificacionActiva  ) {
+        /*   if ((esPrimeraVez) && (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && !tieneNotificacionActiva  ) {
                //ver entrada completa
                layoutEvidencias.isVisible=true
 
@@ -1143,7 +1143,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
                    android.graphics.Color.parseColor("#4CAF50"))  // Color naranja
                return@apply
-           }
+           }*/
 
        }
    }
@@ -1185,7 +1185,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
           }
           var tieneNotificacionActiva = (vezActual > 0 && idPasoNumLogVehiculoNotificacion >0 )
 
-          if ( tieneNotificacionActiva && (vehiculoActual?.IdPaso1LogVehiculo!! > 0)&& (vehiculoActual?.VezPaso1LogVehiculo!! >= 0 )) {
+          if ( /*tieneNotificacionActiva &&*/ (vehiculoActual?.IdPaso1LogVehiculo!! > 0)&& (vehiculoActual?.VezPaso1LogVehiculo!! >= 0 )) {
               layoutSOC.isVisible = true
 
               //ocultos
@@ -1212,7 +1212,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
           }
 
 
-           vehiculo = vehiculoActual
+       /*    vehiculo = vehiculoActual
           if ((esPrimeraVez) && (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && !tieneNotificacionActiva ) {
               layoutSOC.isVisible = true
 
@@ -1232,9 +1232,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
               cbModoTransporte.isEnabled=false
               cbRequiereRecarga.isEnabled=false
               return@apply
-          }
+          }*/
 
-          if(!tieneNotificacionActiva  && (vehiculoActual?.IdPaso1LogVehiculo!! > 0)&& (vehiculoActual?.VezPaso1LogVehiculo!! > 0 )){
+       /*   if(!tieneNotificacionActiva  && (vehiculoActual?.IdPaso1LogVehiculo!! > 0)&& (vehiculoActual?.VezPaso1LogVehiculo!! > 0 )){
               layoutSOC.isVisible = true
 
               etBateria.setText(vehiculo?.Bateria?.toString() ?: "")
@@ -1253,7 +1253,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
               txtOdometro.isVisible=false
 
               return@apply
-          }
+          }*/
 
 
 
