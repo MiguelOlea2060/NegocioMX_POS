@@ -75,8 +75,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
             }
         }
     private var fotosExistentes: Int = 0
-    private var vezActual: Short = 0
-    private var esPrimeraVez: Boolean = true
+  //  private var vezActual: Short = 0
+ /*   private var esPrimeraVez: Boolean = true*/
     private var puedeCapturarFotos: Boolean = true
     private var idPasoNumLogVehiculoNotificacion: Int = 0
     private var idPasoNumLogVehiculoExistente: Int = 0
@@ -238,20 +238,28 @@ class Paso1SOC_Activity : AppCompatActivity() {
                         vehiculoActual = vehiculo
 
                         // ✅ OBTENER EL VALOR DE VEZ DEL VEHÍCULO
-                      vezActual = vehiculo?.Vez ?: 0
+            /*          vezActual = vehiculo?.Vez ?: 0
                       esPrimeraVez = (vezActual == 0.toShort())
 
                         // ✅ OBTENER IDs DE NOTIFICACIÓN
-                        idPasoNumLogVehiculoNotificacion = vehiculo?.IdPasoNumLogVehiculoNotificacion ?: 0
+                       idPasoNumLogVehiculoNotificacion = vehiculo?.IdPasoNumLogVehiculoNotificacion ?: 0
                         idPasoNumLogVehiculoExistente = vehiculo?.IdPasoNumLogVehiculo ?: 0
-
-                        Log.d("Paso1SOC", "📊 Vez actual: $vezActual, Es primera vez: $esPrimeraVez")
+*/
+              //         Log.d("Paso1SOC", "📊 Vez actual: $vezActual, Es primera vez: $esPrimeraVez")*/
 
                         // ✅ MOSTRAR INFORMACIÓN DEL VEHÍCULO
                         mostrarInformacionVehiculo(vehiculo!!)
-                     //   mostrarSeccionesSOC()
+                       /// mostrarSeccionesSOC()
 
                         // ✅ CONFIGURAR CAMPOS Y BOTONES SEGÚN VEZ
+
+
+                        if (vehiculoActual?.IdPaso1LogVehiculo ?: 0 > 0) {
+                            vehiculoActual?.let {
+                                it.VezPaso1LogVehiculo = ((it.VezPaso1LogVehiculo ?: 0) + 1).toShort()
+                            }
+                        }
+
                         configurarCamposSegunVez()
                         configurarBotonesSegunFotos()
 
@@ -259,9 +267,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
                         fotosExistentes = vehiculoPaso1?.FotosPosicion1!! + vehiculoPaso1?.FotosPosicion2!!
 
                         // ✅ MENSAJE AL USUARIO SEGÚN EL MODO
-                        val tieneNotificacionActiva = (vezActual > 0 && idPasoNumLogVehiculoNotificacion > 0)
+                       // val tieneNotificacionActiva = (vezActual > 0 && idPasoNumLogVehiculoNotificacion > 0)
 
-                        val mensaje = if (!tieneNotificacionActiva) {
+                      /*  val mensaje = if (!tieneNotificacionActiva) {
                             "ℹ️ Vehículo encontrado - MODO CONSULTA (Sin notificación activa)"
                         } else if (esPrimeraVez) {
                             "✅ Vehículo encontrado. Primera entrada - Capture al menos 1 foto"
@@ -269,7 +277,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                             "✅ Vehículo encontrado. Entrada #${vezActual + 1} - Actualice batería y capture al menos 1 foto"
                         }
                         Toast.makeText(this@Paso1SOC_Activity, mensaje, Toast.LENGTH_LONG).show()
-                        Toast.makeText(this@Paso1SOC_Activity, mensaje, Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@Paso1SOC_Activity, mensaje, Toast.LENGTH_LONG).show()*/
 
                         ocultarCargaConsulta()
 
@@ -466,8 +474,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
             }
         }
     }
-
-
 
     private fun ocultarSeccionesSOC() {
         binding.apply {
@@ -734,8 +740,13 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
         val bateriaText = binding.etBateria.text.toString().trim()
 
+      /*  if(vehiculoActual?.VezPaso1LogVehiculo!! >= 0) {
+            esPrimeraVez=false
+        }*/
+
+
         // ✅ VALIDAR CAMPOS SEGÚN VEZ
-        if (esPrimeraVez) {
+        if (/*esPrimeraVez*/vehiculoActual?.IdPaso1LogVehiculo == 0 && vehiculoActual?.VezPaso1LogVehiculo?.toInt() == 0) {
             // Primera vez: validar todos los campos
             val odometroText = binding.etOdometro.text.toString().trim()
 
@@ -745,8 +756,8 @@ class Paso1SOC_Activity : AppCompatActivity() {
                 binding.etOdometro.requestFocus()
                 return
             }
-        } else {
-            // Vez >= 1: solo validar batería
+        }
+        if(/*vehiculoActual?.VezPaso1LogVehiculo!! >= 0*/ (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && (vehiculoActual?.VezPaso1LogVehiculo!! >= 1 )  && (vehiculoActual?.VezPaso1LogVehiculo!! <= 3 )) {
             if (bateriaText.isEmpty()) {
                 Toast.makeText(this, "Ingrese el nivel de batería", Toast.LENGTH_SHORT).show()
                 binding.etBateria.selectAll()
@@ -756,7 +767,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
         }
 
         // ✅ SOLO GUARDAR VALORES QUE EL USUARIO INGRESÓ
-// Si el campo está deshabilitado, guardar 0 o false
+        // Si el campo está deshabilitado, guardar 0 o false
         val odometro = if (binding.etOdometro.isEnabled) {
             binding.etOdometro.text.toString().trim().toIntOrNull() ?: 0
         } else {
@@ -788,13 +799,14 @@ class Paso1SOC_Activity : AppCompatActivity() {
             binding.etBateria.requestFocus()
             return
         }
-// Justo antes de lifecycleScope.launch {
+        // Justo antes de lifecycleScope.launch {
         mostrarCargaConMensajes()
+
         lifecycleScope.launch {
             try {
 
 
-// ✅ VALIDAR FOTOS MÍNIMAS SEGÚN ENTRADA
+        // ✅ VALIDAR FOTOS MÍNIMAS SEGÚN ENTRADA
                 val validacionFotos = validarFotosMinimas()
                 if (!validacionFotos.first) {
                     ocultarCarga()
@@ -815,6 +827,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
                 var nombreArchivo = ""
 
+
+
+
                 // ✅ SIEMPRE INSERTAR NUEVO REGISTRO CON VEZ
                 val idPaso1LogVehiculo = dalVehiculo.insertarPaso1LogVehiculo(
                     idVehiculo = vehiculo.Id.toInt(),
@@ -823,7 +838,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                     modoTransporte = modoTransporte,  // Ya calculado arriba según si está habilitado
                     requiereRecarga = requiereRecarga,  // Ya calculado arriba según si está habilitado
                     idUsuarioNubeAlta = idUsuarioNubeAlta,
-                    vez = vezActual,
+                    vez = vehiculoActual?.VezPaso1LogVehiculo!!,
                     fechaMovimiento = fechaActual,
                     idPasoNumLogVehiculoNotificacion = vehiculo.IdPasoNumLogVehiculoNotificacion
                 )
@@ -837,7 +852,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
                     if (evidencia1Capturada && evidencia1File != null) {
                         var fotoBase64 = bllUtil?.convertirImagenABase64(evidencia1File!!)
-                        val nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_1_Vez_${vezActual}.jpg"
+                        val nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_1_Vez_${vehiculoActual?.VezPaso1LogVehiculo!!}.jpg"
 
                         if (ParametrosSistema.cfgApp != null &&
                             ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == false) {
@@ -869,7 +884,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
                     if (evidencia2Capturada && evidencia2File != null) {
                         var fotoBase64 = bllUtil?.convertirImagenABase64(evidencia2File!!)
-                        val nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_2_Vez_${vezActual}.jpg"
+                        val nombreArchivo = "${vehiculoActual?.VIN}_Paso_1_Foto_2_Vez_${vehiculoActual?.VezPaso1LogVehiculo!!}.jpg"
 
                         if (ParametrosSistema.cfgApp != null &&
                             ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == false) {
@@ -978,21 +993,20 @@ class Paso1SOC_Activity : AppCompatActivity() {
         fotosExistentes = 0
         vehiculoPaso1 = null
         // ✅ RESETEAR VARIABLES DE CONTROL NUEVAS
-        vezActual = 0
-        esPrimeraVez = true
+       // vezActual = 0
+        //esPrimeraVez = true
         puedeCapturarFotos = true
         idPasoNumLogVehiculoNotificacion = 0
         idPasoNumLogVehiculoExistente = 0
         ocultarSeccionesSOC()
     }
 
-
    private fun configurarBotonesSegunFotos() {
        binding.apply {
-           if(vehiculoActual?.VezPaso1LogVehiculo!! > 0){
+          /* if(vehiculoActual?.VezPaso1LogVehiculo!! > 0){
                esPrimeraVez=false
-           }
-           if ( esPrimeraVez && vehiculoActual?.IdPaso1LogVehiculo == 0) {
+           }*/
+           if ( /*esPrimeraVez &&*/ vehiculoActual?.IdPaso1LogVehiculo == 0 && vehiculoActual?.VezPaso1LogVehiculo?.toInt() == 0 ) {
                //Entrada nueva
                layoutEvidencias.isVisible=true
 
@@ -1010,6 +1024,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
                layoutEvidencia3.visibility = View.GONE
                layoutEvidencia4.visibility = View.GONE
+               binding.btnDatosAnteriores.isVisible=false
 
 
                btnGuardarSOC.isVisible=true
@@ -1023,7 +1038,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
          //  var tieneNotificacionActiva = (vezActual > 0 && idPasoNumLogVehiculoNotificacion >0 )
 
-           if ( /*tieneNotificacionActiva &&*/ (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && (vehiculoActual?.VezPaso1LogVehiculo!! >= 0 )) {
+           if ( /*tieneNotificacionActiva &&*/ (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && (vehiculoActual?.VezPaso1LogVehiculo!! >= 1 )  && (vehiculoActual?.VezPaso1LogVehiculo!! <= 3 )) {
                //entrada modicada
                layoutEvidencias.isVisible=true
 
@@ -1041,6 +1056,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
                layoutEvidencia3.visibility = View.GONE
                layoutEvidencia4.visibility = View.GONE
+               binding.btnDatosAnteriores.isVisible=true
 
 
                btnGuardarSOC.isVisible=true
@@ -1050,6 +1066,27 @@ class Paso1SOC_Activity : AppCompatActivity() {
                    android.graphics.Color.parseColor("#4CAF50")  // Color verde
                )
                return@apply
+           }
+           if(vehiculoActual?.VezPaso1LogVehiculo!! > 3){
+               binding.layoutSOC.isVisible=true
+               binding.btnDatosAnteriores.isVisible=true
+               binding.etOdometro.isVisible=false
+               binding.txtOdometro.isVisible=false
+               binding.etBateria.isVisible=false
+               binding.cbModoTransporte.isVisible=false
+               binding.cbRequiereRecarga.isVisible=false
+               binding.txtBateria.isVisible=false
+               binding.txtTituloSoc.isVisible=false
+
+
+               // <CHANGE> Centrar el botón Historial cuando está solo
+               val params = binding.btnDatosAnteriores.layoutParams as LinearLayout.LayoutParams
+               params.width = LinearLayout.LayoutParams.MATCH_PARENT  // Ocupar el ancho
+               params.gravity = android.view.Gravity.CENTER_HORIZONTAL  // Centrar en el contenedor
+               params.marginStart = 0  // Remover margen izquierdo
+               params.setMargins(0, 0, 0, 0)  // Remover todos los márgenes
+               binding.btnDatosAnteriores.layoutParams = params
+               binding.btnDatosAnteriores.gravity = android.view.Gravity.CENTER
            }
 
         /*   if ((esPrimeraVez) && (vehiculoActual?.IdPaso1LogVehiculo!! > 0) && !tieneNotificacionActiva  ) {
@@ -1149,11 +1186,11 @@ class Paso1SOC_Activity : AppCompatActivity() {
    }
   private fun configurarCamposSegunVez() {
       binding.apply {
-    if(vehiculoActual?.VezPaso1LogVehiculo!! > 0){
+  /*  if(vehiculoActual?.VezPaso1LogVehiculo!! > 0){
         esPrimeraVez=false
-    }
+    }*/
           // ✅ MODO EDICIÓN - HAY NOTIFICACIÓN ACTIVA
-          if ( esPrimeraVez && vehiculoActual?.IdPaso1LogVehiculo == 0) {
+          if ( /*esPrimeraVez &&*/ vehiculoActual?.IdPaso1LogVehiculo == 0 && vehiculoActual?.VezPaso1LogVehiculo?.toInt() == 0 ) {
 
               etOdometro.isEnabled = true
               etBateria.isEnabled = true
@@ -1183,9 +1220,9 @@ class Paso1SOC_Activity : AppCompatActivity() {
               Log.d("Paso1SOC", "✅ Modo Primera Vez: Todos los campos habilitados")
               return@apply
           }
-          var tieneNotificacionActiva = (vezActual > 0 && idPasoNumLogVehiculoNotificacion >0 )
+       //   var tieneNotificacionActiva = (vezActual > 0 && idPasoNumLogVehiculoNotificacion >0 )
 
-          if ( /*tieneNotificacionActiva &&*/ (vehiculoActual?.IdPaso1LogVehiculo!! > 0)&& (vehiculoActual?.VezPaso1LogVehiculo!! >= 0 )) {
+          if ( /*tieneNotificacionActiva &&*/ (vehiculoActual?.IdPaso1LogVehiculo!! > 0)&& (vehiculoActual?.VezPaso1LogVehiculo!! >= 1 )  && (vehiculoActual?.VezPaso1LogVehiculo!! <= 3)) {
               layoutSOC.isVisible = true
 
               //ocultos
@@ -1207,7 +1244,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
               etBateria.requestFocus()
 
 
-              Log.d("Paso1SOC", "✅ Modo Subsecuente (Vez $vezActual): Solo Batería y Requiere Recarga habilitados")
+              Log.d("Paso1SOC", "✅ Modo Subsecuente (Vez ${vehiculoActual?.VezPaso1LogVehiculo!!}): Solo Batería y Requiere Recarga habilitados")
               return@apply
           }
 
@@ -1263,8 +1300,6 @@ class Paso1SOC_Activity : AppCompatActivity() {
 
 
   }
-
-
 
     private fun cargarUltimosDatosSOC() {
         val vehiculo = vehiculoActual

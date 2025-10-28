@@ -44,7 +44,7 @@ class DatosAnterioresAdapter(
             1 -> "2do registro"
             2 -> "3er registro"
             3 -> "4to registro"
-            else -> "Registro ${registro.Vez + 1}"
+            else -> "Registro numero ${registro.Vez + 1}"
         }
 
 // ✅ OCULTAR ODÓMETRO Y MODO TRANSPORTE PARA VEZ >= 1

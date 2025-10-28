@@ -167,6 +167,7 @@
                 android:layout_height="wrap_content">
 
             <TextView
+                android:id="@+id/txtTituloSoc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="⚡ Datos del SOC"
@@ -182,7 +183,8 @@
                     android:text="Historial"
                     android:backgroundTint="#2196F3"
                     android:textColor="@android:color/white"
-                    android:layout_marginLeft="20dp"/>
+                    android:layout_marginLeft="20dp"
+                    />
 
             </LinearLayout>
 
@@ -225,6 +227,7 @@
 
             <!-- Batería -->
                 <TextView
+                    android:id="@+id/txtBateria"
                     android:layout_marginRight="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

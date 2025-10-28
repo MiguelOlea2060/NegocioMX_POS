@@ -194,7 +194,15 @@ class DatosAnteriores_Activity : AppCompatActivity() {
                 imageView.scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
                 imageView.adjustViewBounds = true
 
-                dialog.setTitle("Evidencia $posicion - Vez $vez")
+                // <CHANGE> Cambiar "Vez X" por "Primera vez", "Segunda vez", etc.
+                val textoVez = when (vez.toInt()) {
+                    0 -> "1er Registro"
+                    1 -> "2do Registro"
+                    2 -> "3er Registro"
+                    3 -> "4to Registro"
+                    else -> "Registro numero ${vez + 1}"
+                }
+                dialog.setTitle("Evidencia $posicion - $textoVez")
                 dialog.setView(imageView)
                 dialog.setPositiveButton("Cerrar") { dialogInterface, _ ->
                     dialogInterface.dismiss()
@@ -234,7 +242,15 @@ class DatosAnteriores_Activity : AppCompatActivity() {
                     imageView.scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
                     imageView.adjustViewBounds = true
 
-                    dialog.setTitle("Evidencia $posicion - Vez $vez")
+                    // <CHANGE> Cambiar "Vez X" por "Primera vez", "Segunda vez", etc.
+                    val textoVez = when (vez.toInt()) {
+                        0 -> "1er Registro"
+                        1 -> "2do Registro"
+                        2 -> "3er Registro"
+                        3 -> "4to Registro"
+                        else -> "Registro numero ${vez + 1}"
+                    }
+                    dialog.setTitle("Evidencia $posicion - $textoVez")
                     dialog.setView(imageView)
                     dialog.setPositiveButton("Cerrar") { dialogInterface, _ ->
                         dialogInterface.dismiss()
