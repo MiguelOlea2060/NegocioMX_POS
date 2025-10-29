@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:background="@color/blue_white_normal"
+        android:background="@color/azulprincipal"
         android:orientation="vertical">
 
         <LinearLayout
@@ -36,7 +36,7 @@
                 android:textSize="16dp"
                 android:background="@color/black"
                 android:text="Lector de QR"
-                android:textColor="@color/white"
+                android:textColor="@color/blancoprincipal"
                 android:paddingLeft="2dp"
                 android:textStyle="bold" />
         </LinearLayout>

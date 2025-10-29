@@ -170,7 +170,7 @@
 
             <Button
                 android:id="@+id/btnTomarFotoCategoria"
-                android:backgroundTint="@color/blue_white_normal"
+                android:backgroundTint="@color/azulprincipal"
                 android:textColor="@color/black"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

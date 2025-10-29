@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="5dp"
-    android:background="@color/blue_white_normal"
+    android:background="@color/azulprincipal"
     android:orientation="vertical">
 
     <androidx.cardview.widget.CardView

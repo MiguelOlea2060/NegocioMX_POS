@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+
     tools:context=".menu_principal_activity">
 
     <LinearLayout
@@ -22,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/transvision_logo_clean" />
+            app:srcCompat="@drawable/logomexproud" />
 
         <!-- NUEVO: Contenedor de notificaciones -->
         <FrameLayout
@@ -225,7 +226,7 @@
     <LinearLayout
         android:padding="5dp"
         android:gravity="center_vertical"
-        android:background="@color/naranja"
+        android:background="@color/doradoprincipal"
         android:layout_marginTop="40dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -233,7 +234,7 @@
 
         <TextView
             android:layout_weight="1"
-            android:textColor="@color/black"
+            android:textColor="@color/azulprincipal"
             android:textAlignment="textStart"
             android:textStyle="bold"
             android:layout_marginLeft="10dp"
@@ -259,7 +260,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:background="@color/deep_blue"
+        android:background="@color/azulprincipal"
         android:layout_width="match_parent"
         android:layout_height="2dp">
     </View>
@@ -277,7 +278,9 @@
             android:id="@+id/btnPaso1SOC"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Paso 1 - Soc" />
+            android:text="Paso 1 - Soc"
+            android:backgroundTint="@color/azulprincipal"
+            />
 
         <Button
             android:layout_weight="1"
@@ -285,7 +288,9 @@
             android:id="@+id/btnConsultaPaso1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Consulta" />
+            android:text="Consulta"
+            android:backgroundTint="@color/azulprincipal"
+            />
 
     </LinearLayout>
 
@@ -293,7 +298,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:background="@color/deep_blue"
+        android:background="@color/azulprincipal"
         android:layout_width="match_parent"
         android:layout_height="2dp">
     </View>
@@ -312,7 +317,9 @@
             android:id="@+id/btnPaso2Accesorios"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Paso 2 - Accesorios" />
+            android:text="Paso 2 - Accesorios"
+            android:backgroundTint="@color/azulprincipal"
+            />
 
         <Button
             android:layout_weight="1"
@@ -320,7 +327,9 @@
             android:id="@+id/btnConsultaPaso2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Consulta" />
+            android:text="Consulta"
+            android:backgroundTint="@color/azulprincipal"
+            />
 
     </LinearLayout>
 
@@ -328,7 +337,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:background="@color/deep_blue"
+        android:background="@color/azulprincipal"
         android:layout_width="match_parent"
         android:layout_height="2dp">
     </View>
@@ -349,7 +358,9 @@
             android:id="@+id/btnPaso3Repuve"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Paso 3 - Repuve" />
+            android:text="Paso 3 - Repuve"
+            android:backgroundTint="@color/azulprincipal"
+            />
 
         <Button
             android:layout_weight="1"
@@ -357,7 +368,9 @@
             android:id="@+id/btnConsultaPaso3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Consulta" />
+            android:text="Consulta"
+            android:backgroundTint="@color/azulprincipal"
+            />
        
 
     </LinearLayout>
@@ -368,7 +381,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:background="@color/deep_blue"
+        android:background="@color/azulprincipal"
         android:layout_width="match_parent"
         android:layout_height="2dp">
     </View>
@@ -391,7 +404,9 @@
             android:id="@+id/btnPasoResumen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Resumen" />
+            android:text="Resumen"
+            android:backgroundTint="@color/azulprincipal"
+            />
 
     </LinearLayout>
 
@@ -403,7 +418,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
-        android:background="@color/deep_blue"
+        android:background="@color/azulprincipal"
         android:layout_width="match_parent"
         android:layout_height="2dp">
     </View>

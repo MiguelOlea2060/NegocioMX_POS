@@ -2,12 +2,12 @@
 <resources>
     <color name="green">#89f22b</color>
     <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <color name="blancoprincipal">#FFFFFF</color>
     <color name="botonverde">#16AD52</color>
     <color name="blue_white">#f0f8ff</color>
-    <color name="blue_white_normal">#a9ecff</color>
+    <color name="azulprincipal">#082255</color>
     <color name="deep_blue">#00aaff</color>
     <color name="blue_normal_deep">#62daff</color>
-    <color name="naranja">#FFA500</color>
+    <color name="doradoprincipal">#D4AC37</color>
     <color name="naranja_ligero">#FFC82F</color>
 </resources>

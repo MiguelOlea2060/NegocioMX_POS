@@ -24,10 +24,10 @@
         <ImageView
             android:layout_width="300dp"
             android:layout_height="120dp"
-            android:src="@drawable/transvision_logo_clean"
+            android:src="@drawable/logomexproud"
             android:scaleType="fitCenter"
             android:layout_marginBottom="12dp"
-            android:contentDescription="Transvision" />
+            android:contentDescription="MexProud" />
 
         <!-- Título de bienvenida -->
         <TextView
@@ -69,7 +69,7 @@
                     android:text="Iniciar Sesión"
                     android:textSize="24sp"
                     android:textStyle="bold"
-                    android:textColor="#1565C0"
+                    android:textColor="@color/azulprincipal"
                     android:layout_gravity="center"
                     android:layout_marginBottom="26dp" />
 
@@ -78,8 +78,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    app:boxStrokeColor="#1565C0"
-                    app:hintTextColor="#1565C0"
+                    app:boxStrokeColor="@color/azulprincipal"
+                    app:hintTextColor="@color/azulprincipal"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -89,10 +89,10 @@
                         android:hint="Correo Electrónico"
                         android:inputType="textEmailAddress"
                         android:textSize="16sp"
-                        android:textColor="#333333"
+                        android:textColor="@color/azulprincipal"
                         android:padding="16dp"
                         android:drawableLeft="@android:drawable/ic_dialog_email"
-                        android:drawableTint="#1565C0"
+                        android:drawableTint="@color/azulprincipal"
                         android:drawablePadding="12dp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -102,10 +102,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="20dp"
-                    app:boxStrokeColor="#1565C0"
-                    app:hintTextColor="#1565C0"
+                    app:boxStrokeColor="@color/azulprincipal"
+                    app:hintTextColor="@color/azulprincipal"
                     app:passwordToggleEnabled="true"
-                    app:passwordToggleTint="#1565C0"
+                    app:passwordToggleTint="@color/azulprincipal"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -115,10 +115,10 @@
                         android:hint="Contraseña"
                         android:inputType="textPassword"
                         android:textSize="16sp"
-                        android:textColor="#333333"
+                        android:textColor="@color/azulprincipal"
                         android:padding="16dp"
                         android:drawableLeft="@android:drawable/ic_lock_idle_lock"
-                        android:drawableTint="#1565C0"
+                        android:drawableTint="@color/azulprincipal"
                         android:drawablePadding="12dp" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -130,7 +130,7 @@
                     android:layout_height="wrap_content"
                     android:text="Recordar mis credenciales"
                     android:textSize="14sp"
-                    android:textColor="#666666"
+                    android:textColor="@color/azulprincipal"
                     android:buttonTint="#1565C0"
                     android:layout_marginBottom="28dp"
                     android:padding="8dp" />
@@ -148,7 +148,7 @@
                     android:elevation="4dp"
                     android:layout_marginBottom="20dp"
                     android:drawableLeft="@android:drawable/ic_menu_send"
-                    android:drawableTint="@android:color/white"
+                    android:drawableTint="@color/azulprincipal"
                     android:drawablePadding="8dp"
                     android:gravity="center" />
 
@@ -156,7 +156,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#E0E0E0"
+                    android:background="@color/azulprincipal"
                     android:layout_marginVertical="16dp" />
 
                 <!-- Texto Registro -->
@@ -166,7 +166,7 @@
                     android:layout_height="wrap_content"
                     android:text="¿No tienes cuenta? Regístrate aquí"
                     android:textSize="14sp"
-                    android:textColor="#FF9800"
+                    android:textColor="@color/doradoprincipal"
                     android:textStyle="bold"
                     android:layout_gravity="center"
                     android:clickable="true"
@@ -174,7 +174,7 @@
                     android:padding="12dp"
                     android:background="?android:attr/selectableItemBackground"
                     android:drawableLeft="@android:drawable/ic_menu_add"
-                    android:drawableTint="#FF9800"
+                    android:drawableTint="@color/doradoprincipal"
                     android:drawablePadding="8dp" />
 
             </LinearLayout>

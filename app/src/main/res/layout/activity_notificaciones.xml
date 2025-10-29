@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@color/blancoprincipal">
 
     <!-- Header -->
     <LinearLayout
@@ -21,7 +22,7 @@
             android:layout_height="32dp"
             android:contentDescription="Volver"
             android:src="@android:drawable/ic_menu_revert"
-            app:tint="@color/white" />
+            app:tint="@color/blancoprincipal" />
 
         <TextView
             android:layout_width="0dp"
@@ -29,7 +30,7 @@
             android:layout_marginStart="16dp"
             android:layout_weight="1"
             android:text="Notificaciones"
-            android:textColor="@color/white"
+            android:textColor="@color/blancoprincipal"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -71,7 +72,8 @@
             android:layout_height="64dp"
             android:alpha="0.3"
             android:src="@android:drawable/ic_popup_reminder"
-            android:tint="@color/deep_blue" />
+            android:tint="@color/deep_blue"
+            tools:ignore="UseAppTint" />
 
         <TextView
             android:layout_width="wrap_content"

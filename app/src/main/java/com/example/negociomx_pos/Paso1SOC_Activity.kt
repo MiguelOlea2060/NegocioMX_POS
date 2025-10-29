@@ -1031,7 +1031,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                // Configurar botón Guardar normal
                btnGuardarSOC.text = "💾 GUARDAR"
                btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                   android.graphics.Color.parseColor("#4CAF50")  // Color verde
+                   android.graphics.Color.parseColor("#082255")  // Color verde
                )
                return@apply
            }
@@ -1063,7 +1063,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                // Configurar botón Guardar normal
                btnGuardarSOC.text = "💾 GUARDAR"
                btnGuardarSOC.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                   android.graphics.Color.parseColor("#4CAF50")  // Color verde
+                   android.graphics.Color.parseColor("#082255")  // Color verde
                )
                return@apply
            }

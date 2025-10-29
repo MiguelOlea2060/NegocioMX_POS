@@ -10,18 +10,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        >
 
         <!-- Título -->
         <TextView
             android:padding="3dp"
-            android:background="@color/naranja_ligero"
+            android:background="@color/doradoprincipal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text=" Paso 1 - Soc "
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="#2E7D32"
+            android:textColor="@color/azulprincipal"
             android:gravity="center"
             android:layout_marginBottom="24dp" />
 
@@ -40,7 +41,7 @@
                 android:text="🚗 Escanea el Codigo QR"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#1976D2"
+                android:textColor="@color/azulprincipal"
                 android:layout_marginBottom="12dp" />
 
             <LinearLayout
@@ -55,7 +56,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:textColor="@color/black"
+                    android:textColor="@color/azulprincipal"
                     android:hint="Ingrese VIN del vehículo"
                     android:background="@drawable/edittext_background"
                     android:padding="5dp"
@@ -69,8 +70,8 @@
                     android:layout_width="85dp"
                     android:layout_height="48dp"
                     android:text=" 🔍 "
-                    android:backgroundTint="#2196F3"
-                    android:textColor="@android:color/white"
+                    android:backgroundTint="@color/azulprincipal"
+                    android:textColor="@color/azulprincipal"
                     android:textSize="16sp" />
 
             </LinearLayout>
@@ -86,7 +87,8 @@
             android:background="@drawable/info_background"
             android:padding="16dp"
             android:layout_marginBottom="16dp"
-            android:visibility="gone">
+            android:visibility="gone"
+            >
 
             <TextView
                 android:layout_width="wrap_content"
@@ -94,7 +96,7 @@
                 android:text="📋 Datos del Vehículo"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#388E3C"
+                android:textColor="@color/azulprincipal"
                 android:layout_marginBottom="12dp" />
 
             <TextView
@@ -173,7 +175,7 @@
                 android:text="⚡ Datos del SOC"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#FF6F00"
+                android:textColor="@color/doradoprincipal"
                 android:layout_marginBottom="16dp" />
 
                 <Button
@@ -181,8 +183,8 @@
                     android:layout_width="165dp"
                     android:layout_height="40dp"
                     android:text="Historial"
-                    android:backgroundTint="#2196F3"
-                    android:textColor="@android:color/white"
+                    android:backgroundTint="@color/azulprincipal"
+                    android:textColor="@color/blancoprincipal"
                     android:layout_marginLeft="20dp"
                     />
 
@@ -202,13 +204,13 @@
                     android:text="🛣️ Odómetro (km)"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#424242"
+                    android:textColor="@color/azulprincipal"
                     android:layout_marginBottom="8dp" />
 
                 <EditText
                     android:textStyle="bold"
                     android:maxLength="3"
-                    android:textColor="@color/black"
+                    android:textColor="@color/azulprincipal"
                     android:id="@+id/etOdometro"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
@@ -234,14 +236,14 @@
                     android:text="🔋 Nivel de Batería (%)"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#424242"
+                    android:textColor="@color/azulprincipal"
                     android:layout_marginBottom="8dp" />
 
                 <EditText
                     android:textStyle="bold"
                     android:layout_marginLeft="5dp"
                     android:maxLength="3"
-                    android:textColor="@color/black"
+                    android:textColor="@color/azulprincipal"
                     android:id="@+id/etBateria"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
@@ -261,7 +263,7 @@
                 android:layout_height="wrap_content"
                 android:text="🚛 Modo Transporte"
                 android:textSize="18sp"
-                android:textColor="#424242"
+                android:textColor="@color/azulprincipal"
                 android:layout_marginBottom="8dp" />
 
             <CheckBox
@@ -271,7 +273,7 @@
                 android:layout_height="wrap_content"
                 android:text="⚡ Requiere Recarga"
                 android:textSize="18sp"
-                android:textColor="#424242"
+                android:textColor="@color/azulprincipal"
                 android:layout_marginBottom="10dp" />
 
         </LinearLayout>
@@ -285,7 +287,8 @@
             android:background="@drawable/card_background"
             android:padding="16dp"
             android:layout_marginBottom="16dp"
-            android:visibility="gone">
+            android:visibility="gone"
+            >
 
             <TextView
                 android:layout_width="wrap_content"
@@ -293,7 +296,7 @@
                 android:text="📸 Evidencias"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#E91E63"
+                android:textColor="@color/azulprincipal"
                 android:layout_marginBottom="10dp" />
 
             <!-- Evidencia 1 -->
@@ -309,8 +312,8 @@
                     android:layout_height="48dp"
                     android:layout_weight="1"
                     android:text="📷 Foto 1"
-                    android:backgroundTint="#9C27B0"
-                    android:textColor="@android:color/white"
+                    android:backgroundTint="@color/azulprincipal"
+                    android:textColor="@color/blancoprincipal"
                     android:textSize="14sp"
                     android:layout_marginEnd="8dp" />
 
@@ -337,8 +340,8 @@
                     android:layout_height="48dp"
                     android:layout_weight="1"
                     android:text="📷 Foto 2"
-                    android:backgroundTint="#9C27B0"
-                    android:textColor="@android:color/white"
+                    android:backgroundTint="@color/azulprincipal"
+                    android:textColor="@color/blancoprincipal"
                     android:textSize="14sp"
                     android:layout_marginEnd="8dp" />
 
@@ -430,7 +433,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 style="?android:attr/progressBarStyleLarge"
-                android:indeterminateTint="#2196F3" />
+                android:indeterminateTint="@color/azulprincipal" />
 
             <TextView
                 android:id="@+id/tvLoadingText"
@@ -439,7 +442,7 @@
                 android:layout_marginTop="16dp"
                 android:text="Preparando datos..."
                 android:textSize="16sp"
-                android:textColor="#2196F3" />
+                android:textColor="@color/azulprincipal" />
 
             <TextView
                 android:id="@+id/tvLoadingSubtext"
@@ -448,7 +451,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Esto puede tomar unos momentos"
                 android:textSize="12sp"
-                android:textColor="@android:color/darker_gray" />
+                android:textColor="@color/azulprincipal" />
 
         </LinearLayout>
 
@@ -458,8 +461,8 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="💾 GUARDAR "
-            android:backgroundTint="#4CAF50"
-            android:textColor="@android:color/white"
+            android:backgroundTint="@color/azulprincipal"
+            android:textColor="@color/blancoprincipal"
             android:textSize="18sp"
             android:textStyle="bold"
             android:visibility="gone" />
