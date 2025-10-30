@@ -279,37 +279,37 @@ class Paso2SOC_Activity : AppCompatActivity() {
         vehiculoActual?.let { paso2 ->
             // Configurar botón evidencia 1
             if (paso2.TieneFoto1!!) {
-                binding.btnEvidencia1.text = "👁️ Ver Foto 1"
+                binding.btnEvidencia1.text = "👁️ Ver Tapete"
                 binding.tvEstadoEvidencia1.text = "📷"
             } else {
-                binding.btnEvidencia1.text = "📷 Foto 1"
+                binding.btnEvidencia1.text = "📷 Tapete"
                 binding.tvEstadoEvidencia1.text = "❌"
             }
 
             // Configurar botón evidencia 2
             if (paso2.TieneFoto2!!) {
-                binding.btnEvidencia2.text = "👁️ Ver Foto 2"
+                binding.btnEvidencia2.text = "👁️ Ver M. Usuario"
                 binding.tvEstadoEvidencia2.text = "📷"
             } else {
-                binding.btnEvidencia2.text = "📷 Foto 2"
+                binding.btnEvidencia2.text = "📷 M. Usuario"
                 binding.tvEstadoEvidencia2.text = "❌"
             }
 
             // Configurar botón evidencia 3
             if (paso2.TieneFoto3!!) {
-                binding.btnEvidencia3.text = "👁️ Ver Foto 3"
+                binding.btnEvidencia3.text = "👁️ Ver Triptico"
                 binding.tvEstadoEvidencia3.text = "📷"
             } else {
-                binding.btnEvidencia3.text = "📷 Foto 3"
+                binding.btnEvidencia3.text = "📷 Triptico"
                 binding.tvEstadoEvidencia3.text = "❌"
             }
 
             // Configurar botón evidencia 4
             if (paso2.TieneFoto4!!) {
-                binding.btnEvidencia4.text = "👁️ Ver Foto 4"
+                binding.btnEvidencia4.text = "👁️ Ver Garantia"
                 binding.tvEstadoEvidencia4.text = "📷"
             } else {
-                binding.btnEvidencia4.text = "📷 Foto 4"
+                binding.btnEvidencia4.text = "📷 Garantia"
                 binding.tvEstadoEvidencia4.text = "❌"
             }
         }
