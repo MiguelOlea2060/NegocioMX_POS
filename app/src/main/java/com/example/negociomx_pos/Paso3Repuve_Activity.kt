@@ -56,6 +56,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
     private var evidenciaCapturada: Boolean = false
     private var fotoUri: Uri? = null
 
+
     // Variables para control de datos
     private var idUsuarioNubeAlta: Int = ParametrosSistema.usuarioLogueado.IdUsuario
 
@@ -123,6 +124,10 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         binding.btnGuardarPaso3.setOnClickListener {
             guardarPaso3()
         }
+        binding.btnRegresarPaso3.setOnClickListener {
+            finish()
+        }
+
 
         // ✅ CONFIGURAR LOADING CONTAINER
         loadingContainer = findViewById(R.id.loadingContainer)
@@ -149,15 +154,9 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         when {
             vehiculoActual!=null && vehiculoActual?.IdPaso3LogVehiculo!!>0 -> {
                 binding.btnGuardarPaso3.text = "⬅️ ATRÁS"
-                binding.btnGuardarPaso3.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    android.graphics.Color.parseColor("#FF9800")
-                )
             }
             else -> {
                 binding.btnGuardarPaso3.text = "💾 GUARDAR"
-                binding.btnGuardarPaso3.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    android.graphics.Color.parseColor("#4CAF50")
-                )
             }
         }
     }
@@ -243,20 +242,17 @@ class Paso3Repuve_Activity : AppCompatActivity() {
    private fun configurarBotonSegunFoto() {
        vehiculoActual?.let { paso3 ->
            if (paso3.TieneFoto) {
-               binding.btnEvidencia.text = "👁️ Ver Foto REPUVE"
-               binding.btnEvidencia.backgroundTintList = ContextCompat.getColorStateList(this, android.R.color.holo_blue_dark)
+               binding.btnEvidencia.text = "👁️ Ver Repuve"
                binding.tvEstadoEvidencia.text = "📷"
-               binding.btnGuardarPaso3.alpha = 0.5f
+             //  binding.btnGuardarPaso3.alpha = 0.5f
                binding.tvMensajeInfo.text = "✅ Foto REPUVE ya registrada - No se puede modificar"
            } else {
-               binding.btnEvidencia.text = "📷 Foto REPUVE"
-               binding.btnEvidencia.backgroundTintList = ContextCompat.getColorStateList(this, android.R.color.holo_orange_dark)
+               binding.btnEvidencia.text = "📷 Repuve"
                binding.tvEstadoEvidencia.text = "❌"
            }
        } ?: run {
            // Si no hay registro existente, configurar para nueva foto
-           binding.btnEvidencia.text = "📷 Foto REPUVE"
-           binding.btnEvidencia.backgroundTintList = ContextCompat.getColorStateList(this, android.R.color.holo_orange_dark)
+           binding.btnEvidencia.text = "📷 Repuve"
            binding.tvEstadoEvidencia.text = "❌"
        }
    }

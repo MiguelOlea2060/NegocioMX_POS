@@ -196,6 +196,11 @@ class Paso1SOC_Activity : AppCompatActivity() {
             intent.putExtra("IdVehiculo", vehiculo.Id.toInt())
             startActivity(intent)
         }
+
+        binding.btnRegresarPaso1.setOnClickListener {
+            finish()
+        }
+
     }
     private fun verificaVINSuministrado() {
         val vin = binding.etVIN.text.toString().trim()

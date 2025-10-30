@@ -168,6 +168,10 @@ class Paso2SOC_Activity : AppCompatActivity() {
         binding.btnGuardarPaso2.setOnClickListener {
             guardarPaso2()
         }
+        binding.btnRegresarPaso2.setOnClickListener {
+            finish()
+        }
+
 
         // ✅ CONFIGURAR LOADING CONTAINER
         loadingContainer = findViewById(R.id.loadingContainer)

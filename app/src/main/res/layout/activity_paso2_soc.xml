@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
@@ -12,10 +12,26 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
+    <LinearLayout
+        android:padding="4dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_vertical"
+        android:background="@color/doradoprincipal"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/btnRegresarPaso2"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:contentDescription="Volver"
+            android:src="@android:drawable/ic_menu_revert"
+            app:tint="@color/azulprincipal" />
+
         <!-- Título -->
         <TextView
             android:paddingLeft="3dp"
-            android:background="@color/doradoprincipal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text=" Paso 2 - Accesorios "
@@ -23,7 +39,10 @@
             android:textStyle="bold"
             android:textColor="@color/azulprincipal"
             android:gravity="center"
-            android:layout_marginBottom="24dp" />
+          />
+
+
+    </LinearLayout>
 
         <!-- Sección VIN -->
         <LinearLayout

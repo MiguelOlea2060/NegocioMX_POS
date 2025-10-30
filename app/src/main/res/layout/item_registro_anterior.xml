@@ -28,8 +28,8 @@
                 android:text="VEZ 0"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#2196F3"
-                android:background="#E3F2FD"
+                android:textColor="@color/blancoprincipal"
+                android:background="@color/azulprincipal"
                 android:padding="8dp"
                 android:layout_marginEnd="12dp" />
 
@@ -40,7 +40,7 @@
                 android:layout_weight="1"
                 android:text="📅 Fecha: 2024-01-15 10:30:25"
                 android:textSize="14sp"
-                android:textColor="#666666"
+                android:textColor="@color/black"
                 android:gravity="end|center_vertical" />
 
         </LinearLayout>
@@ -67,7 +67,7 @@
                     android:layout_weight="1"
                     android:text="🛣️ Odómetro:"
                     android:textSize="14sp"
-                    android:textColor="#424242" />
+                    android:textColor="@color/black" />
 
                 <TextView
                     android:id="@+id/tvOdometro"
@@ -76,7 +76,7 @@
                     android:text="12,500 km"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:textColor="#2E7D32" />
+                    android:textColor="@color/black" /> />
 
             </LinearLayout>
 
@@ -92,7 +92,7 @@
                     android:layout_weight="1"
                     android:text="🔋 Batería:"
                     android:textSize="14sp"
-                    android:textColor="#424242" />
+                    android:textColor="@color/black" /> />
 
                 <TextView
                     android:id="@+id/tvBateria"
@@ -101,7 +101,7 @@
                     android:text="85%"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:textColor="#2E7D32" />
+                    android:textColor="@color/black" /> />
 
             </LinearLayout>
 
@@ -119,7 +119,7 @@
                     android:layout_weight="1"
                     android:text="🚛 Modo Transporte: SÍ"
                     android:textSize="14sp"
-                    android:textColor="#424242" />
+                    android:textColor="@color/black" /> />
 
                 <TextView
                     android:id="@+id/tvRequiereRecarga"
@@ -127,7 +127,7 @@
                     android:layout_height="wrap_content"
                     android:text="⚡ Recarga: NO"
                     android:textSize="14sp"
-                    android:textColor="#424242" />
+                    android:textColor="@color/black" /> />
 
             </LinearLayout>
 
@@ -148,8 +148,8 @@
                 android:layout_weight="1"
                 android:text="👁️ Foto 1"
                 android:textSize="14sp"
-                android:backgroundTint="#9C27B0"
-                android:textColor="@android:color/white"
+                android:backgroundTint="@color/azulprincipal"
+                android:textColor="@color/blancoprincipal"
                 android:layout_marginEnd="8dp" />
 
             <Button
@@ -159,8 +159,8 @@
                 android:layout_weight="1"
                 android:text="👁️ Foto 2"
                 android:textSize="14sp"
-                android:backgroundTint="#9C27B0"
-                android:textColor="@android:color/white" />
+                android:backgroundTint="@color/azulprincipal"
+                android:textColor="@color/blancoprincipal" />
 
         </LinearLayout>
 

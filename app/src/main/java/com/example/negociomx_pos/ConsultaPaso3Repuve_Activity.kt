@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -33,6 +34,7 @@ class ConsultaPaso3Repuve_Activity : AppCompatActivity() {
     private lateinit var tvVehiculosUnicos: TextView
     private lateinit var tvTotalFotos: TextView
     private lateinit var tvMensajeSinResultados: TextView
+    private lateinit var btnRegresar:ImageView
 
     private lateinit var adapter: Paso3Adapter
     private val dalConsultaPaso3 = DALPaso3()
@@ -62,6 +64,8 @@ class ConsultaPaso3Repuve_Activity : AppCompatActivity() {
         tvVehiculosUnicos = findViewById(R.id.tvVehiculosUnicos)
         tvTotalFotos = findViewById(R.id.tvTotalFotos)
         tvMensajeSinResultados = findViewById(R.id.tvMensajeSinResultados)
+        btnRegresar=findViewById(R.id.btnRegresarConsultaPaso3)
+
     }
 
     private fun configurarRecyclerView() {
@@ -87,7 +91,13 @@ class ConsultaPaso3Repuve_Activity : AppCompatActivity() {
                 Toast.makeText(this, "Seleccione una fecha", Toast.LENGTH_SHORT).show()
             }
         }
+
+        btnRegresar.setOnClickListener {
+            finish()
+        }
+
     }
+
 
     private fun establecerFechaActual() {
         val fechaActual = Calendar.getInstance()

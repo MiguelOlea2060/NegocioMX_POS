@@ -19,12 +19,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+
         <ImageView
             android:id="@+id/btnRegresarConsultaPaso2"
-            android:layout_marginLeft="4dp"
-            android:src="@drawable/regresar_icono_64x64"
-            android:layout_width="40dp"
-            android:layout_height="40dp"/>
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:contentDescription="Volver"
+            android:src="@android:drawable/ic_menu_revert"
+            app:tint="@color/azulprincipal" />
 
         <!--Título -->
         <TextView
