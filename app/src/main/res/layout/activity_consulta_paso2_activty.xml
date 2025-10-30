@@ -36,7 +36,7 @@
             android:textStyle="bold"
             android:textColor="@color/azulprincipal"
             android:gravity="center"
-            android:background="@color/naranja_ligero"/>
+            android:background="@color/doradoprincipal"/>
     </LinearLayout>
 
     <!--Sección de Filtros -->
