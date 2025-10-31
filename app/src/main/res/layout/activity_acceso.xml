@@ -161,6 +161,7 @@
 
                 <!-- Texto Registro -->
                 <TextView
+                    android:visibility="gone"
                     android:id="@+id/lblRegistrarUsuarioAcceso"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
