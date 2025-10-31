@@ -35,7 +35,7 @@ class DALPaso2 {
                     CONVERT(varchar, p.Fechaaltafoto2, 120) as FechaAltaFoto2,
                     CONVERT(varchar, p.Fechaaltafoto3, 120) as FechaAltaFoto3,
                     CONVERT(varchar, p.Fechaaltafoto4, 120) as FechaAltaFoto4,
-                    TieneFoto1, TieneFoto2, TieneFoto3, TieneFoto4, 
+                    TieneFoto1, TieneFoto2, TieneFoto3, TieneFoto4, p.nombrearchivofoto1
                 FROM dbo.Paso2LogVehiculo p 
                 INNER JOIN dbo.vehiculo v with (nolock) ON p.IdVehiculo = v.IdVehiculo 
                 INNER JOIN dbo.MarcaAuto m with (nolock) ON v.IdMarca = m.IdMarcaAuto
