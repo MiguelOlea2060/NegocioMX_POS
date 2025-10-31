@@ -123,7 +123,7 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         tvLoadingText = findViewById(R.id.tvLoadingText)
         tvLoadingSubtext = findViewById(R.id.tvLoadingSubtext)
         btnGuardarPaso4 = findViewById(R.id.btnGuardarPaso4)
-        tvMensajeInfo = findViewById(R.id.tvMensajeInfo)
+
 
         // Información del vehículo
         tvBlVehiculo = findViewById(R.id.tvBlVehiculo)

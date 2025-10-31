@@ -388,41 +388,6 @@
 
 
 
-    <LinearLayout
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-       
-        <Button
-            android:layout_weight="1"
-            android:layout_marginLeft="5dp"
-            android:id="@+id/btnPasoResumen"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Resumen"
-            android:backgroundTint="@color/azulprincipal"
-            />
-
-    </LinearLayout>
-
-
-
-
-
-    <View
-        android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
-        android:background="@color/azulprincipal"
-        android:layout_width="match_parent"
-        android:layout_height="2dp">
-    </View>
-
 
 
     <LinearLayout
@@ -439,7 +404,9 @@
             android:id="@+id/btnPaso4Fotos"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Paso 4 - Llantas" />
+            android:text="Paso 4 - Llantas"
+            android:backgroundTint="@color/azulprincipal"
+            />
 
         <Button
             android:layout_weight="1"
@@ -447,9 +414,51 @@
             android:id="@+id/btnConsultaPaso4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Consulta" />
+            android:text="Consulta"
+            android:backgroundTint="@color/azulprincipal"
+            />
 
     </LinearLayout>
+
+
+
+    <View
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/azulprincipal"
+        android:layout_width="match_parent"
+        android:layout_height="2dp">
+    </View>
+
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <Button
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp"
+            android:id="@+id/btnPasoResumen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Resumen"
+            android:backgroundTint="@color/azulprincipal"
+            />
+
+    </LinearLayout>
+
+
+
+
+
+
 
 
 

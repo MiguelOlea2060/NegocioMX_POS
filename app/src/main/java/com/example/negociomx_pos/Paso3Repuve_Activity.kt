@@ -190,7 +190,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
                             "✅ Vehículo encontrado. Sin foto REPUVE previa",
                             Toast.LENGTH_SHORT
                         ).show()
-                        binding.tvMensajeInfo.text = "⚠️ Debe tomar la foto REPUVE obligatoria"
+
                     }
 
                     ocultarCargaConsulta()
@@ -245,7 +245,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
                binding.btnEvidencia.text = "👁️ Ver Repuve"
                binding.tvEstadoEvidencia.text = "📷"
              //  binding.btnGuardarPaso3.alpha = 0.5f
-               binding.tvMensajeInfo.text = "✅ Foto REPUVE ya registrada - No se puede modificar"
+
            } else {
                binding.btnEvidencia.text = "📷 Repuve"
                binding.tvEstadoEvidencia.text = "❌"
@@ -325,7 +325,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
 
             // ✅ ACTUALIZAR ESTADO SIN VISTA PREVIA
             binding.tvEstadoEvidencia.text = "📷"
-            binding.tvMensajeInfo.text = "✅ Foto capturada - Presione GUARDAR para confirmar"
+
 
             Toast.makeText(this@Paso3Repuve_Activity, "✅ Foto REPUVE capturada (sin guardar)", Toast.LENGTH_SHORT).show()
 
@@ -641,7 +641,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
                     binding.btnEvidencia.text = "👁️ Ver Foto REPUVE"
                     binding.tvEstadoEvidencia.text = "📷"
                     binding.btnGuardarPaso3.alpha = 0.5f
-                    binding.tvMensajeInfo.text = "✅ Foto REPUVE guardada - No se puede modificar"
+
 
                     // ✅ LIMPIAR VARIABLES DE CAPTURA
                     evidenciaFile = null
@@ -790,7 +790,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
             tvEstadoEvidencia.text = "❌"
             btnEvidencia.text = "📷 Foto REPUVE"
             btnEvidencia.backgroundTintList = ContextCompat.getColorStateList(this@Paso3Repuve_Activity, android.R.color.holo_orange_dark)
-            tvMensajeInfo.text = "ℹ️ Esta foto es obligatoria y solo se puede tomar una vez"
+
         }
 
         vehiculoActual = null

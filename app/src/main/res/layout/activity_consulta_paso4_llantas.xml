@@ -10,18 +10,41 @@
     android:padding="4dp"
     tools:context=".ConsultaPaso4Llantas_Activity">
 
-    <!-- Título -->
-    <TextView
+
+
+    <LinearLayout
+        android:padding="4dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_vertical"
+        android:background="@color/doradoprincipal"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=" 📊 Consulta Paso 4 - Llantas "
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="#2E7D32"
-        android:gravity="center"
-        android:background="@color/naranja_ligero"
-        android:padding="6dp"
-        android:layout_marginBottom="16dp" />
+        android:layout_height="wrap_content">
+
+
+        <ImageView
+            android:id="@+id/btnRegresarPaso2"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:contentDescription="Volver"
+            android:src="@android:drawable/ic_menu_revert"
+            app:tint="@color/azulprincipal" />
+
+
+        <!-- Título -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=" 📊 Consulta Paso 4 - Llantas "
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/azulprincipal"
+            android:gravity="center"
+            android:padding="6dp"
+           />
+
+
+    </LinearLayout>
 
     <!-- Sección de Filtros -->
     <LinearLayout
@@ -38,7 +61,7 @@
             android:text="📅 Seleccionar Fecha"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#1976D2"
+            android:textColor="@color/azulprincipal"
             android:layout_marginBottom="8dp" />
 
         <!-- Sección compacta de fecha -->
@@ -72,8 +95,8 @@
                 android:layout_width="140dp"
                 android:layout_height="48dp"
                 android:text=" 🔍 "
-                android:backgroundTint="#2196F3"
-                android:textColor="@android:color/white"
+                android:backgroundTint="@color/azulprincipal"
+                android:textColor="@color/blancoprincipal"
                 android:textSize="16sp" />
 
         </LinearLayout>
@@ -165,9 +188,11 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@android:color/white"
+        android:background="@color/blancoprincipal"
         android:padding="5dp"
-        tools:listitem="@layout/item_consulta_paso4" />
+        tools:listitem="@layout/item_consulta_paso4"
+        android:visibility="gone"
+        />
 
     <!-- Mensaje Sin Resultados -->
     <LinearLayout
@@ -177,7 +202,8 @@
         android:layout_weight="1"
         android:orientation="vertical"
         android:gravity="center"
-        android:visibility="gone">
+        android:visibility="gone"
+        >
 
         <TextView
             android:layout_width="wrap_content"
@@ -191,7 +217,7 @@
             android:layout_height="wrap_content"
             android:text="No se encontraron registros"
             android:textSize="18sp"
-            android:textColor="#666666"
+            android:textColor="@color/azulprincipal"
             android:layout_marginBottom="8dp" />
 
         <TextView
@@ -200,7 +226,7 @@
             android:layout_height="wrap_content"
             android:text="para la fecha seleccionada"
             android:textSize="14sp"
-            android:textColor="#999999" />
+            android:textColor="@color/azulprincipal" />
 
     </LinearLayout>
 

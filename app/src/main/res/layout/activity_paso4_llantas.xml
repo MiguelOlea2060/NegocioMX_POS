@@ -12,18 +12,40 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
+
+    <LinearLayout
+        android:padding="4dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center_vertical"
+        android:background="@color/doradoprincipal"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <ImageView
+            android:id="@+id/btnRegresarPaso2"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:contentDescription="Volver"
+            android:src="@android:drawable/ic_menu_revert"
+            app:tint="@color/azulprincipal" />
+
         <!-- Título -->
         <TextView
             android:padding="3dp"
-            android:background="@color/naranja_ligero"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text=" Paso 4 - Llantas "
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="#2E7D32"
+            android:textColor="@color/azulprincipal"
             android:gravity="center"
-            android:layout_marginBottom="24dp" />
+             />
+
+
+    </LinearLayout>
 
         <!-- Sección VIN -->
         <LinearLayout
@@ -40,7 +62,7 @@
                 android:text="🚗 Escanea el Codigo QR"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#1976D2"
+                android:textColor="@color/azulprincipal"
                 android:layout_marginBottom="12dp" />
 
             <LinearLayout
@@ -55,7 +77,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:textColor="@color/black"
+                    android:textColor="@color/azulprincipal"
                     android:hint="Ingrese VIN del vehículo"
                     android:background="@drawable/edittext_background"
                     android:padding="5dp"
@@ -69,8 +91,8 @@
                     android:layout_width="85dp"
                     android:layout_height="48dp"
                     android:text=" 🔍 "
-                    android:backgroundTint="#2196F3"
-                    android:textColor="@android:color/white"
+                    android:backgroundTint="@color/azulprincipal"
+                    android:textColor="@color/blancoprincipal"
                     android:textSize="16sp" />
 
             </LinearLayout>
@@ -86,7 +108,8 @@
             android:background="@drawable/info_background"
             android:padding="16dp"
             android:layout_marginBottom="16dp"
-            android:visibility="gone">
+            android:visibility="gone"
+            >
 
             <TextView
                 android:layout_width="wrap_content"
@@ -94,7 +117,7 @@
                 android:text="📋 Datos del Vehículo"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#388E3C"
+                android:textColor="@color/azulprincipal"
                 android:layout_marginBottom="12dp" />
 
             <TextView
@@ -160,7 +183,8 @@
             android:background="@drawable/card_background"
             android:padding="16dp"
             android:layout_marginBottom="16dp"
-            android:visibility="gone">
+            android:visibility="gone"
+           >
 
             <TextView
                 android:layout_width="wrap_content"
@@ -168,7 +192,7 @@
                 android:text="🛞 Verificación de Llantas"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="#E91E63"
+                android:textColor="@color/azulprincipal"
                 android:layout_marginBottom="16dp" />
 
             <!-- Llantas Delanteras -->
@@ -193,7 +217,7 @@
                         android:text="Delantera Izq"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#424242"
+                        android:textColor="@color/black"
                         android:layout_marginBottom="4dp" />
 
                     <ImageView
@@ -212,7 +236,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Verificada"
-                        android:textSize="10sp" />
+                        android:textSize="10sp"
+                        android:textColor="@color/black"
+                        />
 
                 </LinearLayout>
 
@@ -231,7 +257,7 @@
                         android:text="Delantera Der"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#424242"
+                        android:textColor="@color/black"
                         android:layout_marginBottom="4dp" />
 
                     <ImageView
@@ -250,7 +276,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Verificada"
-                        android:textSize="10sp" />
+                        android:textSize="10sp"
+                        android:textColor="@color/black"/>
 
                 </LinearLayout>
 
@@ -278,7 +305,7 @@
                         android:text="Trasera Izq"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#424242"
+                        android:textColor="@color/black"
                         android:layout_marginBottom="4dp" />
 
                     <ImageView
@@ -297,7 +324,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Verificada"
-                        android:textSize="10sp" />
+                        android:textSize="10sp"
+                        android:textColor="@color/black"/>
+
 
                 </LinearLayout>
 
@@ -316,7 +345,7 @@
                         android:text="Trasera Der"
                         android:textSize="12sp"
                         android:textStyle="bold"
-                        android:textColor="#424242"
+                        android:textColor="@color/black"
                         android:layout_marginBottom="4dp" />
 
                     <ImageView
@@ -335,24 +364,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Verificada"
-                        android:textSize="10sp" />
+                        android:textSize="10sp"
+                        android:textColor="@color/black"/>
 
                 </LinearLayout>
 
             </LinearLayout>
 
-            <!-- Mensaje informativo -->
-            <TextView
-                android:id="@+id/tvMensajeInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ℹ️ Toque una imagen para capturar foto (función deshabilitada temporalmente)"
-                android:textSize="14sp"
-                android:textColor="#666666"
-                android:textStyle="italic"
-                android:gravity="center"
-                android:padding="8dp"
-                android:background="#F0F0F0" />
+
 
         </LinearLayout>
 
@@ -363,15 +382,16 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:orientation="vertical"
+            android:gravity="center"
             android:visibility="gone"
-            android:gravity="center">
+            >
 
             <ProgressBar
                 android:id="@+id/progressBar"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 style="?android:attr/progressBarStyleLarge"
-                android:indeterminateTint="#2196F3" />
+                android:indeterminateTint="@color/azulprincipal" />
 
             <TextView
                 android:id="@+id/tvLoadingText"
@@ -380,7 +400,7 @@
                 android:layout_marginTop="16dp"
                 android:text="Preparando datos..."
                 android:textSize="16sp"
-                android:textColor="#2196F3" />
+                android:textColor="@color/azulprincipal" />
 
             <TextView
                 android:id="@+id/tvLoadingSubtext"
@@ -389,7 +409,7 @@
                 android:layout_marginTop="8dp"
                 android:text="Esto puede tomar unos momentos"
                 android:textSize="12sp"
-                android:textColor="@android:color/darker_gray" />
+                android:textColor="@color/azulprincipal" />
 
         </LinearLayout>
 
@@ -399,11 +419,12 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="💾 GUARDAR "
-            android:backgroundTint="#4CAF50"
-            android:textColor="@android:color/white"
+            android:backgroundTint="@color/azulprincipal"
+            android:textColor="@color/blancoprincipal"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:visibility="gone" />
+            android:visibility="gone"
+             />
 
     </LinearLayout>
 

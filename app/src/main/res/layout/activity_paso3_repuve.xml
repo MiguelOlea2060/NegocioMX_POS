@@ -174,7 +174,7 @@
 
         </LinearLayout>
 
-        Sección Evidencia REPUVE (1 sola foto)
+
         <LinearLayout
             android:id="@+id/layoutEvidencia"
             android:layout_width="match_parent"
@@ -196,7 +196,7 @@
                 android:layout_marginBottom="16dp" />
 
 
-            Botón de evidencia
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -225,17 +225,7 @@
             </LinearLayout>
 
 
-            <TextView
-                android:id="@+id/tvMensajeInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ℹ️ Esta foto es obligatoria y solo se puede tomar una vez"
-                android:textSize="14sp"
-                android:textColor="#666666"
-                android:textStyle="italic"
-                android:gravity="center"
-                android:padding="8dp"
-                android:background="#F0F0F0" />
+
 
         </LinearLayout>
 

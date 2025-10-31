@@ -170,8 +170,8 @@ class menu_principal_activity : AppCompatActivity() {
         btnCargaMasivaVins.isVisible=visibleBtns
         btnCargaMasivaVins.isVisible=visibleBtns
 
-        btnPaso4Fotos.isVisible=false
-        btnConsultaPaso4.isVisible=false
+     /*   btnPaso4Fotos.isVisible=false
+        btnConsultaPaso4.isVisible=false*/
         btnAdminUsuarios.isVisible=false
 
         btnUm.setOnClickListener {
