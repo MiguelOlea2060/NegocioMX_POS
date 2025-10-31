@@ -151,7 +151,7 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             style="?android:attr/progressBarStyleLarge"
-            android:indeterminateTint="#2196F3" />
+            android:indeterminateTint="@color/azulprincipal" />
 
         <TextView
             android:id="@+id/tvLoadingText"
@@ -160,7 +160,7 @@
             android:layout_marginTop="16dp"
             android:text="Consultando registros Paso 3..."
             android:textSize="16sp"
-            android:textColor="#2196F3" />
+            android:textColor="@color/azulprincipal" />
 
         <TextView
             android:id="@+id/tvLoadingSubtext"
