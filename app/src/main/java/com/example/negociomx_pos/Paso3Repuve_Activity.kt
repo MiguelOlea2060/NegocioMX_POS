@@ -640,7 +640,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
                     // ✅ RECONFIGURAR BOTÓN PARA MODO VER
                     binding.btnEvidencia.text = "👁️ Ver Foto REPUVE"
                     binding.tvEstadoEvidencia.text = "📷"
-                    binding.btnGuardarPaso3.alpha = 0.5f
+                   // binding.btnGuardarPaso3.alpha = 0.5f
 
 
                     // ✅ LIMPIAR VARIABLES DE CAPTURA

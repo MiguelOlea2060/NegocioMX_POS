@@ -44,7 +44,7 @@ class Paso4Llantas_Activity : AppCompatActivity() {
     private lateinit var tvLoadingText: TextView
     private lateinit var tvLoadingSubtext: TextView
     private lateinit var btnGuardarPaso4: Button
-    private lateinit var tvMensajeInfo: TextView
+   // private lateinit var tvMensajeInfo: TextView
 
     // Variables de información del vehículo
     private lateinit var tvBlVehiculo: TextView
@@ -63,7 +63,7 @@ class Paso4Llantas_Activity : AppCompatActivity() {
     private lateinit var cbLlanta2: CheckBox
     private lateinit var cbLlanta3: CheckBox
     private lateinit var cbLlanta4: CheckBox
-
+    private lateinit var btnRegresar:ImageView
     // Variables para manejo de loading
     private var loadingHandler: Handler? = null
     private var loadingRunnable: Runnable? = null
@@ -142,6 +142,8 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         cbLlanta2 = findViewById(R.id.cbLlanta2)
         cbLlanta3 = findViewById(R.id.cbLlanta3)
         cbLlanta4 = findViewById(R.id.cbLlanta4)
+
+        btnRegresar=findViewById(R.id.btnRegresarPaso4)
     }
 
     private fun configurarEventos() {
@@ -173,6 +175,11 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         // ✅ BOTÓN GUARDAR
         btnGuardarPaso4.setOnClickListener {
             guardarPaso4()
+        }
+
+
+        btnRegresar.setOnClickListener {
+            finish()
         }
     }
 
@@ -259,15 +266,12 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         when {
             (vehiculoActual  !=null && vehiculoActual?.IdPaso4LogVehiculo!!>0)-> {
                 btnGuardarPaso4.text = "⬅️ ATRÁS"
-                btnGuardarPaso4.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    android.graphics.Color.parseColor("#FF9800")
-                )
+
+
             }
             else -> {
                 btnGuardarPaso4.text = "💾 GUARDAR"
-                btnGuardarPaso4.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                    android.graphics.Color.parseColor("#4CAF50")
-                )
+
             }
         }
     }
@@ -313,7 +317,7 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         if(vehiculoActual?.TieneFoto2==true)totalFotos++
         if(vehiculoActual?.TieneFoto3==true)totalFotos++
         if(vehiculoActual?.TieneFoto4==true)totalFotos++
-        tvMensajeInfo.text = "ℹ️ $totalVerificadas llantas verificadas, $totalFotos  fotos capturadas."
+       // tvMensajeInfo.text = "ℹ️ $totalVerificadas llantas verificadas, $totalFotos  fotos capturadas."
     }
 
     private fun manejarClicLlanta(posicion: Int) {
@@ -718,7 +722,7 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         if (vehiculoActual?.TieneFoto2==true)totalGuardadas++
         if (vehiculoActual?.TieneFoto3==true)totalGuardadas++
         if (vehiculoActual?.TieneFoto4==true)totalGuardadas++
-        tvMensajeInfo.text = "ℹ️ $totalGuardadas fotos guardadas, $totalCapturadas nuevas capturadas. Toque imagen para ver/capturar."
+   //     tvMensajeInfo.text = "ℹ️ $totalGuardadas fotos guardadas, $totalCapturadas nuevas capturadas. Toque imagen para ver/capturar."
     }
 
     private fun mostrarFotoCapturadaLocal(posicion: Byte) {

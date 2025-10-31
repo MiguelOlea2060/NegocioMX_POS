@@ -162,7 +162,7 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             style="?android:attr/progressBarStyleLarge"
-            android:indeterminateTint="#2196F3" />
+            android:indeterminateTint="@color/azulprincipal" />
 
         <TextView
             android:id="@+id/tvLoadingText"
@@ -171,7 +171,7 @@
             android:layout_marginTop="16dp"
             android:text="Consultando registros..."
             android:textSize="16sp"
-            android:textColor="#2196F3" />
+            android:textColor="@color/azulprincipal" />
 
         <TextView
             android:id="@+id/tvLoadingSubtext"
@@ -180,7 +180,7 @@
             android:layout_marginTop="8dp"
             android:text="Filtrando por fecha seleccionada"
             android:textSize="12sp"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="@color/azulprincipal" />
 
     </LinearLayout>
 

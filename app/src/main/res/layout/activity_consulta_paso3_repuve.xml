@@ -169,7 +169,7 @@
             android:layout_marginTop="8dp"
             android:text="Filtrando por fecha seleccionada"
             android:textSize="12sp"
-            android:textColor="@android:color/darker_gray" />
+            android:textColor="@color/azulprincipal" />
 
     </LinearLayout>
 
