@@ -232,7 +232,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
                 ).show()
 
                 val fecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                vehiculoPaso1 = dalVehiculo.consultarVehiculoPorVINParaPaso1(vin, fecha)
+                vehiculoPaso1 = dalVehiculo.consultarVehiculoPorVINParaPaso1    (vin, fecha)
 
                 if (vehiculoPaso1 != null) {
                     vehiculo = bll.convertToVehiculo(vehiculoPaso1!!)
