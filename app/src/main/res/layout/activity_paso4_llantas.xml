@@ -235,7 +235,7 @@
                         android:id="@+id/cbLlanta1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Verificada"
+                        android:text="¿Servicio?"
                         android:textSize="10sp"
                         android:textColor="@color/black"
                         />
@@ -275,7 +275,7 @@
                         android:id="@+id/cbLlanta2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Verificada"
+                        android:text="¿Servicio?"
                         android:textSize="10sp"
                         android:textColor="@color/black"/>
 
@@ -323,7 +323,7 @@
                         android:id="@+id/cbLlanta3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Verificada"
+                        android:text="¿Servicio?"
                         android:textSize="10sp"
                         android:textColor="@color/black"/>
 
@@ -337,7 +337,8 @@
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:gravity="center"
-                    android:layout_marginStart="8dp">
+                    android:layout_marginStart="8dp"
+                    android:layout_marginBottom="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -363,7 +364,7 @@
                         android:id="@+id/cbLlanta4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Verificada"
+                        android:text="¿Servicio?"
                         android:textSize="10sp"
                         android:textColor="@color/black"/>
 
@@ -373,7 +374,38 @@
 
 
 
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
+
+                <Button
+                    android:id="@+id/btnEvidenciaPaso4"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="📷 Foto "
+                    android:backgroundTint="@color/azulprincipal"
+                    android:textColor="@color/blancoprincipal"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvEstadoEvidenciaPaso4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:text="❌"
+                    android:textSize="24sp"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
         </LinearLayout>
+
+
+
 
         <!-- Loading Container -->
         <LinearLayout

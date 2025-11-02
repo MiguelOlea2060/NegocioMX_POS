@@ -669,7 +669,11 @@ class DALVehiculo {
                 select v.vin, v.idmarca, v.idmodelo, ma.nombre Marca, m.nombre Modelo, v.Annio, Motor, v.idvehiculo
                         , ce.Nombre ColorExterior, ci.Nombre ColorInterior, tc.Nombre TipoCombustible
                         , tv.Nombre TipoVehiculo, bl, p.IdPaso4LogVehiculo, pd.Posicion, pd.Verificada
-                        , pd.Verificada, CASE WHEN pd.Foto IS NOT NULL THEN 1 ELSE 0 END as TieneFoto
+                        , pd.Verificada, CASE 
+    WHEN pd.Foto IS NOT NULL THEN 1 
+    WHEN pd.NombreArchivo IS NOT NULL AND pd.NombreArchivo != '' THEN 1 
+    ELSE 0 
+  END as TieneFoto
                 from vehiculo v left join dbo.Paso4LogVehiculo p on p.IdVehiculo=v.IdVehiculo left join dbo.Paso4LogVehiculoFotos pd on p.IdPaso4LogVehiculo=pd.IdPaso4LogVehiculo
                     inner join dbo.MarcaAuto ma with (nolock) on v.IdMarca=ma.IdMarcaAuto
                     inner join dbo.Modelo m with (nolock) on v.IdModelo=m.IdModelo
@@ -1343,7 +1347,8 @@ class DALVehiculo {
         idUsuarioNubeAlta: Int,
         posicion: Byte,
         verificada: Boolean,
-        fotoBase64: String?
+        fotoBase64: String?,
+        nombreArchivo: String
     ): Boolean = withContext(Dispatchers.IO) {
         var conexion: Connection? = null
         var statement: PreparedStatement? = null
@@ -1357,9 +1362,9 @@ class DALVehiculo {
                 return@withContext false
             }
 
-            val nombreArchivo = if (fotoBase64 != null) {
+          /*  val nombreArchivo = if (fotoBase64 != null) {
                 "Paso4Llanta${posicion}_${SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())}.jpg"
-            } else null
+            } else null*/
 
             val query = """
                 INSERT INTO Paso4LogVehiculoFotos (IdPaso4LogVehiculo, IdUsuarioNubeAlta, FechaAlta, Consecutivo, Posicion, Verificada, Foto, NombreArchivo)
@@ -1371,13 +1376,19 @@ class DALVehiculo {
             statement.setInt(2, idUsuarioNubeAlta)
             statement.setByte(3, posicion)
             statement.setBoolean(4, verificada)
-            statement.setString(5, fotoBase64)
+            // <CHANGE> Si fotoBase64 es null, guardar NULL en BD (foto está en Web API)
+            if (fotoBase64 != null && fotoBase64.isNotEmpty()) {
+                statement.setString(5, fotoBase64)
+            } else {
+                statement.setNull(5, java.sql.Types.VARCHAR)
+            }
+            // <CHANGE> SIEMPRE guardar el nombre del archivo
             statement.setString(6, nombreArchivo)
 
             val filasAfectadas = statement.executeUpdate()
 
             if (filasAfectadas > 0) {
-                Log.d("DALVehiculo", "✅ Foto Paso4 posición $posicion insertada exitosamente")
+                Log.d("DALVehiculo", "✅ Foto Paso4 posición $posicion insertada exitosamente con nombre: $nombreArchivo")
                 return@withContext true
             } else {
                 Log.w("DALVehiculo", "⚠️ No se insertó la foto Paso4 posición $posicion")

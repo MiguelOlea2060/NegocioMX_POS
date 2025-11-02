@@ -22,6 +22,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.negociomx_pos.BE.VehiculoPaso4
 import com.example.negociomx_pos.DAL.DALVehiculo
+import com.example.negociomx_pos.Utils.ApiUploadUtil
 import com.example.negociomx_pos.Utils.BLLUtils
 import com.example.negociomx_pos.Utils.ParametrosSistema
 import kotlinx.coroutines.launch
@@ -29,6 +30,8 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class Paso4Llantas_Activity : AppCompatActivity() {
 
@@ -75,6 +78,13 @@ class Paso4Llantas_Activity : AppCompatActivity() {
     private var fotoHabilitada: Boolean = true // HABILITADA AHORA
     private var posicionFotoActual: Byte = 0
     private var fotoUri: Uri? = null
+
+
+    // Variables para foto de evidencia del botón
+    private lateinit var btnEvidenciaPaso4: Button
+    private lateinit var tvEstadoEvidenciaPaso4: TextView
+    private var fotoEvidenciaCapturada: Boolean = false
+    private var archivoFotoEvidencia: File? = null
 
     var bllUtil:BLLUtils?=null
     // Variables para manejo de fotos por posición
@@ -142,6 +152,9 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         cbLlanta2 = findViewById(R.id.cbLlanta2)
         cbLlanta3 = findViewById(R.id.cbLlanta3)
         cbLlanta4 = findViewById(R.id.cbLlanta4)
+        // Botón de evidencia
+        btnEvidenciaPaso4 = findViewById(R.id.btnEvidenciaPaso4)
+        tvEstadoEvidenciaPaso4 = findViewById(R.id.tvEstadoEvidenciaPaso4)
 
         btnRegresar=findViewById(R.id.btnRegresarPaso4)
     }
@@ -181,6 +194,19 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         btnRegresar.setOnClickListener {
             finish()
         }
+        btnEvidenciaPaso4.setOnClickListener {
+            // <CHANGE> Verificar estado del botón antes de ejecutar acción
+            if (!btnEvidenciaPaso4.isEnabled) {
+                Toast.makeText(this, "No se capturó foto en este registro", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (vehiculoActual?.TieneFoto1 == true) {
+                verFotoEvidenciaExistente()
+            } else {
+                capturarFotoEvidencia()
+            }
+        }
     }
 
     private fun verificaVINSuministrado() {
@@ -212,6 +238,8 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                     mostrarInformacionVehiculo(vehiculo)
                     mostrarSeccionLlantas()
                     cargarDatosExistentes()
+                    cargarDatosExistentes()
+                    configurarBotonEvidenciaSegunFoto()
 
                     activaDesactivaControlesParaEdicion(true)
                     if(vehiculoActual?.IdPaso4LogVehiculo!!>0)
@@ -276,6 +304,39 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         }
     }
 
+    private fun configurarBotonEvidenciaSegunFoto() {
+        vehiculoActual?.let { paso4 ->
+            // <CHANGE> Verificar si ya existe registro guardado
+            val tieneRegistroGuardado = paso4.IdPaso4LogVehiculo!! > 0
+
+            if (paso4.TieneFoto1 == true) {
+                // Ya tiene foto guardada - Modo VER
+                btnEvidenciaPaso4.text = "👁️ Ver Foto"
+                btnEvidenciaPaso4.isEnabled = true
+                btnEvidenciaPaso4.alpha = 1.0f
+                tvEstadoEvidenciaPaso4.text = "📷"
+            } else if (tieneRegistroGuardado) {
+                // Tiene registro pero NO tiene foto - Modo DESHABILITADO
+                btnEvidenciaPaso4.text = "❌ Sin Foto"
+                btnEvidenciaPaso4.isEnabled = false
+                btnEvidenciaPaso4.alpha = 0.5f
+                tvEstadoEvidenciaPaso4.text = "❌"
+            } else {
+                // No tiene registro - Modo CAPTURAR
+                btnEvidenciaPaso4.text = "📷 Foto Evidencia"
+                btnEvidenciaPaso4.isEnabled = true
+                btnEvidenciaPaso4.alpha = 1.0f
+                tvEstadoEvidenciaPaso4.text = "❌"
+            }
+        } ?: run {
+            // Si no hay vehículo, configurar para captura
+            btnEvidenciaPaso4.text = "📷 Foto Evidencia"
+            btnEvidenciaPaso4.isEnabled = true
+            btnEvidenciaPaso4.alpha = 1.0f
+            tvEstadoEvidenciaPaso4.text = "❌"
+        }
+    }
+
     private fun mostrarInformacionVehiculo(vehiculo: VehiculoPaso4) {
         tvBlVehiculo.text = "MBL: ${vehiculo.BL}"
         tvMarcaModeloAnnio.text = "${vehiculo.Marca} - ${vehiculo.Modelo}, ${vehiculo.Anio}"
@@ -318,6 +379,14 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         if(vehiculoActual?.TieneFoto3==true)totalFotos++
         if(vehiculoActual?.TieneFoto4==true)totalFotos++
        // tvMensajeInfo.text = "ℹ️ $totalVerificadas llantas verificadas, $totalFotos  fotos capturadas."
+
+
+        // <CHANGE> Actualizar estado de foto de evidencia
+        if (vehiculoActual?.TieneFoto1 == true) {
+            tvEstadoEvidenciaPaso4.text = "✅"
+        } else {
+            tvEstadoEvidenciaPaso4.text = "❌"
+        }
     }
 
     private fun manejarClicLlanta(posicion: Int) {
@@ -384,6 +453,52 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         }
     }
 
+
+    private fun capturarFotoEvidencia() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            permisoLauncher.launch(Manifest.permission.CAMERA)
+            return
+        }
+
+        // Validar que haya un vehículo consultado
+        if (vehiculoActual == null) {
+            Toast.makeText(this, "Primero consulte un vehículo", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Validar si ya tiene foto capturada
+        if (fotoEvidenciaCapturada) {
+            Toast.makeText(this, "Ya tiene foto de evidencia capturada. Presione Guardar para confirmar.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Validar si ya existe en BD
+        if (vehiculoActual?.TieneFoto1 == true) {
+            Toast.makeText(this, "Ya existe foto de evidencia registrada", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        try {
+            val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val imageFileName = "${vehiculoActual?.VIN}_Paso_4_Foto_1.jpg"
+            val storageDir = File(getExternalFilesDir(null), "Paso4_Photos")
+
+            if (!storageDir.exists()) {
+                storageDir.mkdirs()
+            }
+
+            val photoFile = File(storageDir, imageFileName)
+            fotoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
+            posicionFotoActual = 1 // Posición 1 para la foto de evidencia
+
+            camaraLauncher.launch(fotoUri)
+
+        } catch (e: Exception) {
+            Log.e("Paso4LLANTAS", "Error creando archivo de foto evidencia: ${e.message}")
+            Toast.makeText(this, "Error preparando cámara", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun procesarFoto(uri: Uri, posicion: Byte) {
         try {
             Log.d("Paso4LLANTAS", "📸 Procesando foto llanta posición $posicion")
@@ -401,14 +516,14 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                 return
             }
 
-            val archivoFinal = if (archivoLocal.length() > 2.2 * 1024 * 1024) {
+            val archivoFinal = if (archivoLocal.length() > 1.8 * 1024 * 1024) {
                 Log.d("Paso4LLANTAS", "📦 Comprimiendo imagen de ${archivoLocal.length()} bytes")
                 comprimirImagen(archivoLocal, posicion)
             } else {
                 archivoLocal
             }
 
-            fotosCapturadas[posicion] = archivoFinal
+           /* fotosCapturadas[posicion] = archivoFinal
             estadoCaptura[posicion] = true
 
             // Actualizar UI para mostrar que la foto fue capturada
@@ -417,6 +532,29 @@ class Paso4Llantas_Activity : AppCompatActivity() {
             Toast.makeText(this@Paso4Llantas_Activity, "✅ Foto llanta $posicion capturada (sin guardar)", Toast.LENGTH_SHORT).show()
 
             Log.d("Paso4LLANTAS", "✅ Foto llanta $posicion lista para guardar")
+
+        } catch (e: Exception) {
+            Log.e("Paso4LLANTAS", "💥 Error procesando foto: ${e.message}")
+            Toast.makeText(this@Paso4Llantas_Activity, "Error procesando foto: ${e.message}", Toast.LENGTH_SHORT).show()
+        }*/
+
+
+            // <CHANGE> Diferenciar entre foto de evidencia (posición 1) y fotos de llantas
+            if (posicion == 1.toByte()) {
+                // Es la foto de evidencia del botón
+                archivoFotoEvidencia = archivoFinal
+                fotoEvidenciaCapturada = true
+                tvEstadoEvidenciaPaso4.text = "✅"
+                Toast.makeText(this@Paso4Llantas_Activity, "✅ Foto de evidencia capturada (sin guardar)", Toast.LENGTH_SHORT).show()
+            } else {
+                // Es foto de llanta individual
+                fotosCapturadas[posicion] = archivoFinal
+                estadoCaptura[posicion] = true
+                actualizarEstadoFotoUI(posicion, true)
+                Toast.makeText(this@Paso4Llantas_Activity, "✅ Foto llanta $posicion capturada (sin guardar)", Toast.LENGTH_SHORT).show()
+            }
+
+            Log.d("Paso4LLANTAS", "✅ Foto posición $posicion lista para guardar")
 
         } catch (e: Exception) {
             Log.e("Paso4LLANTAS", "💥 Error procesando foto: ${e.message}")
@@ -443,6 +581,118 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                 Log.e("Paso4LLANTAS", "Error cargando foto: ${e.message}")
                 Toast.makeText(this@Paso4Llantas_Activity, "Error cargando foto: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun verFotoEvidenciaExistente() {
+        val vehiculo = vehiculoActual
+        if (vehiculo == null) {
+            Toast.makeText(this, "Error: No hay vehículo seleccionado", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        lifecycleScope.launch {
+            try {
+                Toast.makeText(this@Paso4Llantas_Activity, "Cargando foto de evidencia...", Toast.LENGTH_SHORT).show()
+
+                var fotoBase64: String? = null
+
+                // ✅ VERIFICAR SI DEBE CARGAR DESDE BD O DESDE WEB API
+                if (ParametrosSistema.cfgApp != null &&
+                    ParametrosSistema.cfgApp?.ManejaGuardadoArchivosEnBD == true) {
+                    // Cargar desde Base de Datos
+                    fotoBase64 = dalVehiculo.obtenerFotoBase64Paso4(vehiculo.Id.toInt(), 1)
+                }
+
+                if (ParametrosSistema.cfgApp != null &&
+                    ParametrosSistema.cfgApp?.ManejaGuardadoArchivosEnBD == true &&
+                    fotoBase64 != null && fotoBase64.isNotEmpty()) {
+                    // Mostrar desde Base64
+                    mostrarDialogoFoto(fotoBase64, 1)
+                } else if (ParametrosSistema.cfgApp != null &&
+                    ParametrosSistema.cfgApp?.ManejaGuardadoArchivosEnBD == false) {
+                    // Cargar desde Web API
+                    val nombreArchivo = "${vehiculoActual?.VIN}_Paso_4_Foto_1.jpg"
+                    val urlCompletoFoto = ParametrosSistema.cfgApp?.UrlGuardadoArchivos + '/' +
+                            ParametrosSistema.cfgApp?.CarpetaGuardadoArchivosNube?.replace("~/", "") +
+                            '/' + nombreArchivo
+                    mostrarDialogoFotoFromUrl(urlCompletoFoto, 1)
+                } else {
+                    Toast.makeText(
+                        this@Paso4Llantas_Activity,
+                        "No se pudo cargar la foto de evidencia",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+            } catch (e: Exception) {
+                Log.e("Paso4LLANTAS", "Error cargando foto de evidencia: ${e.message}")
+                Toast.makeText(
+                    this@Paso4Llantas_Activity,
+                    "Error cargando foto: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private suspend fun mostrarDialogoFotoFromUrl(url: String, posicion: Byte) {
+        try {
+            // ✅ CARGAR IMAGEN DESDE URL EN BACKGROUND THREAD
+            val bitmap = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                bllUtil?.mLoad(url)
+            }
+
+            if (bitmap != null) {
+                // Crear diálogo personalizado
+                val dialog = android.app.AlertDialog.Builder(this@Paso4Llantas_Activity)
+                val imageView = android.widget.ImageView(this@Paso4Llantas_Activity)
+
+                // Configurar ImageView
+                imageView.setImageBitmap(bitmap)
+                imageView.scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
+                imageView.adjustViewBounds = true
+
+                val nombrePosicion = when (posicion) {
+                    1.toByte() -> "Foto de Evidencia"
+                    2.toByte() -> "Delantera Derecha"
+                    3.toByte() -> "Trasera Izquierda"
+                    4.toByte() -> "Trasera Derecha"
+                    else -> "Posición $posicion"
+                }
+
+                // Configurar diálogo
+                dialog.setTitle("Paso 4 - $nombrePosicion")
+                dialog.setView(imageView)
+                dialog.setPositiveButton("Cerrar") { dialogInterface, _ ->
+                    dialogInterface.dismiss()
+                }
+
+                val alertDialog = dialog.create()
+                alertDialog.show()
+
+                // Ajustar tamaño del diálogo
+                val window = alertDialog.window
+                window?.setLayout(
+                    (resources.displayMetrics.widthPixels * 0.9).toInt(),
+                    (resources.displayMetrics.heightPixels * 0.7).toInt()
+                )
+
+            } else {
+                Toast.makeText(
+                    this@Paso4Llantas_Activity,
+                    "Error decodificando la imagen",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+        } catch (e: Exception) {
+            Log.e("Paso4LLANTAS", "Error mostrando foto desde URL: ${e.message}")
+            Toast.makeText(
+                this@Paso4Llantas_Activity,
+                "Error mostrando foto",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -528,7 +778,7 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                         3.toByte() to cbLlanta3.isChecked,
                         4.toByte() to cbLlanta4.isChecked
                     )
-                    for ((posicion, verificada) in checkboxes) {
+                   /* for ((posicion, verificada) in checkboxes) {
                         var yaExiste = false
                         if(vehiculoActual?.TieneFoto1==true && posicion.toInt()==1)yaExiste=true
                         else if(vehiculoActual?.TieneFoto2==true && posicion.toInt()==2)yaExiste=true
@@ -551,7 +801,163 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                             )
                             if (!resultado) exitoso = false
                         }
+                    }*/
+
+                    // <CHANGE> Primero guardar la foto de evidencia si fue capturada (posición 1)
+                 /*   if (fotoEvidenciaCapturada && archivoFotoEvidencia != null && vehiculoActual?.TieneFoto1 != true) {
+                        val fotoBase64Evidencia = bllUtil?.convertirImagenABase64(archivoFotoEvidencia!!)
+                        val resultadoEvidencia = dalVehiculo.insertarFotoPaso4(
+                            idPaso4LogVehiculo = idPaso4LogVehiculo,
+                            idUsuarioNubeAlta = idUsuarioNubeAlta,
+                            posicion = 1,
+                            verificada = cbLlanta1.isChecked,
+                            fotoBase64 = fotoBase64Evidencia
+                        )
+                        if (!resultadoEvidencia) exitoso = false
                     }
+
+// Luego guardar las fotos de las llantas (posiciones 2, 3, 4)
+                    for ((posicion, verificada) in checkboxes) {
+                        // <CHANGE> Saltar posición 1 si ya se guardó la foto de evidencia
+                        if (posicion == 1.toByte() && fotoEvidenciaCapturada) {
+                            continue
+                        }
+
+                        var yaExiste = false
+                        if(vehiculoActual?.TieneFoto1==true && posicion.toInt()==1)yaExiste=true
+                        else if(vehiculoActual?.TieneFoto2==true && posicion.toInt()==2)yaExiste=true
+                        else if(vehiculoActual?.TieneFoto3==true && posicion.toInt()==3)yaExiste=true
+                        else if(vehiculoActual?.TieneFoto4==true && posicion.toInt()==4)yaExiste=true
+                        if (!yaExiste) {
+                            // Obtener foto si fue capturada
+                            var fotoBase64: String? = null
+                            val archivoFoto = fotosCapturadas[posicion]
+                            if (archivoFoto != null) {
+                                fotoBase64 =bllUtil?.convertirImagenABase64(archivoFoto)
+                            }
+
+                            val resultado = dalVehiculo.insertarFotoPaso4(
+                                idPaso4LogVehiculo = idPaso4LogVehiculo,
+                                idUsuarioNubeAlta = idUsuarioNubeAlta,
+                                posicion = posicion,
+                                verificada = verificada,
+                                fotoBase64 = fotoBase64
+                            )
+                            if (!resultado) exitoso = false
+                        }
+                    }*/
+
+
+                    // <CHANGE> Primero guardar la foto de evidencia si fue capturada (posición 1)
+                    if (fotoEvidenciaCapturada && archivoFotoEvidencia != null && vehiculoActual?.TieneFoto1 != true) {
+                        // ✅ GENERAR NOMBRE DE ARCHIVO
+                        var nombreArchivo = "${vehiculoActual?.VIN}_Paso_4_Foto_1.jpg"
+
+                        // ✅ CONVERTIR IMAGEN A BASE64
+                        var fotoBase64Evidencia: String? = bllUtil?.convertirImagenABase64(archivoFotoEvidencia!!)
+
+                        // ✅ VALIDAR SI DEBE GUARDAR EN API O EN BASE DE DATOS
+                        if (ParametrosSistema.cfgApp != null &&
+                            ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == false) {
+                            // Subir a API Web
+                            val urlBase = ParametrosSistema.cfgApp!!.UrlGuardadoArchivos + '/' +
+                                    ParametrosSistema.cfgApp!!.UrlAPIControllerGuardadoArchivos
+
+                            val resultadoSubida = ApiUploadUtil.subirFoto(
+                                urlBase = urlBase,
+                                nombreArchivo = nombreArchivo,
+                                file = archivoFotoEvidencia!!,
+                                vin = vehiculoActual!!.VIN,
+                                paso = 4,
+                                numeroFoto = 1
+                            )
+
+                            // Si la subida fue exitosa, NO guardar en BD (setear fotoBase64 a null)
+                            if (resultadoSubida.first) {
+                                fotoBase64Evidencia = null
+                                Log.d("Paso4LLANTAS", "✅ Foto evidencia subida a API exitosamente")
+                            } else {
+                                Log.e("Paso4LLANTAS", "❌ Error subiendo foto evidencia a API: ${resultadoSubida.second}")
+                            }
+                        }
+
+                        val resultadoEvidencia = dalVehiculo.insertarFotoPaso4(
+                            idPaso4LogVehiculo = idPaso4LogVehiculo,
+                            idUsuarioNubeAlta = idUsuarioNubeAlta,
+                            posicion = 1,
+                            verificada = cbLlanta1.isChecked,
+                            fotoBase64 = fotoBase64Evidencia,
+                            nombreArchivo=nombreArchivo
+                        )
+                        if (!resultadoEvidencia) exitoso = false
+                    }
+
+// Luego guardar las fotos de las llantas (posiciones 2, 3, 4)
+                    for ((posicion, verificada) in checkboxes) {
+                        // <CHANGE> Saltar posición 1 si ya se guardó la foto de evidencia
+                        if (posicion == 1.toByte() && fotoEvidenciaCapturada) {
+                            continue
+                        }
+
+                        var yaExiste = false
+                        if(vehiculoActual?.TieneFoto1==true && posicion.toInt()==1)yaExiste=true
+                        else if(vehiculoActual?.TieneFoto2==true && posicion.toInt()==2)yaExiste=true
+                        else if(vehiculoActual?.TieneFoto3==true && posicion.toInt()==3)yaExiste=true
+                        else if(vehiculoActual?.TieneFoto4==true && posicion.toInt()==4)yaExiste=true
+
+                        if (!yaExiste) {
+                            // Obtener foto si fue capturada
+                            var fotoBase64: String? = null
+                            val archivoFoto = fotosCapturadas[posicion]
+
+                            if (archivoFoto != null) {
+                                // ✅ GENERAR NOMBRE DE ARCHIVO PARA CADA POSICIÓN
+                                val nombreArchivo = "${vehiculoActual?.VIN}_Paso_4_Foto_${posicion}.jpg"
+
+                                // ✅ CONVERTIR IMAGEN A BASE64
+                                fotoBase64 = bllUtil?.convertirImagenABase64(archivoFoto)
+
+                                // ✅ VALIDAR SI DEBE GUARDAR EN API O EN BASE DE DATOS
+                                if (ParametrosSistema.cfgApp != null &&
+                                    ParametrosSistema.cfgApp!!.ManejaGuardadoArchivosEnBD == false) {
+                                    // Subir a API Web
+                                    val urlBase = ParametrosSistema.cfgApp!!.UrlGuardadoArchivos + '/' +
+                                            ParametrosSistema.cfgApp!!.UrlAPIControllerGuardadoArchivos
+
+                                    val resultadoSubida = ApiUploadUtil.subirFoto(
+                                        urlBase = urlBase,
+                                        nombreArchivo = nombreArchivo,
+                                        file = archivoFoto,
+                                        vin = vehiculoActual!!.VIN,
+                                        paso = 4,
+                                        numeroFoto = posicion.toInt()
+                                    )
+
+                                    // Si la subida fue exitosa, NO guardar en BD (setear fotoBase64 a null)
+                                    if (resultadoSubida.first) {
+                                        fotoBase64 = null
+                                        Log.d("Paso4LLANTAS", "✅ Foto llanta $posicion subida a API exitosamente")
+                                    } else {
+                                        Log.e("Paso4LLANTAS", "❌ Error subiendo foto llanta $posicion a API: ${resultadoSubida.second}")
+                                    }
+                                }
+                            }
+
+                            val resultado = dalVehiculo.insertarFotoPaso4(
+                                idPaso4LogVehiculo = idPaso4LogVehiculo,
+                                idUsuarioNubeAlta = idUsuarioNubeAlta,
+                                posicion = posicion,
+                                verificada = verificada,
+                                fotoBase64 = fotoBase64,
+                                nombreArchivo = ""
+                            )
+                            if (!resultado) exitoso = false
+                        }
+                    }
+
+
+
+
                 }
 
                 ocultarCarga()
@@ -560,9 +966,17 @@ class Paso4Llantas_Activity : AppCompatActivity() {
                         "✅ Verificación de llantas guardada exitosamente",
                         Toast.LENGTH_LONG).show()
 
+                    // <CHANGE> Actualizar estado del vehículo después de guardar
+                    if (fotoEvidenciaCapturada) {
+                        vehiculoActual?.TieneFoto1 = true
+                    }
+
+                    // <CHANGE> Reconfigurar botón para modo VER
+                    configurarBotonEvidenciaSegunFoto()
+
                     // Limpiar fotos capturadas después de guardar exitosamente
                     limpiarControles()
-                } else {
+                }else {
                     Toast.makeText(this@Paso4Llantas_Activity,
                         "❌ Error guardando verificación",
                         Toast.LENGTH_LONG).show()
@@ -576,8 +990,7 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         }
     }
 
-    private fun limpiarControles()
-    {
+    private fun limpiarControles() {
         fotosCapturadas.clear()
         estadoCaptura.clear()
 
@@ -586,6 +999,10 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         cbLlanta2.isChecked=false
         cbLlanta3.isChecked=false
         cbLlanta4.isChecked=false
+        // <CHANGE> Limpiar foto de evidencia
+        fotoEvidenciaCapturada = false
+        archivoFotoEvidencia = null
+        tvEstadoEvidenciaPaso4.text = "❌"
 
         etVIN.setText("")
         etVIN.requestFocus()
@@ -675,7 +1092,7 @@ class Paso4Llantas_Activity : AppCompatActivity() {
         return try {
             val bitmap = BitmapFactory.decodeFile(archivoOriginal.absolutePath)
 
-            val maxSize = 3072
+            val maxSize = 1800
             var ratio: Float = 1.0F
             if (bitmap.width > bitmap.height)
                 ratio = maxSize.toFloat() / bitmap.width

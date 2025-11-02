@@ -581,7 +581,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
             val bitmap = BitmapFactory.decodeFile(archivoOriginal.absolutePath)
 
             // Calcular nuevo tamaño manteniendo proporción (máximo 2048px)
-            val maxSize = 3072
+            val maxSize = 1800
 //            val maxSize = 2048
 //            val ratio = minOf(maxSize.toFloat() / bitmap.width, maxSize.toFloat() / bitmap.height)
             var ratio: Float = 1.0F
@@ -641,7 +641,7 @@ class Paso1SOC_Activity : AppCompatActivity() {
             }
 
             var tamanoFisicoArchivo: Long = archivoLocal.length()
-            var tamanoFisicoMaxArchivo: Long = (2.2 * 1024 * 1024).toLong()
+            var tamanoFisicoMaxArchivo: Long = (1.8 * 1024 * 1024).toLong()
             val archivoFinal = if (tamanoFisicoArchivo > tamanoFisicoMaxArchivo) {
                 Log.d("Paso1SOC", "📦 Comprimiendo imagen de ${archivoLocal.length()} bytes")
                 comprimirImagen(archivoLocal)

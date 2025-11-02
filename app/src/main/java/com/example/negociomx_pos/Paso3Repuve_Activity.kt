@@ -312,7 +312,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
                 return
             }
 
-            val archivoFinal = if (archivoLocal.length() > 2.2 * 1024 * 1024) {
+            val archivoFinal = if (archivoLocal.length() > 1.8 * 1024 * 1024) {
                 Log.d("Paso3REPUVE", "📦 Comprimiendo imagen de ${archivoLocal.length()} bytes")
                 comprimirImagen(archivoLocal)
             } else {
@@ -337,31 +337,6 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         }
     }
 
-  /*  private fun verFotoExistente() {
-        val vehiculo = vehiculoActual
-        if (vehiculo == null) {
-            Toast.makeText(this, "Error: No hay vehículo seleccionado", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        lifecycleScope.launch {
-            try {
-                Toast.makeText(this@Paso3Repuve_Activity, "Cargando foto...", Toast.LENGTH_SHORT).show()
-
-                val fotoBase64 = dalVehiculo.obtenerFotoBase64Paso3(vehiculo.Id.toInt())
-
-                if (fotoBase64 != null && fotoBase64.isNotEmpty()) {
-                    mostrarDialogoFoto(fotoBase64)
-                } else {
-                    Toast.makeText(this@Paso3Repuve_Activity, "No se pudo cargar la foto", Toast.LENGTH_SHORT).show()
-                }
-
-            } catch (e: Exception) {
-                Log.e("Paso3REPUVE", "Error cargando foto: ${e.message}")
-                Toast.makeText(this@Paso3Repuve_Activity, "Error cargando foto: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }*/
 
 
     private fun verFotoExistente() {
@@ -703,7 +678,7 @@ class Paso3Repuve_Activity : AppCompatActivity() {
         return try {
             val bitmap = BitmapFactory.decodeFile(archivoOriginal.absolutePath)
 
-            val maxSize = 3072
+            val maxSize = 1800
             var ratio: Float = 1.0F
             if (bitmap.width > bitmap.height)
                 ratio = maxSize.toFloat() / bitmap.width
